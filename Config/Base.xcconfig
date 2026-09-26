@@ -1,0 +1,52 @@
+// Base.xcconfig
+// Krasip
+// Build settings for the Krasip app target, shared by Debug and Release.
+
+// --- Identity ---
+PRODUCT_NAME = Krasip
+PRODUCT_BUNDLE_IDENTIFIER = com.boopannachai.Krasip
+MARKETING_VERSION = 0.1.0
+CURRENT_PROJECT_VERSION = 1
+
+// --- Platform ---
+// The spec targets macOS 14+. Newer APIs (on-device Thai recognition, Liquid Glass) are
+// used behind availability checks.
+SDKROOT = macosx
+SUPPORTED_PLATFORMS = macosx
+MACOSX_DEPLOYMENT_TARGET = 14.0
+
+// --- Swift ---
+SWIFT_VERSION = 6.0
+SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor
+SWIFT_APPROACHABLE_CONCURRENCY = YES
+SWIFT_EMIT_LOC_STRINGS = YES
+
+// --- Signing ---
+// Signing with the same Apple Development certificate every build keeps the Accessibility
+// and Microphone permissions granted between builds.
+DEVELOPMENT_TEAM = 45C3927649
+CODE_SIGN_STYLE = Automatic
+CODE_SIGN_ENTITLEMENTS = Config/Krasip.entitlements
+ENABLE_HARDENED_RUNTIME = YES
+
+// No App Sandbox: typing into other apps needs the Accessibility API, which the sandbox blocks.
+ENABLE_APP_SANDBOX = NO
+
+// --- Info.plist ---
+// Standard keys are generated from INFOPLIST_KEY_* settings; Config/Info.plist adds the rest.
+GENERATE_INFOPLIST_FILE = YES
+INFOPLIST_FILE = Config/Info.plist
+INFOPLIST_KEY_CFBundleDisplayName = Krasip
+INFOPLIST_KEY_LSApplicationCategoryType = public.app-category.productivity
+INFOPLIST_KEY_NSHumanReadableCopyright = Made for Thai speakers who mix in English.
+// Menu bar utility: no Dock icon until a window is open.
+INFOPLIST_KEY_LSUIElement = YES
+INFOPLIST_KEY_NSMicrophoneUsageDescription = Krasip listens only while you hold the dictation shortcut, then turns your speech into text.
+INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = Krasip uses Apple speech recognition to turn your Thai and English speech into text.
+
+// --- Assets ---
+ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon
+ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor
+COMBINE_HIDPI_IMAGES = YES
+LD_RUNPATH_SEARCH_PATHS = @executable_path/../Frameworks
+ENABLE_PREVIEWS = YES

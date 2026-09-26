@@ -1,0 +1,149 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "Add your API key in Krasip Settings → Languages.": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ใส่ API key ของคุณที่ การตั้งค่า Krasip → ภาษา"
+          }
+        }
+      }
+    },
+    "Could not reach the speech service: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ติดต่อบริการถอดเสียงไม่ได้: %@"
+          }
+        }
+      }
+    },
+    "No microphone was found.": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ไม่พบไมโครโฟน"
+          }
+        }
+      }
+    },
+    "No speech was detected.": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ไม่พบเสียงพูด"
+          }
+        }
+      }
+    },
+    "Nothing is being recorded.": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ตอนนี้ไม่ได้กำลังอัดเสียงอยู่"
+          }
+        }
+      }
+    },
+    "Speech recognition is not allowed. Turn it on in System Settings → Privacy & Security → Speech Recognition.": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ยังไม่ได้อนุญาตให้ใช้การรู้จำเสียงพูด เปิดได้ที่ การตั้งค่าระบบ → ความเป็นส่วนตัวและความปลอดภัย → การรู้จำเสียงพูด"
+          }
+        }
+      }
+    },
+    "Speech recognition is unavailable: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ใช้การรู้จำเสียงพูดไม่ได้: %@"
+          }
+        }
+      }
+    },
+    "The API key was rejected. Check it in Krasip Settings → Languages.": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "API key ถูกปฏิเสธ ตรวจสอบที่ การตั้งค่า Krasip → ภาษา"
+          }
+        }
+      }
+    },
+    "The microphone stopped unexpectedly: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ไมโครโฟนหยุดทำงานกะทันหัน: %@"
+          }
+        }
+      }
+    },
+    "The speech service is busy or your quota is used up. Try again in a moment.": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "บริการถอดเสียงกำลังยุ่งหรือโควต้าหมดแล้ว ลองใหม่อีกสักครู่"
+          }
+        }
+      }
+    },
+    "The speech service returned an error (%@): %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "บริการถอดเสียงตอบกลับข้อผิดพลาด (%@): %@"
+          }
+        }
+      }
+    },
+    "Transcription took too long.": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ถอดเสียงนานเกินไป"
+          }
+        }
+      }
+    },
+    "Krasip can't use the microphone. Allow it in System Settings → Privacy & Security → Microphone.": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Krasip ใช้ไมโครโฟนไม่ได้ อนุญาตได้ที่ การตั้งค่าระบบ → ความเป็นส่วนตัวและความปลอดภัย → ไมโครโฟน"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

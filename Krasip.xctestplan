@@ -1,0 +1,38 @@
+{
+  "configurations" : [
+    {
+      "id" : "6C0F2D8E-1B7A-4C1E-9F43-0A1B2C3D4E5F",
+      "name" : "Default",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Packages\/KrasipKit",
+        "identifier" : "KrasipCoreTests",
+        "name" : "KrasipCoreTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Packages\/KrasipKit",
+        "identifier" : "KrasipStorageTests",
+        "name" : "KrasipStorageTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Packages\/KrasipKit",
+        "identifier" : "KrasipSystemTests",
+        "name" : "KrasipSystemTests"
+      }
+    }
+  ],
+  "version" : 1
+}

@@ -1,0 +1,24 @@
+# .gitignore
+# Krasip
+# Build products, per-user Xcode state, and local tooling.
+
+# Xcode
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Packages/KrasipKit/.build/
+Packages/KrasipKit/.swiftpm/
+
+# macOS
+.DS_Store
+
+# Local agent tooling
+.claude/
+
+# Coverage data from instrumented runs
+*.profraw

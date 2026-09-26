@@ -1,0 +1,503 @@
+{
+  "name": "Krasip Thai-English benchmark",
+  "version": 1,
+  "glossary": [
+    {
+      "id": "8B0E6D7A-4C1F-4B7E-9E0B-5D2C7A1F3E01",
+      "aliases": [
+        "side project",
+        "ไซต์โปรเจกต์",
+        "ไซด์โปรเจกต์"
+      ],
+      "preferredOutput": "side-project",
+      "mode": "locked",
+      "createdAt": "2026-09-22T00:00:00Z"
+    }
+  ],
+  "items": [
+    {
+      "id": "A01",
+      "category": "acceptance",
+      "script": "วันนี้จะต้องกลับบ้านไปทำ side project",
+      "expected": "วันนี้จะต้องกลับบ้านไปทำ side-project",
+      "keyTerms": [
+        "side-project"
+      ],
+      "note": "Primary success case. Needs the side-project glossary entry."
+    },
+    {
+      "id": "A02",
+      "category": "acceptance",
+      "script": "เดี๋ยว push code ขึ้น GitHub",
+      "expected": "เดี๋ยว push code ขึ้น GitHub",
+      "keyTerms": [
+        "push",
+        "code",
+        "GitHub"
+      ]
+    },
+    {
+      "id": "A03",
+      "category": "acceptance",
+      "script": "นัดกับพี่แบงก์ตอน ten AM",
+      "expected": "นัดกับพี่แบงก์ตอน 10 AM",
+      "keyTerms": [
+        "พี่แบงก์",
+        "10 AM"
+      ],
+      "note": "Say the time in English: ten AM."
+    },
+    {
+      "id": "A04",
+      "category": "acceptance",
+      "script": "ส่ง pull request ให้ทีม",
+      "expected": "ส่ง pull request ให้ทีม",
+      "keyTerms": [
+        "pull request"
+      ]
+    },
+    {
+      "id": "A05",
+      "category": "acceptance",
+      "script": "ทำ side project",
+      "expected": "ทำ side-project",
+      "keyTerms": [
+        "side-project"
+      ],
+      "note": "If the recognizer writes ไซต์โปรเจกต์, the glossary alias fixes it."
+    },
+    {
+      "id": "T01",
+      "category": "plainThai",
+      "script": "สวัสดีครับ วันนี้อากาศดีมาก",
+      "expected": "สวัสดีครับ วันนี้อากาศดีมาก",
+      "keyTerms": []
+    },
+    {
+      "id": "T02",
+      "category": "plainThai",
+      "script": "เดี๋ยวเย็นนี้แวะซื้อกับข้าวที่ตลาดก่อนกลับบ้าน",
+      "expected": "เดี๋ยวเย็นนี้แวะซื้อกับข้าวที่ตลาดก่อนกลับบ้าน",
+      "keyTerms": []
+    },
+    {
+      "id": "T03",
+      "category": "plainThai",
+      "script": "ขอบคุณมากนะคะ ไว้เจอกันพรุ่งนี้",
+      "expected": "ขอบคุณมากนะคะ ไว้เจอกันพรุ่งนี้",
+      "keyTerms": []
+    },
+    {
+      "id": "T04",
+      "category": "plainThai",
+      "script": "ช่วยส่งเอกสารให้ผมภายในวันศุกร์ได้ไหมครับ",
+      "expected": "ช่วยส่งเอกสารให้ผมภายในวันศุกร์ได้ไหมครับ",
+      "keyTerms": []
+    },
+    {
+      "id": "T05",
+      "category": "plainThai",
+      "script": "ตอนนี้กำลังเดินทางไปประชุม น่าจะถึงช้ากว่าเดิมนิดหน่อย",
+      "expected": "ตอนนี้กำลังเดินทางไปประชุม น่าจะถึงช้ากว่าเดิมนิดหน่อย",
+      "keyTerms": []
+    },
+    {
+      "id": "T06",
+      "category": "plainThai",
+      "script": "ฝากบอกทุกคนว่าพรุ่งนี้หยุดหนึ่งวัน",
+      "expected": "ฝากบอกทุกคนว่าพรุ่งนี้หยุดหนึ่งวัน",
+      "keyTerms": []
+    },
+    {
+      "id": "T07",
+      "category": "plainThai",
+      "script": "อย่าลืมกินข้าวกลางวันด้วยนะ",
+      "expected": "อย่าลืมกินข้าวกลางวันด้วยนะ",
+      "keyTerms": []
+    },
+    {
+      "id": "T08",
+      "category": "plainThai",
+      "script": "คืนนี้ฝนน่าจะตกหนัก ขับรถระวังด้วย",
+      "expected": "คืนนี้ฝนน่าจะตกหนัก ขับรถระวังด้วย",
+      "keyTerms": []
+    },
+    {
+      "id": "W01",
+      "category": "workTerms",
+      "script": "ช่วย review code ใน branch นี้ให้หน่อย",
+      "expected": "ช่วย review code ใน branch นี้ให้หน่อย",
+      "keyTerms": [
+        "review",
+        "code",
+        "branch"
+      ]
+    },
+    {
+      "id": "W02",
+      "category": "workTerms",
+      "script": "เดี๋ยวผม merge PR นี้หลังจาก test ผ่าน",
+      "expected": "เดี๋ยวผม merge PR นี้หลังจาก test ผ่าน",
+      "keyTerms": [
+        "merge",
+        "PR",
+        "test"
+      ]
+    },
+    {
+      "id": "W03",
+      "category": "workTerms",
+      "script": "deadline ของ feature นี้คือวันศุกร์",
+      "expected": "deadline ของ feature นี้คือวันศุกร์",
+      "keyTerms": [
+        "deadline",
+        "feature"
+      ]
+    },
+    {
+      "id": "W04",
+      "category": "workTerms",
+      "script": "พรุ่งนี้มี meeting กับลูกค้าเรื่อง requirement ใหม่",
+      "expected": "พรุ่งนี้มี meeting กับลูกค้าเรื่อง requirement ใหม่",
+      "keyTerms": [
+        "meeting",
+        "requirement"
+      ]
+    },
+    {
+      "id": "W05",
+      "category": "workTerms",
+      "script": "ตอนนี้ server ล่ม ต้อง restart ด่วน",
+      "expected": "ตอนนี้ server ล่ม ต้อง restart ด่วน",
+      "keyTerms": [
+        "server",
+        "restart"
+      ]
+    },
+    {
+      "id": "W06",
+      "category": "workTerms",
+      "script": "อัปเดต status ใน Jira ให้ด้วยนะ",
+      "expected": "อัปเดต status ใน Jira ให้ด้วยนะ",
+      "keyTerms": [
+        "status",
+        "Jira"
+      ]
+    },
+    {
+      "id": "W07",
+      "category": "workTerms",
+      "script": "ขอ feedback เรื่อง design ของหน้า login หน่อย",
+      "expected": "ขอ feedback เรื่อง design ของหน้า login หน่อย",
+      "keyTerms": [
+        "feedback",
+        "design",
+        "login"
+      ]
+    },
+    {
+      "id": "W08",
+      "category": "workTerms",
+      "script": "เดี๋ยว deploy ขึ้น production ตอนเย็น",
+      "expected": "เดี๋ยว deploy ขึ้น production ตอนเย็น",
+      "keyTerms": [
+        "deploy",
+        "production"
+      ]
+    },
+    {
+      "id": "W09",
+      "category": "workTerms",
+      "script": "bug นี้เกิดเฉพาะบน iOS เวอร์ชันเก่า",
+      "expected": "bug นี้เกิดเฉพาะบน iOS เวอร์ชันเก่า",
+      "keyTerms": [
+        "bug",
+        "iOS"
+      ]
+    },
+    {
+      "id": "W10",
+      "category": "workTerms",
+      "script": "ช่วยเขียน unit test เพิ่มอีกสองเคส",
+      "expected": "ช่วยเขียน unit test เพิ่มอีกสองเคส",
+      "keyTerms": [
+        "unit test"
+      ]
+    },
+    {
+      "id": "W11",
+      "category": "workTerms",
+      "script": "sprint planning เลื่อนไปวันจันทร์",
+      "expected": "sprint planning เลื่อนไปวันจันทร์",
+      "keyTerms": [
+        "sprint planning"
+      ]
+    },
+    {
+      "id": "W12",
+      "category": "workTerms",
+      "script": "ต้อง refactor function นี้ก่อน release",
+      "expected": "ต้อง refactor function นี้ก่อน release",
+      "keyTerms": [
+        "refactor",
+        "function",
+        "release"
+      ]
+    },
+    {
+      "id": "W13",
+      "category": "workTerms",
+      "script": "แชร์ screen ให้ดูหน่อยได้ไหม",
+      "expected": "แชร์ screen ให้ดูหน่อยได้ไหม",
+      "keyTerms": [
+        "screen"
+      ]
+    },
+    {
+      "id": "W14",
+      "category": "workTerms",
+      "script": "ส่ง invoice ให้ลูกค้าทาง email แล้ว",
+      "expected": "ส่ง invoice ให้ลูกค้าทาง email แล้ว",
+      "keyTerms": [
+        "invoice",
+        "email"
+      ]
+    },
+    {
+      "id": "N01",
+      "category": "names",
+      "script": "เปิด Figma แล้วส่ง link ให้พี่มายด์",
+      "expected": "เปิด Figma แล้วส่ง link ให้พี่มายด์",
+      "keyTerms": [
+        "Figma",
+        "link",
+        "พี่มายด์"
+      ]
+    },
+    {
+      "id": "N02",
+      "category": "names",
+      "script": "ลอง ChatGPT กับ Claude ดูว่าตัวไหนตอบดีกว่า",
+      "expected": "ลอง ChatGPT กับ Claude ดูว่าตัวไหนตอบดีกว่า",
+      "keyTerms": [
+        "ChatGPT",
+        "Claude"
+      ]
+    },
+    {
+      "id": "N03",
+      "category": "names",
+      "script": "คุณสมชายจะเข้าร่วม Zoom call ตอนบ่าย",
+      "expected": "คุณสมชายจะเข้าร่วม Zoom call ตอนบ่าย",
+      "keyTerms": [
+        "คุณสมชาย",
+        "Zoom",
+        "call"
+      ]
+    },
+    {
+      "id": "N04",
+      "category": "names",
+      "script": "แจ้งทีมใน Slack channel general ด้วย",
+      "expected": "แจ้งทีมใน Slack channel general ด้วย",
+      "keyTerms": [
+        "Slack",
+        "channel",
+        "general"
+      ]
+    },
+    {
+      "id": "N05",
+      "category": "names",
+      "script": "ซื้อ MacBook Pro เครื่องใหม่ให้น้องเจ",
+      "expected": "ซื้อ MacBook Pro เครื่องใหม่ให้น้องเจ",
+      "keyTerms": [
+        "MacBook Pro",
+        "น้องเจ"
+      ]
+    },
+    {
+      "id": "N06",
+      "category": "names",
+      "script": "นัดทาน lunch กับ Sarah ที่ Siam Paragon",
+      "expected": "นัดทาน lunch กับ Sarah ที่ Siam Paragon",
+      "keyTerms": [
+        "lunch",
+        "Sarah",
+        "Siam Paragon"
+      ]
+    },
+    {
+      "id": "N07",
+      "category": "names",
+      "script": "ส่งไฟล์ผ่าน Google Drive ให้ทีม marketing",
+      "expected": "ส่งไฟล์ผ่าน Google Drive ให้ทีม marketing",
+      "keyTerms": [
+        "Google Drive",
+        "marketing"
+      ]
+    },
+    {
+      "id": "N08",
+      "category": "names",
+      "script": "Notion ของทีมอัปเดตแล้วนะ",
+      "expected": "Notion ของทีมอัปเดตแล้วนะ",
+      "keyTerms": [
+        "Notion"
+      ]
+    },
+    {
+      "id": "D01",
+      "category": "numbers",
+      "script": "ประชุมเริ่ม nine thirty AM",
+      "expected": "ประชุมเริ่ม 9:30 AM",
+      "keyTerms": [
+        "9:30 AM"
+      ],
+      "note": "Say the time in English: nine thirty AM."
+    },
+    {
+      "id": "D02",
+      "category": "numbers",
+      "script": "ส่งงานก่อน five PM วันนี้",
+      "expected": "ส่งงานก่อน 5 PM วันนี้",
+      "keyTerms": [
+        "5 PM"
+      ],
+      "note": "Say the time in English: five PM."
+    },
+    {
+      "id": "D03",
+      "category": "numbers",
+      "script": "ราคา 2,500 บาท รวม VAT แล้ว",
+      "expected": "ราคา 2,500 บาท รวม VAT แล้ว",
+      "keyTerms": [
+        "2,500",
+        "VAT"
+      ],
+      "note": "Read the price in Thai: สองพันห้าร้อยบาท."
+    },
+    {
+      "id": "D04",
+      "category": "numbers",
+      "script": "นัดวันที่ 15 มีนาคม",
+      "expected": "นัดวันที่ 15 มีนาคม",
+      "keyTerms": [
+        "15"
+      ],
+      "note": "Read the date in Thai: สิบห้า."
+    },
+    {
+      "id": "D05",
+      "category": "numbers",
+      "script": "โอนเงิน 300 บาท ให้แล้วนะ",
+      "expected": "โอนเงิน 300 บาท ให้แล้วนะ",
+      "keyTerms": [
+        "300"
+      ],
+      "note": "Read the amount in Thai: สามร้อย."
+    },
+    {
+      "id": "D06",
+      "category": "numbers",
+      "script": "ยอดขายเพิ่มขึ้น 20% จากเดือนที่แล้ว",
+      "expected": "ยอดขายเพิ่มขึ้น 20% จากเดือนที่แล้ว",
+      "keyTerms": [
+        "20%"
+      ],
+      "note": "Read it in Thai: ยี่สิบเปอร์เซ็นต์."
+    },
+    {
+      "id": "D07",
+      "category": "numbers",
+      "script": "เจอกันพรุ่งนี้ seven o'clock",
+      "expected": "เจอกันพรุ่งนี้ 7 o'clock",
+      "keyTerms": [
+        "7 o'clock"
+      ],
+      "note": "Say the time in English: seven o'clock."
+    },
+    {
+      "id": "D08",
+      "category": "numbers",
+      "script": "ปี 2026 เราจะขยายทีมเป็น 12 คน",
+      "expected": "ปี 2026 เราจะขยายทีมเป็น 12 คน",
+      "keyTerms": [
+        "2026",
+        "12"
+      ],
+      "note": "Read the numbers in Thai."
+    },
+    {
+      "id": "C01",
+      "category": "technical",
+      "script": "เข้าไปดูที่ github.com นะ",
+      "expected": "เข้าไปดูที่ github.com นะ",
+      "keyTerms": [
+        "github.com"
+      ],
+      "note": "Say: github dot com."
+    },
+    {
+      "id": "C02",
+      "category": "technical",
+      "script": "ส่งอีเมลไปที่ hello@example.com ได้เลย",
+      "expected": "ส่งอีเมลไปที่ hello@example.com ได้เลย",
+      "keyTerms": [
+        "hello@example.com"
+      ],
+      "note": "Say: hello at example dot com."
+    },
+    {
+      "id": "C03",
+      "category": "technical",
+      "script": "แก้ไฟล์ config.json แล้ว commit",
+      "expected": "แก้ไฟล์ config.json แล้ว commit",
+      "keyTerms": [
+        "config.json",
+        "commit"
+      ],
+      "note": "Say: config dot json."
+    },
+    {
+      "id": "C04",
+      "category": "technical",
+      "script": "เรียก function fetchUser() ก่อน render",
+      "expected": "เรียก function fetchUser() ก่อน render",
+      "keyTerms": [
+        "fetchUser()",
+        "render"
+      ]
+    },
+    {
+      "id": "C05",
+      "category": "technical",
+      "script": "รัน npm install แล้วค่อย npm run build",
+      "expected": "รัน npm install แล้วค่อย npm run build",
+      "keyTerms": [
+        "npm install",
+        "npm run build"
+      ]
+    },
+    {
+      "id": "C06",
+      "category": "technical",
+      "script": "เปิด https://krasip.app/docs ดูวิธีใช้",
+      "expected": "เปิด https://krasip.app/docs ดูวิธีใช้",
+      "keyTerms": [
+        "https://krasip.app/docs"
+      ]
+    },
+    {
+      "id": "C07",
+      "category": "technical",
+      "script": "ตัวแปร user_id ต้องเป็น string",
+      "expected": "ตัวแปร user_id ต้องเป็น string",
+      "keyTerms": [
+        "user_id",
+        "string"
+      ],
+      "note": "Say: user underscore id."
+    }
+  ]
+}

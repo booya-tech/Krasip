@@ -1,0 +1,28 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "Another app already uses this shortcut. Choose a different one.": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "มีแอปอื่นใช้คีย์ลัดนี้อยู่แล้ว เลือกปุ่มอื่น"
+          }
+        }
+      }
+    },
+    "The shortcut could not be registered (%@).": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ลงทะเบียนคีย์ลัดไม่สำเร็จ (%@)"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}
