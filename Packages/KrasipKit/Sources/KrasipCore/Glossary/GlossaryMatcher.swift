@@ -43,8 +43,8 @@ struct GlossaryMatcher {
 
         struct Hit {
             let candidate: Candidate
-            let start: Int
-            let end: Int
+            let span: Range<Int>
+            let range: Range<String.Index>
         }
 
         var hits: [Hit] = []
@@ -55,8 +55,9 @@ struct GlossaryMatcher {
             while start + key.count <= keys.count {
                 if keys[start] == first, keys[start..<(start + key.count)].elementsEqual(key) {
                     let end = start + key.count
-                    if isAcceptable(start: start, end: end, in: matchText) {
-                        hits.append(Hit(candidate: candidate, start: start, end: end))
+                    let range = matchText.origins[start].lowerBound..<matchText.origins[end - 1].upperBound
+                    if MatchBoundary.isAcceptable(range, in: text) {
+                        hits.append(Hit(candidate: candidate, span: start..<end, range: range))
                     }
                 }
                 start += 1
@@ -70,38 +71,26 @@ struct GlossaryMatcher {
             if lhs.candidate.entry.mode != rhs.candidate.entry.mode {
                 return lhs.candidate.entry.mode == .locked
             }
-            return lhs.start < rhs.start
+            return lhs.span.lowerBound < rhs.span.lowerBound
         }
 
-        var taken: [Range<Int>] = []
         var accepted: [Hit] = []
-        for hit in hits {
-            let span = hit.start..<hit.end
-            guard !taken.contains(where: { $0.overlaps(span) }) else { continue }
-            taken.append(span)
+        for hit in hits where !accepted.contains(where: { $0.span.overlaps(hit.span) }) {
             accepted.append(hit)
         }
 
         return accepted
-            .sorted { $0.start < $1.start }
+            .sorted { $0.span.lowerBound < $1.span.lowerBound }
             .map { hit in
-                let range = matchText.origins[hit.start].lowerBound..<matchText.origins[hit.end - 1].upperBound
-                return Replacement(
+                Replacement(
                     entryID: hit.candidate.entry.id,
-                    range: range,
-                    matchedText: String(text[range]),
+                    range: hit.range,
+                    matchedText: String(text[hit.range]),
                     alias: hit.candidate.alias,
                     output: hit.candidate.entry.preferredOutput,
                     mode: hit.candidate.entry.mode
                 )
             }
-    }
-
-    private func isAcceptable(start: Int, end: Int, in matchText: MatchText) -> Bool {
-        MatchBoundary.isAcceptable(
-            matchText.origins[start].lowerBound..<matchText.origins[end - 1].upperBound,
-            in: matchText.source
-        )
     }
 }
 

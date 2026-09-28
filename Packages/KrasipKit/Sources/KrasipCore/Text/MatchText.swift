@@ -12,12 +12,10 @@ import Foundation
 /// whitespace collapsed. Whitespace next to Thai text is ignored, because speech
 /// recognizers split Thai words with spaces inconsistently.
 struct MatchText {
-    let source: String
     let keys: [Unicode.Scalar]
     let origins: [Range<String.Index>]
 
     init(_ source: String) {
-        self.source = source
         var builder = Builder(recordOrigins: true)
         builder.consume(source)
         keys = builder.keys

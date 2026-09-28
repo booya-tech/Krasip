@@ -42,17 +42,15 @@ public enum WordSegmenter {
         var index = 0
 
         while index < characters.count {
-            let character = characters[index]
-            switch character.scriptClass {
+            let scriptClass = characters[index].scriptClass
+            switch scriptClass {
             case .whitespace:
-                var end = index + 1
-                while end < characters.count, characters[end].scriptClass == .whitespace { end += 1 }
+                let end = runEnd(of: scriptClass, from: index, in: characters)
                 pieces.append(Piece(range: index..<end, isWord: false))
                 index = end
 
             case .thai:
-                var end = index + 1
-                while end < characters.count, characters[end].scriptClass == .thai { end += 1 }
+                let end = runEnd(of: scriptClass, from: index, in: characters)
                 pieces.append(contentsOf: thaiWords(characters, in: index..<end))
                 index = end
 
@@ -79,6 +77,12 @@ public enum WordSegmenter {
             }
         }
         return pieces
+    }
+
+    private static func runEnd(of scriptClass: ScriptClass, from start: Int, in characters: [Character]) -> Int {
+        var end = start + 1
+        while end < characters.count, characters[end].scriptClass == scriptClass { end += 1 }
+        return end
     }
 
     private static func isConnector(_ character: Character) -> Bool {

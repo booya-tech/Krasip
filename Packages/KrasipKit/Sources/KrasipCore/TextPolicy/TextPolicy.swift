@@ -108,13 +108,7 @@ public struct TextPolicy: Sendable {
     // MARK: - 2. Structured spans
 
     private func protectStructured(_ segments: [TextSegment]) -> [TextSegment] {
-        segments.flatMap { segment -> [TextSegment] in
-            guard isOpenTranscript(segment) else { return [segment] }
-            let pieces = ProtectedSpans.structured(in: segment.text).map { span in
-                (span.range, TextSegment(text: String(segment.text[span.range]), origin: .transcript, protection: span.protection))
-            }
-            return split(segment, pieces)
-        }
+        protect(segments, spans: ProtectedSpans.structured(in:))
     }
 
     // MARK: - 3. Glossary
@@ -135,23 +129,15 @@ public struct TextPolicy: Sendable {
         }
         let matcher = GlossaryMatcher(entries: active)
 
-        return segments.flatMap { segment -> [TextSegment] in
-            guard isOpenTranscript(segment) else { return [segment] }
+        return replaceInOpenTranscript(segments) { segment in
             var pieces: [(Range<String.Index>, TextSegment)] = []
             for match in matcher.matches(in: segment.text) {
                 switch match.mode {
                 case .locked:
                     if match.matchedText != match.output {
-                        log.add(
-                            .glossary,
-                            before: match.matchedText,
-                            after: match.output,
-                            entryID: match.entryID,
-                            key: "glossary:\(match.entryID.uuidString)"
-                        )
+                        log.addGlossary(match)
                     }
-                    let output = TextSegment(text: match.output, origin: .glossary(match.entryID), protection: .glossaryOutput)
-                    pieces.append((match.range, output))
+                    pieces.append((match.range, lockedOutput(match)))
                 case .suggest:
                     let pending = TextSegment(text: match.matchedText, origin: .transcript, suggestionEntryID: match.entryID)
                     pieces.append((match.range, pending))
@@ -159,7 +145,7 @@ public struct TextPolicy: Sendable {
                     continue
                 }
             }
-            return split(segment, pieces)
+            return pieces
         }
     }
 
@@ -179,20 +165,12 @@ public struct TextPolicy: Sendable {
         let matcher = SoundAlikeMatcher(entries: entries)
         guard !matcher.isEmpty else { return segments }
 
-        return segments.flatMap { segment -> [TextSegment] in
-            guard isOpenTranscript(segment) else { return [segment] }
+        return replaceInOpenTranscript(segments) { segment in
             var pieces: [(Range<String.Index>, TextSegment)] = []
             for match in matcher.matches(in: segment.text) {
                 if decisions.acceptedSoundAlikes.contains(match.entryID) {
-                    log.add(
-                        .glossary,
-                        before: match.matchedText,
-                        after: match.output,
-                        entryID: match.entryID,
-                        key: "glossary:\(match.entryID.uuidString)"
-                    )
-                    let output = TextSegment(text: match.output, origin: .glossary(match.entryID), protection: .glossaryOutput)
-                    pieces.append((match.range, output))
+                    log.addGlossary(match)
+                    pieces.append((match.range, lockedOutput(match)))
                 } else if style.suggestSoundAlikes {
                     let pending = TextSegment(
                         text: match.matchedText,
@@ -203,20 +181,18 @@ public struct TextPolicy: Sendable {
                     pieces.append((match.range, pending))
                 }
             }
-            return split(segment, pieces)
+            return pieces
         }
     }
 
     // MARK: - 4. Spoken times
 
     private func applySpokenTimes(_ segments: [TextSegment], log: inout ChangeLog) -> [TextSegment] {
-        segments.flatMap { segment -> [TextSegment] in
-            guard isOpenTranscript(segment) else { return [segment] }
-            let pieces = SpokenTime.matches(in: segment.text).map { match in
+        replaceInOpenTranscript(segments) { segment in
+            SpokenTime.matches(in: segment.text).map { match in
                 log.add(.spokenTime, before: String(segment.text[match.range]), after: match.replacement, key: "spokenTime")
                 return (match.range, TextSegment(text: match.replacement, origin: .spokenTime, protection: .spokenTime))
             }
-            return split(segment, pieces)
         }
     }
     
@@ -234,13 +210,7 @@ public struct TextPolicy: Sendable {
     // MARK: - 5. Words and numbers
 
     private func protectWords(_ segments: [TextSegment]) -> [TextSegment] {
-        segments.flatMap { segment -> [TextSegment] in
-            guard isOpenTranscript(segment) else { return [segment] }
-            let pieces = ProtectedSpans.words(in: segment.text).map { span in
-                (span.range, TextSegment(text: String(segment.text[span.range]), origin: .transcript, protection: span.protection))
-            }
-            return split(segment, pieces)
-        }
+        protect(segments, spans: ProtectedSpans.words(in:))
     }
 
     // MARK: - 6. Thai ↔ Latin spacing
@@ -430,6 +400,28 @@ public struct TextPolicy: Sendable {
         segment.origin == .transcript && !segment.isProtected && segment.suggestionEntryID == nil
     }
 
+    /// Runs `pieces` on each open transcript segment and splits the new segments into it.
+    private func replaceInOpenTranscript(
+        _ segments: [TextSegment],
+        _ pieces: (TextSegment) -> [(Range<String.Index>, TextSegment)]
+    ) -> [TextSegment] {
+        segments.flatMap { segment -> [TextSegment] in
+            isOpenTranscript(segment) ? split(segment, pieces(segment)) : [segment]
+        }
+    }
+
+    private func lockedOutput(_ match: Replacement) -> TextSegment {
+        TextSegment(text: match.output, origin: .glossary(match.entryID), protection: .glossaryOutput)
+    }
+
+    private func protect(_ segments: [TextSegment], spans: (String) -> [ProtectedSpan]) -> [TextSegment] {
+        replaceInOpenTranscript(segments) { segment in
+            spans(segment.text).map { span in
+                (span.range, TextSegment(text: String(segment.text[span.range]), origin: .transcript, protection: span.protection))
+            }
+        }
+    }
+
     /// Replaces the given ranges of `segment` with new segments, keeping the rest as-is.
     private func split(_ segment: TextSegment, _ pieces: [(Range<String.Index>, TextSegment)]) -> [TextSegment] {
         guard !pieces.isEmpty else { return [segment] }
@@ -462,5 +454,9 @@ private struct ChangeLog {
         let occurrence = counters[key, default: 0]
         counters[key] = occurrence + 1
         changes.append(TextChange(id: "\(key)#\(occurrence)", kind: kind, before: before, after: after, entryID: entryID))
+    }
+
+    mutating func addGlossary(_ match: Replacement) {
+        add(.glossary, before: match.matchedText, after: match.output, entryID: match.entryID, key: "glossary:\(match.entryID.uuidString)")
     }
 }

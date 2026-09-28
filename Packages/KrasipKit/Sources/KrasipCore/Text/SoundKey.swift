@@ -9,12 +9,10 @@ import Foundation
 /// consonants that sound alike (ต/ด/ท, ก/ค, ซ/ส…). Used only to *suggest* glossary matches;
 /// the user always confirms them.
 struct SoundKey {
-    let source: String
     let keys: [Character]
     let origins: [Range<String.Index>]
 
     init(_ source: String) {
-        self.source = source
         let built = Self.build(source)
         keys = built.keys
         origins = built.origins
@@ -97,13 +95,8 @@ struct SoundKey {
         if let thai = thaiSounds[scalar.value] {
             return thai.isEmpty ? nil : thai
         }
-        if scalar.isThai || scalar.properties.isWhitespace || scalar.isZeroWidth {
-            return nil
-        }
-        if scalar.isLatinLetter || scalar.isASCIIDigit {
-            return scalar.properties.lowercaseMapping
-        }
-        return nil
+        guard scalar.isLatinLetter || scalar.isASCIIDigit else { return nil }
+        return scalar.properties.lowercaseMapping
     }
 
     /// Consonants grouped by sound, vowels by quality (long and short merged). Tone marks,

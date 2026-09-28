@@ -84,12 +84,7 @@ public struct Glossary: Equatable, Sendable {
 
     /// Whether a saved, locked rule already turns `alias` into `preferredOutput`.
     public func alreadyKnows(_ suggestion: Suggestion) -> Bool {
-        let aliasKey = MatchText.keyString(suggestion.alias)
-        return entries.contains { entry in
-            entry.mode == .locked
-                && entry.preferredOutput == suggestion.preferredOutput
-                && entry.aliases.contains { MatchText.keyString($0) == aliasKey }
-        }
+        entries.contains { $0.mode == .locked && $0.turns(suggestion.alias, into: suggestion.preferredOutput) }
     }
 
     /// Latin spellings the user cares about, offered to speech recognizers as vocabulary hints.
@@ -107,15 +102,19 @@ public struct Glossary: Equatable, Sendable {
     }
 
     private func kind(alias: String, output: String) -> Suggestion.Kind {
-        let aliasKey = MatchText.keyString(alias)
-        if let entry = entries.first(where: { entry in
-            entry.preferredOutput == output && entry.aliases.contains { MatchText.keyString($0) == aliasKey }
-        }) {
+        if let entry = entries.first(where: { $0.turns(alias, into: output) }) {
             return .lockEntry(entryID: entry.id)
         }
         if let entry = entries.first(where: { $0.preferredOutput == output }) {
             return .addAlias(entryID: entry.id)
         }
         return .newEntry
+    }
+}
+
+private extension GlossaryEntry {
+    func turns(_ alias: String, into output: String) -> Bool {
+        let aliasKey = MatchText.keyString(alias)
+        return preferredOutput == output && aliases.contains { MatchText.keyString($0) == aliasKey }
     }
 }

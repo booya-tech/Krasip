@@ -186,12 +186,8 @@ public final class DictationFlow {
     }
 
     public func releaseResult() {
-        switch phase {
-        case .finished, .notice:
-            scheduleDismiss(after: environment.settings().finishedDisplayDuration)
-        default:
-            break
-        }
+        guard isShowingResult else { return }
+        scheduleDismiss(after: environment.settings().finishedDisplayDuration)
     }
 
     /// Remove a learning offer after the user answered it.
@@ -203,11 +199,15 @@ public final class DictationFlow {
 
     public func dismiss() {
         dismissTask?.cancel()
-        switch phase {
-        case .finished, .notice:
+        if isShowingResult {
             phase = .idle
-        default:
-            break
+        }
+    }
+
+    private var isShowingResult: Bool {
+        switch phase {
+        case .finished, .notice: true
+        default: false
         }
     }
 
@@ -285,10 +285,7 @@ public final class DictationFlow {
         guard generation == self.generation else { return }
         switch phase {
         case .listening, .transcribing:
-            self.generation += 1
-            timerTask?.cancel()
-            session = nil
-            showNotice(.microphone(error as? DictationError ?? .engineFailure(error.localizedDescription)))
+            stopForMicrophoneFailure(error)
         default:
             break
         }
@@ -301,13 +298,20 @@ public final class DictationFlow {
             self.elapsed = elapsed
             self.level = level
         case .failed(let error):
-            generation += 1
-            timerTask?.cancel()
-            session = nil
-            showNotice(.microphone(error))
+            stopForMicrophoneFailure(error)
         default:
             break
         }
+    }
+
+    private func stopForMicrophoneFailure(_ error: any Error) {
+        generation += 1
+        timerTask?.cancel()
+        endSession(with: .microphone(Self.dictationError(error)))
+    }
+
+    private static func dictationError(_ error: any Error) -> DictationError {
+        error as? DictationError ?? .engineFailure(error.localizedDescription)
     }
 
     // MARK: - Processing
@@ -323,15 +327,13 @@ public final class DictationFlow {
             environment.feedback(.stoppedListening)
         } catch {
             guard generation == self.generation else { return }
-            self.session = nil
-            showNotice(.microphone(error as? DictationError ?? .engineFailure(error.localizedDescription)))
+            endSession(with: .microphone(Self.dictationError(error)))
             return
         }
         guard generation == self.generation else { return }
 
         guard clip.voicedDuration(threshold: settings.voiceThreshold) >= settings.minimumVoicedDuration else {
-            self.session = nil
-            showNotice(.noSpeech)
+            endSession(with: .noSpeech)
             return
         }
         session.clip = clip
@@ -347,16 +349,14 @@ public final class DictationFlow {
             }
         } catch {
             guard generation == self.generation, !(error is CancellationError) else { return }
-            self.session = nil
             let failure = error as? TranscriptionError
-            showNotice(failure == .noSpeech ? .noSpeech : .transcription(failure ?? .network(error.localizedDescription)))
+            endSession(with: failure == .noSpeech ? .noSpeech : .transcription(failure ?? .network(error.localizedDescription)))
             return
         }
         guard generation == self.generation else { return }
 
         guard !transcript.rawText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            self.session = nil
-            showNotice(.noSpeech)
+            endSession(with: .noSpeech)
             return
         }
         session.transcript = transcript
@@ -392,7 +392,7 @@ public final class DictationFlow {
     }
 
     private func insert(review: FlowPhase.Review, generation: Int) async {
-        guard generation == self.generation, let session, let clip = session.clip else { return }
+        guard generation == self.generation, let session, session.clip != nil else { return }
         let text = review.text
         lastText = text
         phase = .inserting(appName: session.target.appName)
@@ -400,16 +400,7 @@ public final class DictationFlow {
         let result = await environment.insert(text, session.target)
         guard generation == self.generation else { return }
 
-        let settings = environment.settings()
-        var offers: [LearningOffer] = []
-        if settings.saveHistory {
-            let audioPath = settings.keepAudio ? environment.persistAudio(clip, session.id) : nil
-            environment.record(makeRecord(review: review, session: session, result: result, audioPath: audioPath))
-            if let edited = review.editedText, edited != review.finalText.text,
-               let outcome = environment.applyCorrection(session.id, edited) {
-                offers = outcome.offers
-            }
-        }
+        let offers = saveToHistory(review, session: session, result: result)
 
         self.session = nil
         phase = .finished(.init(
@@ -421,19 +412,26 @@ public final class DictationFlow {
             offers: offers
         ))
         environment.feedback(result.succeeded ? .inserted : .copied)
+        let settings = environment.settings()
         let display = result.succeeded && offers.isEmpty ? settings.finishedDisplayDuration : settings.noticeDisplayDuration * 2
         scheduleDismiss(after: display)
     }
 
     /// Text the user did not insert still goes to history, so nothing is ever lost.
     private func recordUnsent(_ review: FlowPhase.Review, result: InsertionResult) {
+        guard let session else { return }
+        saveToHistory(review, session: session, result: result)
+    }
+
+    /// Saves the dictation, and the user's edit as a correction, when history is on. Returns any learning offers.
+    @discardableResult
+    private func saveToHistory(_ review: FlowPhase.Review, session: Session, result: InsertionResult) -> [LearningOffer] {
         let settings = environment.settings()
-        guard settings.saveHistory, let session else { return }
+        guard settings.saveHistory else { return [] }
         let audioPath = settings.keepAudio ? session.clip.flatMap { environment.persistAudio($0, session.id) } : nil
         environment.record(makeRecord(review: review, session: session, result: result, audioPath: audioPath))
-        if let edited = review.editedText, edited != review.finalText.text {
-            _ = environment.applyCorrection(session.id, edited)
-        }
+        guard let edited = review.editedText, edited != review.finalText.text else { return [] }
+        return environment.applyCorrection(session.id, edited)?.offers ?? []
     }
 
     private func makeRecord(review: FlowPhase.Review, session: Session, result: InsertionResult, audioPath: String?) -> DictationRecord {
@@ -470,6 +468,11 @@ public final class DictationFlow {
 
     // MARK: - Notices
 
+    private func endSession(with kind: FlowPhase.Notice.Kind) {
+        session = nil
+        showNotice(kind)
+    }
+
     private func showNotice(_ kind: FlowPhase.Notice.Kind) {
         phase = .notice(.init(kind: kind))
         if kind != .holdLonger {
@@ -484,13 +487,8 @@ public final class DictationFlow {
         let sleep = environment.sleep
         dismissTask = Task { [weak self] in
             await sleep(duration)
-            guard !Task.isCancelled, let self, self.generation == generation else { return }
-            switch self.phase {
-            case .finished, .notice:
-                self.phase = .idle
-            default:
-                break
-            }
+            guard !Task.isCancelled, let self, self.generation == generation, self.isShowingResult else { return }
+            self.phase = .idle
         }
     }
 
