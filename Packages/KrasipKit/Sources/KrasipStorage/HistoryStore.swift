@@ -153,9 +153,8 @@ public final class HistoryStore: Sendable {
         }
         return rows.compactMap { row in
             guard !dismissed.contains(row.key), let correctionID = row.correctionID.flatMap(UUID.init(uuidString:)) else { return nil }
-            let suggestion = glossary.learn(raw: row.alias, corrected: row.output)
-                .map { Suggestion(alias: row.alias, preferredOutput: row.output, kind: $0.kind) }
-                ?? Suggestion(alias: row.alias, preferredOutput: row.output, kind: .newEntry)
+            let kind = glossary.learn(raw: row.alias, corrected: row.output)?.kind ?? .newEntry
+            let suggestion = Suggestion(alias: row.alias, preferredOutput: row.output, kind: kind)
             guard !glossary.alreadyKnows(suggestion) else { return nil }
             return LearningOffer(suggestion: suggestion, occurrences: row.count, correctionID: correctionID)
         }
@@ -177,7 +176,7 @@ public final class HistoryStore: Sendable {
 
     @discardableResult
     public func deleteAll() throws -> [String] {
-        let paths = try audioPaths(where: "1 = 1", [])
+        let paths = try audioPaths()
         try database.transaction {
             try database.run("DELETE FROM dictations")
             try database.run("DELETE FROM dismissed_offers")
@@ -187,7 +186,7 @@ public final class HistoryStore: Sendable {
 
     @discardableResult
     public func deleteOlderThan(_ date: Date) throws -> [String] {
-        let paths = try audioPaths(where: "started_at < ?", [.date(date)])
+        let paths = try audioPaths(startedBefore: date)
         try database.run("DELETE FROM dictations WHERE started_at < ?", [.date(date)])
         return paths
     }
@@ -195,7 +194,7 @@ public final class HistoryStore: Sendable {
     /// Forgets every saved audio path and returns them so the files can be removed.
     @discardableResult
     public func removeAllAudioReferences() throws -> [String] {
-        let paths = try audioPaths(where: "1 = 1", [])
+        let paths = try audioPaths()
         try database.run("UPDATE dictations SET audio_path = NULL")
         return paths
     }
@@ -249,8 +248,9 @@ public final class HistoryStore: Sendable {
         }.first ?? 0
     }
 
-    private func audioPaths(where condition: String, _ values: [Value]) throws -> [String] {
-        try database.query("SELECT audio_path FROM dictations WHERE audio_path IS NOT NULL AND \(condition)", values) {
+    private func audioPaths(startedBefore date: Date? = nil) throws -> [String] {
+        let filter = date == nil ? "" : " AND started_at < ?"
+        return try database.query("SELECT audio_path FROM dictations WHERE audio_path IS NOT NULL\(filter)", date.map { [.date($0)] } ?? []) {
             $0.string(0) ?? ""
         }.filter { !$0.isEmpty }
     }

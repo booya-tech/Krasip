@@ -102,15 +102,7 @@ public final class SQLiteDatabase: @unchecked Sendable {
     }
 
     public func run(_ sql: String, _ values: [Value] = []) throws {
-        try locked {
-            let statement = try prepare(sql, values)
-            defer { sqlite3_finalize(statement) }
-            var code = sqlite3_step(statement)
-            while code == SQLITE_ROW {
-                code = sqlite3_step(statement)
-            }
-            guard code == SQLITE_DONE else { throw lastError(code) }
-        }
+        _ = try query(sql, values) { _ in () }
     }
 
     public func query<T>(_ sql: String, _ values: [Value] = [], map: (Row) throws -> T) throws -> [T] {
