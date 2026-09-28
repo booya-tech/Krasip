@@ -134,16 +134,13 @@ final class BenchmarkModel {
     private var customURL: URL { directory.appending(path: "custom.json") }
 
     private func loadCustomItems() {
-        guard let data = try? Data(contentsOf: customURL) else { return }
-        customItems = (try? JSONDecoder().decode([BenchmarkItem].self, from: data)) ?? []
+        customItems = Self.load([BenchmarkItem].self, from: customURL) ?? []
     }
 
     private func saveCustomItems() {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        if let data = try? encoder.encode(customItems) {
-            try? data.write(to: customURL, options: .atomic)
-        }
+        Self.save(customItems, to: customURL, encoder: encoder)
     }
 
     func summary(for engine: SpeechEngine) -> BenchmarkSummary? {
@@ -364,20 +361,17 @@ final class BenchmarkModel {
     private func scanRecordings() {
         let files = (try? FileManager.default.contentsOfDirectory(atPath: directory.path)) ?? []
         recordedIDs = Set(files.filter { $0.hasSuffix(".m4a") }.map { String($0.dropLast(4)) })
-        if let data = try? Data(contentsOf: syntheticURL), let ids = try? JSONDecoder().decode([String].self, from: data) {
+        if let ids = Self.load([String].self, from: syntheticURL) {
             syntheticIDs = Set(ids).intersection(recordedIDs)
         }
     }
 
     private func saveSyntheticList() {
-        if let data = try? JSONEncoder().encode(Array(syntheticIDs).sorted()) {
-            try? data.write(to: syntheticURL, options: .atomic)
-        }
+        Self.save(Array(syntheticIDs).sorted(), to: syntheticURL)
     }
 
     private func loadResults() {
-        guard let data = try? Data(contentsOf: resultsURL),
-              let saved = try? JSONDecoder().decode([String: [String: BenchmarkScore]].self, from: data) else { return }
+        guard let saved = Self.load([String: [String: BenchmarkScore]].self, from: resultsURL) else { return }
         results = Dictionary(uniqueKeysWithValues: saved.compactMap { key, value in
             SpeechEngine(rawValue: key).map { ($0, value) }
         })
@@ -385,8 +379,15 @@ final class BenchmarkModel {
 
     private func saveResults() {
         let encodable = Dictionary(uniqueKeysWithValues: results.map { ($0.key.rawValue, $0.value) })
-        if let data = try? JSONEncoder().encode(encodable) {
-            try? data.write(to: resultsURL, options: .atomic)
-        }
+        Self.save(encodable, to: resultsURL)
+    }
+
+    private static func load<T: Decodable>(_ type: T.Type, from url: URL) -> T? {
+        guard let data = try? Data(contentsOf: url) else { return nil }
+        return try? JSONDecoder().decode(type, from: data)
+    }
+
+    private static func save(_ value: some Encodable, to url: URL, encoder: JSONEncoder = JSONEncoder()) {
+        try? encoder.encode(value).write(to: url, options: .atomic)
     }
 }
