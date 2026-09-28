@@ -15,12 +15,7 @@ final class SampleSink: @unchecked Sendable {
     private var currentLevel: Float = 0
 
     init(inputFormat: AVAudioFormat) throws {
-        guard let output = AVAudioFormat(
-            commonFormat: .pcmFormatFloat32,
-            sampleRate: AudioClip.standardSampleRate,
-            channels: 1,
-            interleaved: false
-        ), let converter = AVAudioConverter(from: inputFormat, to: output) else {
+        guard let output = AVAudioFormat.mono(), let converter = AVAudioConverter(from: inputFormat, to: output) else {
             throw DictationError.engineFailure("This microphone format is not supported.")
         }
         outputFormat = output
@@ -48,7 +43,7 @@ final class SampleSink: @unchecked Sendable {
         lock.unlock()
         guard converter.inputFormat == buffer.format else { return }
 
-        let feeder = BufferFeeder(buffer)
+        let feeder = BufferFeeder(buffer, whenDrained: .noDataNow)
         var error: NSError?
         let status = converter.convert(to: converted, error: &error) { _, inputStatus in
             feeder.next(inputStatus)
@@ -84,22 +79,31 @@ final class SampleSink: @unchecked Sendable {
     }
 }
 
-/// Hands one buffer to the converter, then reports "no data for now" so the converter keeps
-/// its resampling state between buffers.
-private final class BufferFeeder: @unchecked Sendable {
+/// Hands one buffer to a converter, then reports `whenDrained`: `.noDataNow` keeps the
+/// converter's resampling state between buffers, `.endOfStream` ends the stream.
+final class BufferFeeder: @unchecked Sendable {
     private var buffer: AVAudioPCMBuffer?
+    private let whenDrained: AVAudioConverterInputStatus
 
-    init(_ buffer: AVAudioPCMBuffer) {
+    init(_ buffer: AVAudioPCMBuffer, whenDrained: AVAudioConverterInputStatus) {
         self.buffer = buffer
+        self.whenDrained = whenDrained
     }
 
     func next(_ status: UnsafeMutablePointer<AVAudioConverterInputStatus>) -> AVAudioBuffer? {
         guard let buffer else {
-            status.pointee = .noDataNow
+            status.pointee = whenDrained
             return nil
         }
         self.buffer = nil
         status.pointee = .haveData
         return buffer
+    }
+}
+
+extension AVAudioFormat {
+    /// Non-interleaved mono Float32, the shape every Krasip clip uses.
+    static func mono(sampleRate: Double = AudioClip.standardSampleRate) -> AVAudioFormat? {
+        AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: sampleRate, channels: 1, interleaved: false)
     }
 }

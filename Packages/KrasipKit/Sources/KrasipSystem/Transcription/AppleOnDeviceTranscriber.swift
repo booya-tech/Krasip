@@ -22,11 +22,11 @@ public final class AppleOnDeviceTranscriber: Transcriber {
     }
 
     public static func isSupported(_ language: Language) async -> Bool {
-        await DictationTranscriber.supportedLocale(equivalentTo: Locale(identifier: language.localeIdentifier)) != nil
+        await supportedLocale(for: language) != nil
     }
 
     public static func modelState(for language: Language) async -> ModelState {
-        guard let locale = await DictationTranscriber.supportedLocale(equivalentTo: Locale(identifier: language.localeIdentifier)) else {
+        guard let locale = await supportedLocale(for: language) else {
             return .unsupported
         }
         switch await AssetInventory.status(forModules: [makeTranscriber(locale: locale)]) {
@@ -40,9 +40,7 @@ public final class AppleOnDeviceTranscriber: Transcriber {
 
     /// Downloads the recognition model if needed. `progress` receives 0...1.
     public static func prepareModel(for language: Language, progress: (@Sendable (Double) -> Void)? = nil) async throws {
-        guard let locale = await DictationTranscriber.supportedLocale(equivalentTo: Locale(identifier: language.localeIdentifier)) else {
-            throw TranscriptionError.unavailable("\(language.displayName) is not supported on this Mac.")
-        }
+        let locale = try await requireLocale(for: language)
         guard let request = try await AssetInventory.assetInstallationRequest(supporting: [makeTranscriber(locale: locale)]) else {
             progress?(1)
             return
@@ -57,9 +55,7 @@ public final class AppleOnDeviceTranscriber: Transcriber {
 
     public func transcribe(_ audio: AudioClip, languages: [Language], vocabulary: [String]) async throws -> Transcript {
         let language = Language.primary(of: languages)
-        guard let locale = await DictationTranscriber.supportedLocale(equivalentTo: Locale(identifier: language.localeIdentifier)) else {
-            throw TranscriptionError.unavailable("\(language.displayName) is not supported on this Mac.")
-        }
+        let locale = try await Self.requireLocale(for: language)
         let transcriber = Self.makeTranscriber(locale: locale)
         if let request = try await AssetInventory.assetInstallationRequest(supporting: [transcriber]) {
             try await request.downloadAndInstall()
@@ -113,6 +109,17 @@ public final class AppleOnDeviceTranscriber: Transcriber {
             providerID: id.rawValue,
             processingDuration: Date().timeIntervalSince(started)
         )
+    }
+
+    private static func supportedLocale(for language: Language) async -> Locale? {
+        await DictationTranscriber.supportedLocale(equivalentTo: Locale(identifier: language.localeIdentifier))
+    }
+
+    private static func requireLocale(for language: Language) async throws -> Locale {
+        guard let locale = await supportedLocale(for: language) else {
+            throw TranscriptionError.unavailable("\(language.displayName) is not supported on this Mac.")
+        }
+        return locale
     }
 
     private static func makeTranscriber(locale: Locale) -> DictationTranscriber {

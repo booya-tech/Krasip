@@ -12,7 +12,6 @@ public final class MicrophoneRecorder: DictationRecording {
 
     private var engine: AVAudioEngine?
     private var sink: SampleSink?
-    private var startedAt: Date?
     private var meterTask: Task<Void, Never>?
     private var configurationObserver: (any NSObjectProtocol)?
 
@@ -41,16 +40,13 @@ public final class MicrophoneRecorder: DictationRecording {
             cancel()
         }
 
-        switch Self.permission {
-        case .authorized:
-            break
-        case .notDetermined:
+        let permission = Self.permission
+        var granted = permission == .authorized
+        if permission == .notDetermined {
             continuation.yield(.requestingPermission)
-            guard await Self.requestPermission() else {
-                continuation.yield(.failed(.microphoneDenied))
-                throw DictationError.microphoneDenied
-            }
-        default:
+            granted = await Self.requestPermission()
+        }
+        guard granted else {
             continuation.yield(.failed(.microphoneDenied))
             throw DictationError.microphoneDenied
         }
@@ -59,17 +55,14 @@ public final class MicrophoneRecorder: DictationRecording {
         let engine = AVAudioEngine()
         let input = engine.inputNode
         selectPreferredDevice(on: input)
-        let format = input.outputFormat(forBus: 0)
-        guard format.sampleRate > 0, format.channelCount > 0 else {
+        guard let format = Self.usableFormat(of: input) else {
             continuation.yield(.failed(.noInputDevice))
             throw DictationError.noInputDevice
         }
 
         let sink = try SampleSink(inputFormat: format)
-        input.installTap(onBus: 0, bufferSize: 2048, format: format, block: Self.tapBlock(for: sink))
-        engine.prepare()
         do {
-            try engine.start()
+            try Self.startCapture(on: engine, into: sink, format: format)
         } catch {
             input.removeTap(onBus: 0)
             let failure = DictationError.engineFailure(error.localizedDescription)
@@ -79,10 +72,8 @@ public final class MicrophoneRecorder: DictationRecording {
 
         self.engine = engine
         self.sink = sink
-        let startedAt = Date()
-        self.startedAt = startedAt
         observeConfigurationChanges(of: engine)
-        startMeter(sink: sink, startedAt: startedAt)
+        startMeter(sink: sink, startedAt: Date())
     }
 
     public func stop() async throws -> AudioClip {
@@ -93,7 +84,6 @@ public final class MicrophoneRecorder: DictationRecording {
 
         tearDown(engine)
         let clip = AudioClip(samples: sink.collected())
-        reset()
         continuation.yield(.finished(duration: clip.duration))
         return clip
     }
@@ -101,7 +91,6 @@ public final class MicrophoneRecorder: DictationRecording {
     public func cancel() {
         guard let engine else { return }
         tearDown(engine)
-        reset()
         continuation.yield(.cancelled)
     }
 
@@ -111,6 +100,18 @@ public final class MicrophoneRecorder: DictationRecording {
     /// calls it on its real-time thread.
     private nonisolated static func tapBlock(for sink: SampleSink) -> AVAudioNodeTapBlock {
         { buffer, _ in sink.append(buffer) }
+    }
+
+    /// The input's current format, or `nil` when there is no usable microphone.
+    private static func usableFormat(of input: AVAudioInputNode) -> AVAudioFormat? {
+        let format = input.outputFormat(forBus: 0)
+        return format.sampleRate > 0 && format.channelCount > 0 ? format : nil
+    }
+
+    private static func startCapture(on engine: AVAudioEngine, into sink: SampleSink, format: AVAudioFormat) throws {
+        engine.inputNode.installTap(onBus: 0, bufferSize: 2048, format: format, block: tapBlock(for: sink))
+        engine.prepare()
+        try engine.start()
     }
 
     private func selectPreferredDevice(on input: AVAudioInputNode) {
@@ -158,38 +159,30 @@ public final class MicrophoneRecorder: DictationRecording {
         guard let engine, let sink, !engine.isRunning else { return }
         let input = engine.inputNode
         input.removeTap(onBus: 0)
-        let format = input.outputFormat(forBus: 0)
-        guard format.sampleRate > 0, format.channelCount > 0, sink.switchInput(to: format) else {
+        guard let format = Self.usableFormat(of: input), sink.switchInput(to: format) else {
             tearDown(engine)
-            reset()
             continuation.yield(.failed(.noInputDevice))
             return
         }
-        input.installTap(onBus: 0, bufferSize: 2048, format: format, block: Self.tapBlock(for: sink))
-        engine.prepare()
         do {
-            try engine.start()
+            try Self.startCapture(on: engine, into: sink, format: format)
         } catch {
             tearDown(engine)
-            reset()
             continuation.yield(.failed(.engineFailure("The microphone changed while recording.")))
         }
     }
 
+    /// Stops the engine and clears all recording state.
     private func tearDown(_ engine: AVAudioEngine) {
         engine.inputNode.removeTap(onBus: 0)
         engine.stop()
-    }
-
-    private func reset() {
         meterTask?.cancel()
         meterTask = nil
         if let configurationObserver {
             NotificationCenter.default.removeObserver(configurationObserver)
         }
         configurationObserver = nil
-        engine = nil
+        self.engine = nil
         sink = nil
-        startedAt = nil
     }
 }

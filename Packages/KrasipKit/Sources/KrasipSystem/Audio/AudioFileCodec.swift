@@ -20,11 +20,14 @@ public enum AudioFileCodec {
         func append<T: FixedWidthInteger>(_ value: T) {
             withUnsafeBytes(of: value.littleEndian) { data.append(contentsOf: $0) }
         }
+        func append(_ tag: String) {
+            data.append(contentsOf: tag.utf8)
+        }
 
-        data.append(contentsOf: Array("RIFF".utf8))
+        append("RIFF")
         append(UInt32(36) + dataSize)
-        data.append(contentsOf: Array("WAVE".utf8))
-        data.append(contentsOf: Array("fmt ".utf8))
+        append("WAVE")
+        append("fmt ")
         append(UInt32(16))
         append(UInt16(1))
         append(UInt16(1))
@@ -32,7 +35,7 @@ public enum AudioFileCodec {
         append(sampleRate * 2)
         append(UInt16(2))
         append(UInt16(16))
-        data.append(contentsOf: Array("data".utf8))
+        append("data")
         append(dataSize)
         for sample in clip.samples {
             let clamped = max(-1, min(1, sample))
@@ -47,8 +50,7 @@ public enum AudioFileCodec {
 
     /// AAC in an M4A container: small enough to keep for "retry" without filling the disk.
     public static func writeM4A(_ clip: AudioClip, to url: URL) throws {
-        guard !clip.samples.isEmpty else { throw CodecError.emptyAudio }
-        guard let buffer = pcmBuffer(clip) else { throw CodecError.emptyAudio }
+        guard !clip.samples.isEmpty, let buffer = pcmBuffer(clip) else { throw CodecError.emptyAudio }
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
         let settings: [String: Any] = [
             AVFormatIDKey: kAudioFormatMPEG4AAC,
@@ -70,7 +72,7 @@ public enum AudioFileCodec {
         }
         try file.read(into: input)
 
-        guard let output = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: AudioClip.standardSampleRate, channels: 1, interleaved: false),
+        guard let output = AVAudioFormat.mono(),
               let converter = AVAudioConverter(from: format, to: output) else {
             throw CodecError.unreadable("Unsupported audio format")
         }
@@ -78,7 +80,7 @@ public enum AudioFileCodec {
         guard let converted = AVAudioPCMBuffer(pcmFormat: output, frameCapacity: capacity) else {
             throw CodecError.emptyAudio
         }
-        let feeder = OneShotFeeder(input)
+        let feeder = BufferFeeder(input, whenDrained: .endOfStream)
         var error: NSError?
         let status = converter.convert(to: converted, error: &error) { _, inputStatus in
             feeder.next(inputStatus)
@@ -92,7 +94,7 @@ public enum AudioFileCodec {
 
     /// The clip as an AVAudioPCMBuffer (16 kHz mono Float32).
     public static func pcmBuffer(_ clip: AudioClip) -> AVAudioPCMBuffer? {
-        guard let format = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: clip.sampleRate, channels: 1, interleaved: false),
+        guard let format = AVAudioFormat.mono(sampleRate: clip.sampleRate),
               let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: AVAudioFrameCount(max(clip.samples.count, 1))),
               let channel = buffer.floatChannelData?[0] else { return nil }
         clip.samples.withUnsafeBufferPointer { source in
@@ -104,21 +106,3 @@ public enum AudioFileCodec {
     }
 }
 
-/// Feeds a single buffer to a converter and then signals the end of the stream.
-private final class OneShotFeeder: @unchecked Sendable {
-    private var buffer: AVAudioPCMBuffer?
-
-    init(_ buffer: AVAudioPCMBuffer) {
-        self.buffer = buffer
-    }
-
-    func next(_ status: UnsafeMutablePointer<AVAudioConverterInputStatus>) -> AVAudioBuffer? {
-        guard let buffer else {
-            status.pointee = .endOfStream
-            return nil
-        }
-        self.buffer = nil
-        status.pointee = .haveData
-        return buffer
-    }
-}

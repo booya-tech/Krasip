@@ -58,24 +58,21 @@ public final class TextInserter {
             return insertIntoOwnWindow(text)
         }
         guard AXIsProcessTrusted() else {
-            copyToClipboard(text)
-            return .copiedToClipboard(.accessibilityNotTrusted)
+            return copyInstead(text, .accessibilityNotTrusted)
         }
 
         await bringToFront(target)
 
         guard let element = FocusInspector.focusedElement() else {
             if IsSecureEventInputEnabled() {
-                copyToClipboard(text)
-                return .copiedToClipboard(.secureField)
+                return copyInstead(text, .secureField)
             }
             return await pasteWithoutFocusInfo(text)
         }
 
         let focus = FocusInspector.inspect(element)
         if focus.isSecure {
-            copyToClipboard(text)
-            return .copiedToClipboard(.secureField)
+            return copyInstead(text, .secureField)
         }
 
         if mode == .automatic, focus.isEditable, !focus.isWebContent, await setDirectly(text, into: element) {
@@ -88,16 +85,19 @@ public final class TextInserter {
             if mode == .pasteOnly {
                 return await pasteWithoutFocusInfo(text)
             }
-            copyToClipboard(text)
-            return .copiedToClipboard(.noFocusedField)
+            return copyInstead(text, .noFocusedField)
         }
         return await paste(text, into: element, verify: !focus.isWebContent)
     }
 
+    private func copyInstead(_ text: String, _ failure: InsertionFailure) -> InsertionResult {
+        copyToClipboard(text)
+        return .copiedToClipboard(failure)
+    }
+
     private func insertIntoOwnWindow(_ text: String) -> InsertionResult {
         guard let textView = NSApp.keyWindow?.firstResponder as? NSTextView, textView.isEditable else {
-            copyToClipboard(text)
-            return .copiedToClipboard(.noFocusedField)
+            return copyInstead(text, .noFocusedField)
         }
         textView.insertText(text, replacementRange: textView.selectedRange())
         return .inserted(.accessibility)
@@ -152,8 +152,7 @@ public final class TextInserter {
                     return .inserted(.paste)
                 }
             }
-            copyToClipboard(text)
-            return .copiedToClipboard(.appRejected)
+            return copyInstead(text, .appRejected)
         }
 
         await restore(snapshot, to: pasteboard, ifStill: ourChange)
