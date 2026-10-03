@@ -22,8 +22,8 @@ enum PreviewRenderer {
 
     /// A controller on throwaway storage, filled with sample data. Real user data is never touched.
     static func makeController() -> AppController {
-        let defaults = UserDefaults(suiteName: "com.boopannachai.Krasip.previews") ?? .standard
-        defaults.removePersistentDomain(forName: "com.boopannachai.Krasip.previews")
+        let defaults = UserDefaults(suiteName: "com.bliumworks.krasip.previews") ?? .standard
+        defaults.removePersistentDomain(forName: "com.bliumworks.krasip.previews")
         let store = try! KrasipStore.inMemory()
         let app = AppController(defaults: defaults, store: store)
         app.glossary.save(GlossaryEntry(aliases: ["กิตฮับ", "กิทฮับ"], preferredOutput: "GitHub", mode: .suggest))
