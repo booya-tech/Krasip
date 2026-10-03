@@ -34,25 +34,25 @@ public struct TextPolicy: Sendable {
         segments = protectStructured(segments)
         segments = applyGlossary(segments, glossary: glossary, decisions: decisions, log: &log)
         segments = applySoundAlikes(segments, glossary: glossary, style: style, decisions: decisions, log: &log)
-        
+
         if style.convertSpokenTimes, !decisions.disabledKinds.contains(.spokenTime) {
-            segments = applySpokenTimes(segments, log: &log)
+            segments = applySpokenTimes(segments, found: SpokenTime.matches(in:), log: &log)
         }
-        
+
         if style.convertThaiTimes, !decisions.disabledKinds.contains(.spokenTime) {
-            segments = applyThaiSpokenTimes(segments, log: &log)
+            segments = applySpokenTimes(segments, found: ThaiSpokenTime.matches(in:), log: &log)
         }
-        
+
         segments = protectWords(segments)
-        
+
         if style.spaceBetweenThaiAndLatin, !decisions.disabledKinds.contains(.spacing) {
             segments = applyScriptSpacing(segments, log: &log)
         }
-        
+
         if !decisions.disabledKinds.contains(.punctuation) {
             segments = applyPunctuation(segments, mode: style.punctuation, log: &log)
         }
-        
+
         segments = tidyWhitespace(segments)
 
         return FinalText(
@@ -187,23 +187,16 @@ public struct TextPolicy: Sendable {
 
     // MARK: - 4. Spoken times
 
-    private func applySpokenTimes(_ segments: [TextSegment], log: inout ChangeLog) -> [TextSegment] {
+    private func applySpokenTimes(
+        _ segments: [TextSegment],
+        found: (String) -> [TimeMatch],
+        log: inout ChangeLog
+    ) -> [TextSegment] {
         replaceInOpenTranscript(segments) { segment in
-            SpokenTime.matches(in: segment.text).map { match in
+            found(segment.text).map { match in
                 log.add(.spokenTime, before: String(segment.text[match.range]), after: match.replacement, key: "spokenTime")
                 return (match.range, TextSegment(text: match.replacement, origin: .spokenTime, protection: .spokenTime))
             }
-        }
-    }
-    
-    private func applyThaiSpokenTimes(_ segments: [TextSegment], log: inout ChangeLog) -> [TextSegment] {
-        segments.flatMap { segment -> [TextSegment] in
-            guard isOpenTranscript(segment) else { return [segment] }
-            let pieces = ThaiSpokenTime.matches(in: segment.text).map { match in
-                log.add(.spokenTime, before: String(segment.text[match.range]), after: match.replacement, key: "spokenTime")
-                return (match.range, TextSegment(text: match.replacement, origin: .spokenTime, protection: .spokenTime))
-            }
-            return split(segment, pieces)
         }
     }
 

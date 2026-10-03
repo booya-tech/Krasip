@@ -4,15 +4,17 @@
 
 import Foundation
 
+/// A spoken time found in the text, and the digits that take its place. Both the English and
+/// the Thai converter return these, so the policy can run either one the same way.
+struct TimeMatch {
+    let range: Range<String.Index>
+    let replacement: String
+}
+
 /// Only clock times with an explicit marker (AM, PM, o'clock) are converted. Other number
 /// words ("two cats") and Thai number words are left exactly as spoken.
 enum SpokenTime {
-    struct Match {
-        let range: Range<String.Index>
-        let replacement: String
-    }
-
-    static func matches(in text: String) -> [Match] {
+    static func matches(in text: String) -> [TimeMatch] {
         let whole = NSRange(text.startIndex..<text.endIndex, in: text)
         return pattern.matches(in: text, range: whole).compactMap { match in
             guard let range = Range(match.range, in: text),
@@ -26,7 +28,7 @@ enum SpokenTime {
                 guard let minute = minutes(minuteText) else { return nil }
                 clock += ":" + (minute < 10 ? "0\(minute)" : "\(minute)")
             }
-            return Match(range: range, replacement: clock + separator + marker)
+            return TimeMatch(range: range, replacement: clock + separator + marker)
         }
     }
 

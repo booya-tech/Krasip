@@ -1,9 +1,6 @@
-//
-//  ThaiSpokenTimeTests.swift
-//  KrasipKit
-//
-//  Created by boopanachai on 9/26/26.
-//
+// ThaiSpokenTimeTests.swift
+// KrasipKit
+// Checks that Thai spoken clock times become digits, and that look-alike phrases are left alone.
 
 import Testing
 @testable import KrasipCore
@@ -11,7 +8,7 @@ import Testing
 struct ThaiSpokenTimeTests {
     private let policy = TextPolicy()
     private let on = TextStyle(convertThaiTimes: true)
-    
+
     @Test(arguments: [
         ("นัดเที่ยงคืน", "นัด 00:00"),
         ("ตื่นตีหนึ่ง", "ตื่น 01:00"),
@@ -33,6 +30,7 @@ struct ThaiSpokenTimeTests {
         ("นัดสิบเอ็ดโมงเช้า", "นัด 11:00"),
         ("นัดเที่ยง", "นัด 12:00"),
         ("นัดบ่ายโมง", "นัด 13:00"),
+        ("นัดบ่ายโมงครึ่ง", "นัด 13:30"),
         ("นัดบ่าย 2", "นัด 14:00"),
         ("นัดบ่าย2", "นัด 14:00"),
         ("นัดบ่ายสอง", "นัด 14:00"),
@@ -53,7 +51,7 @@ struct ThaiSpokenTimeTests {
         ("นอนสี่ทุ่ม", "นอน 22:00"),
         ("นอนห้าทุ่ม", "นอน 23:00")
     ])
-    func convertsThaiClockTimes(raw: String, expected: String) { // no async wait or throw in testing
+    func convertsThaiClockTimes(raw: String, expected: String) {
         #expect(policy.finalize(raw, glossary: Glossary(), style: on).text == expected)
     }
 
@@ -71,12 +69,14 @@ struct ThaiSpokenTimeTests {
         "นัดหกโมงครึ่ง",
         "ทุ่มเงิน",
         "รอสิบนาที",
-        "เที่ยงแท้"
+        "เที่ยงแท้",
+        "มีสองคน",
+        "นัดห้าโมงเช้า"
     ])
     func leavesNonTimesAlone(raw: String) {
         #expect(policy.finalize(raw, glossary: Glossary(), style: on).text == raw)
     }
-    
+
     @Test func isOffByDefault() {
         #expect(policy.finalize("นัดสิบโมงเช้า", glossary: Glossary()).text == "นัดสิบโมงเช้า")
     }
