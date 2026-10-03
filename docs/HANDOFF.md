@@ -47,14 +47,14 @@ A real microphone, real permissions, and other apps. About 15 minutes, in [`MANU
 2. Insertion into Notes, Slack, a browser field, a code editor, and Terminal — the one part no test can fake.
 3. The password-field refusal and the "Copied — paste with Command+V" fallback.
 4. The Thai interface end to end.
-5. Recording the 50 benchmark sentences in your own voice, then choosing between the Apple and OpenAI engines with real numbers.
+5. Recording the benchmark sentences in your own voice, then choosing between the Apple and OpenAI engines with real numbers.
 
 ## Honest limits
 
 - The recognizer, not Krasip, decides how English words come out. Expect to teach it 10–20 terms in the first week; the History → "Make Rule…" path exists for exactly that.
 - No streaming partial transcripts. The spec asked for recorded-audio requests first.
 - Signed for development only. Sharing it with someone else needs a Developer ID certificate and notarization.
-- The benchmark ships 50 sentences; the spec's quality plan asks for 200+ of your own. The Benchmark window can add and import more.
+- The benchmark ships 56 sentences; the spec's quality plan asks for 200+ of your own. The Benchmark window can add and import more.
 
 ## Where things are
 

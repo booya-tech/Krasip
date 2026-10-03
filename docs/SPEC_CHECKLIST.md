@@ -88,7 +88,7 @@ All five rows of the spec table are automated in `Tests/KrasipCoreTests/Acceptan
 | Milestone | Status |
 | --- | --- |
 | 0 — app, mic permission, record `.m4a`, fake transcript | Built (`FixtureTranscriber` is the fake transcript; kept audio and benchmark clips are `.m4a`) |
-| 1 — one ASR adapter, Thai + English config, raw transcript shown unaltered, 50-sentence set | Built · You (record the 50 sentences in the Benchmark window) |
+| 1 — one ASR adapter, Thai + English config, raw transcript shown unaltered, 50-sentence set | Built · You (record the sentences in the Benchmark window) |
 | 2 — local glossary, exact normalized matching, "Add preferred spelling" from a selected span, locked terms before formatting | Test · Built |
 | 3 — hotkey, overlay, Accessibility insertion + fallback, block secure fields | Built · Test (a debug simulation drives the real overlay end to end: sizing, position, auto-dismiss, hands-free, Esc) · **You: try Notes, Slack, a browser field, and an editor** ([manual plan](MANUAL_TEST_PLAN.md)) |
 | 4 — edit in overlay/history, repeated-correction offer, change explanations and undo | Test · Built |
@@ -103,7 +103,7 @@ All five rows of the spec table are automated in `Tests/KrasipCoreTests/Acceptan
 | Latency (release → inserted) | History → stats bar (median) and Benchmark |
 | Insertion success rate | History → stats bar |
 
-The shipped set has 50 sentences across all six categories. The Benchmark window can **Add Sentence…** and **Import Sentences…**, so you can grow it toward the spec's 200-utterance plan (and record some in noisy places, as the plan asks).
+The shipped set has 56 sentences across all six categories, including six Thai spoken times. The Benchmark window can **Add Sentence…** and **Import Sentences…**, so you can grow it toward the spec's 200-utterance plan (and record some in noisy places, as the plan asks).
 
 ### First benchmark run (synthetic voice)
 

@@ -52,7 +52,7 @@ Krasip lives in the **menu bar** (a waveform icon). There is no Dock icon unless
 | Check the text first | Settings → General → "Let me check it first" (or per app) |
 | Fix a past dictation | Menu bar → History… |
 | Teach a spelling | Settings → Glossary, or select a word in History → "Add Preferred Spelling…" |
-| Compare speech engines | Menu bar → Benchmark… (record the 50 sentences, add your own) |
+| Compare speech engines | Menu bar → Benchmark… (record the set, add your own) |
 | Pick a microphone | Settings → General → Microphone |
 | Switch the app to Thai | Settings → Languages → Show Krasip in → ไทย, then Restart Now |
 

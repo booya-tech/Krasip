@@ -155,11 +155,11 @@ A fake microphone, a fixed transcript, and a fake inserter stand in for the real
 | `acceptsWrappedListAndFractionalDates` | `{"entries": [...]}` and dates with milliseconds also load; mode defaults to locked. |
 | `rejectsGarbage` | Invalid JSON gives an error instead of an empty glossary. |
 
-### BenchmarkTests.swift — the 50-sentence set and its metrics
+### BenchmarkTests.swift — the bundled sentence set and its metrics
 
 | Test | What it checks |
 | --- | --- |
-| `bundledSetHasFiftyUniqueItems` | 50 sentences, unique ids, every category present. |
+| `bundledSetHasUniqueItemsInEveryCategory` | 56 sentences, unique ids, every category present. |
 | `perfectTranscriptsOfTheScriptProduceTheExpectedText` | If a recognizer heard each sentence perfectly, the policy produces exactly the expected text — 50 real-world checks of the policy. |
 | `expectedTextsAreStableUnderThePolicy` | The expected texts themselves are never changed by the policy. |
 | `keyTermsAppearInExpectedText` | Every key term really appears in its expected sentence. |

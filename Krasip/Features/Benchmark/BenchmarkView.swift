@@ -1,6 +1,6 @@
 // BenchmarkView.swift
 // Krasip
-// Benchmark window: record the 50 sentences, run engines, compare term preservation and transliteration.
+// Benchmark window: record the sentences, run engines, compare term preservation and transliteration.
 
 import AppKit
 import SwiftUI
