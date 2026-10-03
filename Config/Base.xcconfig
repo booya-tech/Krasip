@@ -24,7 +24,8 @@ SWIFT_EMIT_LOC_STRINGS = YES
 // --- Signing ---
 // Signing with the same Apple Development certificate every build keeps the Accessibility
 // and Microphone permissions granted between builds.
-DEVELOPMENT_TEAM = 45C3927649
+// Your own team ID goes in Config/Local.xcconfig, which is not checked in. See the README.
+DEVELOPMENT_TEAM =
 CODE_SIGN_STYLE = Automatic
 CODE_SIGN_ENTITLEMENTS = Config/Krasip.entitlements
 ENABLE_HARDENED_RUNTIME = YES
@@ -50,3 +51,8 @@ ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor
 COMBINE_HIDPI_IMAGES = YES
 LD_RUNPATH_SEARCH_PATHS = @executable_path/../Frameworks
 ENABLE_PREVIEWS = YES
+
+// --- Local overrides ---
+// Last include wins, so anything in Config/Local.xcconfig overrides the settings above.
+// The file is optional and is not checked in; it holds per-machine values like DEVELOPMENT_TEAM.
+#include? "Local.xcconfig"

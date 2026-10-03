@@ -8,6 +8,9 @@ xcuserdata/
 DerivedData/
 build/
 
+# Per-machine signing settings (your own Apple team ID)
+Config/Local.xcconfig
+
 # Swift Package Manager
 .build/
 .swiftpm/
