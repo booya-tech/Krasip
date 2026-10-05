@@ -236,6 +236,8 @@ enum AppString {
         static let spacingExample = String(localized: "ไปทำside-project → ไปทำ side-project")
         static let spokenTimes = String(localized: "Write spoken times as numbers")
         static let spokenTimesExample = String(localized: "ten AM → 10 AM")
+        static let thaiTimes = String(localized: "Write Thai spoken times as numbers")
+        static let thaiTimesExample = String(localized: "สิบโมงเช้า → 10:00")
         static let punctuation = String(localized: "Punctuation")
         static let downloadModel = String(localized: "Download")
         static let modelChecking = String(localized: "Checking…")

@@ -1,16 +1,16 @@
 // BenchmarkTests.swift
 // KrasipCoreTests
-// The bundled 50-sentence benchmark loads, is balanced, and its metrics score correctly.
+// The bundled benchmark set loads, is balanced, and its metrics score correctly.
 
 import Foundation
 import Testing
 @testable import KrasipCore
 
 struct BenchmarkTests {
-    @Test func bundledSetHasFiftyUniqueItems() throws {
+    @Test func bundledSetHasUniqueItemsInEveryCategory() throws {
         let set = try BenchmarkSet.bundled()
-        #expect(set.items.count == 50)
-        #expect(Set(set.items.map(\.id)).count == 50)
+        #expect(set.items.count == 56)
+        #expect(Set(set.items.map(\.id)).count == set.items.count)
         for category in BenchmarkCategory.allCases {
             #expect(set.items.contains { $0.category == category })
         }
@@ -18,11 +18,12 @@ struct BenchmarkTests {
 
     @Test func perfectTranscriptsOfTheScriptProduceTheExpectedText() throws {
         // If the recognizer heard the script perfectly, the text policy must produce the
-        // expected output exactly. This checks the policy against 50 realistic sentences.
+        // expected output exactly. Thai time conversion is on, matching the app's own default.
         let set = try BenchmarkSet.bundled()
         let glossary = Glossary(set.glossary)
+        let style = TextStyle(convertThaiTimes: true)
         for item in set.items {
-            let result = TextPolicy().finalize(item.script, glossary: glossary)
+            let result = TextPolicy().finalize(item.script, glossary: glossary, style: style)
             #expect(result.text == item.expected, "\(item.id): \(result.text)")
         }
     }

@@ -61,7 +61,7 @@ public struct BenchmarkSet: Codable, Sendable {
         self.items = items
     }
 
-    /// The 50-sentence Thai-English set shipped with the app.
+    /// The Thai-English sentence set shipped with the app.
     public static func bundled() throws -> BenchmarkSet {
         guard let url = Bundle.module.url(forResource: "benchmark-th-en", withExtension: "json") else {
             throw CocoaError(.fileNoSuchFile)

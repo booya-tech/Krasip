@@ -64,4 +64,4 @@ A robot voice reading English with a Thai accent is the worst case, but the dire
 - No streaming partial transcripts: the spec asks for recorded-audio requests first.
 - The app is signed for development. A download for other people needs a Developer ID certificate and notarization.
 - Undo after an Accessibility insertion depends on the app: pasted text always undoes with ⌘Z, directly-set text usually does.
-- The benchmark ships 50 sentences; the spec's quality plan asks for 200+ of your own (the Benchmark window can add and import more).
+- The benchmark ships 56 sentences; the spec's quality plan asks for 200+ of your own (the Benchmark window can add and import more).

@@ -12,6 +12,15 @@
       "preferredOutput": "side-project",
       "mode": "locked",
       "createdAt": "2026-09-22T00:00:00Z"
+    },
+    {
+      "id": "8B0E6D7A-4C1F-4B7E-9E0B-5D2C7A1F3E02",
+      "aliases": [
+        "report"
+      ],
+      "preferredOutput": "report",
+      "mode": "locked",
+      "createdAt": "2026-10-03T00:00:00Z"
     }
   ],
   "items": [
@@ -427,6 +436,67 @@
         "12"
       ],
       "note": "Read the numbers in Thai."
+    },
+    {
+      "id": "D09",
+      "category": "numbers",
+      "script": "ประชุมทีมสิบโมงเช้านะ",
+      "expected": "ประชุมทีม 10:00 นะ",
+      "keyTerms": [
+        "10:00"
+      ],
+      "note": "Thai spoken time: สิบโมงเช้า."
+    },
+    {
+      "id": "D10",
+      "category": "numbers",
+      "script": "เจอกันบ่ายสองครึ่งที่ออฟฟิศ",
+      "expected": "เจอกัน 14:30 ที่ออฟฟิศ",
+      "keyTerms": [
+        "14:30"
+      ],
+      "note": "Thai spoken time with ครึ่ง."
+    },
+    {
+      "id": "D11",
+      "category": "numbers",
+      "script": "ส่ง report ก่อนบ่ายสาม",
+      "expected": "ส่ง report ก่อน 15:00",
+      "keyTerms": [
+        "report",
+        "15:00"
+      ],
+      "note": "Thai time next to an English term."
+    },
+    {
+      "id": "D12",
+      "category": "numbers",
+      "script": "เลิกงานหกโมงเย็น",
+      "expected": "เลิกงาน 18:00",
+      "keyTerms": [
+        "18:00"
+      ],
+      "note": "โมงเย็น, which หกโมง alone would not convert."
+    },
+    {
+      "id": "D13",
+      "category": "numbers",
+      "script": "กินข้าวเย็นหนึ่งทุ่ม",
+      "expected": "กินข้าวเย็น 19:00",
+      "keyTerms": [
+        "19:00"
+      ],
+      "note": "Evening hours counted in ทุ่ม."
+    },
+    {
+      "id": "D14",
+      "category": "numbers",
+      "script": "ตื่นตีห้าไปวิ่ง",
+      "expected": "ตื่น 05:00 ไปวิ่ง",
+      "keyTerms": [
+        "05:00"
+      ],
+      "note": "Early hours counted in ตี."
     },
     {
       "id": "C01",

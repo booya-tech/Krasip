@@ -23,14 +23,24 @@ More screens: [glossary](docs/screenshots/settings-glossary.png) · [languages](
 
 ## Quick start
 
-1. Open `Krasip.xcodeproj` in Xcode.
-2. Choose the **Krasip** scheme and **My Mac**, then press **⌘R**.
-3. The setup guide opens. Allow the **Microphone** and **Accessibility**, and pick a speech engine.
-4. Click into any text field (Notes is a good first try), hold **⌥ Space**, speak, and let go.
+1. Create `Config/Local.xcconfig` with your own Apple team ID. The file is gitignored, so every
+   machine signs with its own certificate:
+   ```
+   DEVELOPMENT_TEAM = YOURTEAMID
+   ```
+   Your team ID is the 10-character code at [developer.apple.com/account](https://developer.apple.com/account) under Membership details. If you already have a distribution certificate, this prints it too:
+   ```bash
+   security find-identity -v -p codesigning | grep "Apple Distribution"
+   ```
+   The code in brackets on that line is the team ID. Ignore the `Apple Development` lines; their brackets hold a per-certificate ID, not the team.
+2. Open `Krasip.xcodeproj` in Xcode.
+3. Choose the **Krasip** scheme and **My Mac**, then press **⌘R**.
+4. The setup guide opens. Allow the **Microphone** and **Accessibility**, and pick a speech engine.
+5. Click into any text field (Notes is a good first try), hold **⌥ Space**, speak, and let go.
 
 Krasip lives in the **menu bar** (a waveform icon). There is no Dock icon unless a Krasip window is open.
 
-> Signing uses your team `45C3927649` with automatic signing. Keep signing with the same certificate, or macOS will ask for the Accessibility permission again after each build.
+> Signing is automatic. Keep signing with the same certificate every build, or macOS will ask for the Accessibility permission again each time.
 
 ### Everyday use
 
@@ -42,7 +52,7 @@ Krasip lives in the **menu bar** (a waveform icon). There is no Dock icon unless
 | Check the text first | Settings → General → "Let me check it first" (or per app) |
 | Fix a past dictation | Menu bar → History… |
 | Teach a spelling | Settings → Glossary, or select a word in History → "Add Preferred Spelling…" |
-| Compare speech engines | Menu bar → Benchmark… (record the 50 sentences, add your own) |
+| Compare speech engines | Menu bar → Benchmark… (record the set, add your own) |
 | Pick a microphone | Settings → General → Microphone |
 | Switch the app to Thai | Settings → Languages → Show Krasip in → ไทย, then Restart Now |
 
@@ -185,4 +195,9 @@ the glossary see the right text.
 | "Didn't catch that" | Hold the shortcut a moment longer and speak after the red dot appears. |
 
 See [`docs/HANDOFF.md`](docs/HANDOFF.md) for the state of the project, [`docs/MANUAL_TEST_PLAN.md`](docs/MANUAL_TEST_PLAN.md) for a 15-minute hands-on checklist, [`docs/SPEC_CHECKLIST.md`](docs/SPEC_CHECKLIST.md) for how each spec requirement is covered, and [`docs/DESIGN_NOTES.md`](docs/DESIGN_NOTES.md) for why the code is shaped this way.
-# Krasip
+
+---
+
+## License
+
+All rights reserved. You may read this code. You may not use, copy, or distribute it. Ask me if you want to.

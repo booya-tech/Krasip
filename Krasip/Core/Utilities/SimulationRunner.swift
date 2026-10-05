@@ -26,8 +26,8 @@ enum SimulationRunner {
     private static var inserted: [String] = []
 
     static func makeController() -> AppController {
-        let defaults = UserDefaults(suiteName: "com.boopannachai.Krasip.simulation") ?? .standard
-        defaults.removePersistentDomain(forName: "com.boopannachai.Krasip.simulation")
+        let defaults = UserDefaults(suiteName: "com.bliumworks.krasip.simulation") ?? .standard
+        defaults.removePersistentDomain(forName: "com.bliumworks.krasip.simulation")
         let overrides = FlowOverrides(
             recorder: SimulatedRecorder(),
             transcriber: FixtureTranscriber(text: "วันนี้จะต้องกลับบ้านไปทำ side project", confidence: 0.9, delay: .milliseconds(400)),

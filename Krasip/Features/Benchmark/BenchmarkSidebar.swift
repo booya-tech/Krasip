@@ -1,6 +1,6 @@
 // BenchmarkSidebar.swift
 // Krasip
-// Benchmark sidebar: category filter, the 50 sentences, and how many are recorded.
+// Benchmark sidebar: category filter, the sentence list, and how many are recorded.
 
 import SwiftUI
 import KrasipCore

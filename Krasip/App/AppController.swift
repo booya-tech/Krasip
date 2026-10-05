@@ -37,7 +37,7 @@ final class AppController {
 
     @ObservationIgnored let recorder = MicrophoneRecorder()
     @ObservationIgnored let inserter = TextInserter()
-    @ObservationIgnored let keychain = KeychainStore(service: "com.boopannachai.Krasip")
+    @ObservationIgnored let keychain = KeychainStore(service: "com.bliumworks.krasip")
     @ObservationIgnored let audioArchive = AudioArchive()
     @ObservationIgnored private(set) var feedback: FeedbackPlayer!
     @ObservationIgnored private(set) var windows: WindowManager!

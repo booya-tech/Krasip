@@ -79,6 +79,7 @@ final class AppSettings {
 
     var spaceBetweenThaiAndLatin: Bool { didSet { defaults.set(spaceBetweenThaiAndLatin, forKey: Key.spacing) } }
     var convertSpokenTimes: Bool { didSet { defaults.set(convertSpokenTimes, forKey: Key.spokenTimes) } }
+    var convertThaiTimes: Bool { didSet { defaults.set(convertThaiTimes, forKey: Key.thaiTimes) } }
     var suggestSoundAlikes: Bool { didSet { defaults.set(suggestSoundAlikes, forKey: Key.soundAlikes) } }
     var punctuation: PunctuationMode { didSet { defaults.set(punctuation.rawValue, forKey: Key.punctuation) } }
 
@@ -108,6 +109,7 @@ final class AppSettings {
 
         spaceBetweenThaiAndLatin = defaults.object(forKey: Key.spacing) as? Bool ?? true
         convertSpokenTimes = defaults.object(forKey: Key.spokenTimes) as? Bool ?? true
+        convertThaiTimes = defaults.object(forKey: Key.thaiTimes) as? Bool ?? true
         suggestSoundAlikes = defaults.object(forKey: Key.soundAlikes) as? Bool ?? true
         punctuation = defaults.string(forKey: Key.punctuation).flatMap(PunctuationMode.init(rawValue:)) ?? .keep
 
@@ -123,6 +125,7 @@ final class AppSettings {
             punctuation: punctuation,
             spaceBetweenThaiAndLatin: spaceBetweenThaiAndLatin,
             convertSpokenTimes: convertSpokenTimes,
+            convertThaiTimes: convertThaiTimes,
             suggestSoundAlikes: suggestSoundAlikes
         )
     }
@@ -173,6 +176,7 @@ final class AppSettings {
         static let openAILanguageHint = "openAISendsLanguageHint"
         static let spacing = "spaceBetweenThaiAndLatin"
         static let spokenTimes = "convertSpokenTimes"
+        static let thaiTimes = "convertThaiTimes"
         static let soundAlikes = "suggestSoundAlikes"
         static let punctuation = "punctuationMode"
         static let saveHistory = "saveHistory"
