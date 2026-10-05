@@ -32,7 +32,7 @@ The full requirement-by-requirement table is in [`SPEC_CHECKLIST.md`](SPEC_CHECK
 
 ## What was verified without you
 
-- **160 automated tests** pass (⌘U, or `swift test` in `Packages/KrasipKit`), including all five rows of the spec's acceptance table and a 20-run stability check. Each test is explained in plain English in [`../TESTS_EXPLAINED.md`](../TESTS_EXPLAINED.md).
+- **164 automated tests** pass (⌘U, or `swift test` in `Packages/KrasipKit`), including all five rows of the spec's acceptance table and a 20-run stability check. Each test is explained in plain English in [`../TESTS_EXPLAINED.md`](../TESTS_EXPLAINED.md).
 - **Live Thai speech recognition** on this Mac's on-device model, driven by generated speech (`KRASIP_LIVE_ASR=1 swift test`).
 - **A 50-sentence benchmark** run end to end. Plain Thai came back near-perfect; English terms spoken by a robot Thai voice came back Thai-spelled 91% of the time. That is a worst case, not your accuracy — but it is exactly the risk the spec warned about, and the reason the glossary exists. Numbers are in [`SPEC_CHECKLIST.md`](SPEC_CHECKLIST.md#first-benchmark-run-synthetic-voice).
 - **A full overlay simulation** with a fake microphone (`--simulate-dictation`): panel size and position in every phase, auto-dismiss, hands-free tapping, Esc, review-then-insert, and the resulting history and stats. Run in both English and Thai.
