@@ -1,0 +1,41 @@
+# ci.yml
+# Krasip
+# Runs the package tests and builds the app on every pull request and on main.
+
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Tests
+    runs-on: macos-26
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - name: Run package tests
+        working-directory: Packages/KrasipKit
+        run: swift test
+
+  build:
+    name: App build
+    runs-on: macos-26
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build the app without signing
+        run: |
+          xcodebuild build \
+            -project Krasip.xcodeproj \
+            -scheme Krasip \
+            -configuration Debug \
+            -destination 'platform=macOS' \
+            CODE_SIGNING_ALLOWED=NO
