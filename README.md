@@ -194,7 +194,7 @@ the glossary see the right text.
 | English words come out in Thai letters | Add a glossary entry (or use Starter Terms), turn on sound-alike suggestions, or try the OpenAI engine. |
 | "Didn't catch that" | Hold the shortcut a moment longer and speak after the red dot appears. |
 
-See [`docs/HANDOFF.md`](docs/HANDOFF.md) for the state of the project, [`docs/MANUAL_TEST_PLAN.md`](docs/MANUAL_TEST_PLAN.md) for a 15-minute hands-on checklist, [`docs/SPEC_CHECKLIST.md`](docs/SPEC_CHECKLIST.md) for how each spec requirement is covered, and [`docs/DESIGN_NOTES.md`](docs/DESIGN_NOTES.md) for why the code is shaped this way.
+See [`docs/BENCHMARK_RESULTS.md`](docs/BENCHMARK_RESULTS.md) for how the speech engine performs on real speech, [`docs/HANDOFF.md`](docs/HANDOFF.md) for the state of the project, [`docs/MANUAL_TEST_PLAN.md`](docs/MANUAL_TEST_PLAN.md) for a 15-minute hands-on checklist, [`docs/SPEC_CHECKLIST.md`](docs/SPEC_CHECKLIST.md) for how each spec requirement is covered, and [`docs/DESIGN_NOTES.md`](docs/DESIGN_NOTES.md) for why the code is shaped this way.
 
 ---
 
