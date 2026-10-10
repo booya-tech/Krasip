@@ -143,7 +143,7 @@ All user-facing text lives in `Krasip/Core/Utilities/AppString.swift` and is tra
 
 ```bash
 cd Packages/KrasipKit
-swift test                      # 164 tests, about one second
+swift test                      # 166 tests, about one second
 KRASIP_LIVE_ASR=1 swift test  # also runs Apple's on-device Thai recognizer on generated speech (macOS 26)
 ```
 

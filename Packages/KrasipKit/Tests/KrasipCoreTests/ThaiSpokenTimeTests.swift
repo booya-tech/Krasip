@@ -56,6 +56,35 @@ struct ThaiSpokenTimeTests {
     }
 
     @Test(arguments: [
+        ("เดี๋ยวเจอกันตอนสิบเอ็ดโมงสิบห้า หน้าตึกนะ", "เดี๋ยวเจอกันตอน 11:15 หน้าตึกนะ"),
+        ("นัดสิบโมงยี่สิบ", "นัด 10:20"),
+        ("นัดเก้าโมงสี่สิบห้า", "นัด 09:45"),
+        ("นัด 11 โมง 15", "นัด 11:15"),
+        ("นัดสิบโมงสิบห้านาที", "นัด 10:15"),
+        ("นัดสิบโมงห้านาที", "นัด 10:05"),
+        ("นัดสิบโมงเช้าสิบห้า", "นัด 10:15"),
+        ("นัดบ่ายสองโมงสี่สิบ", "นัด 14:40"),
+        ("นัดสองทุ่มสิบห้า", "นัด 20:15"),
+        ("เที่ยวบินออกตอน 6 โมง 45 ตอนเช้า", "เที่ยวบินออกตอน 06:45"),
+        ("นัดหกโมงตอนเช้า", "นัด 06:00"),
+        ("เจอกันห้าโมงสิบห้าตอนเย็น", "เจอกัน 17:15"),
+        ("เจอกันหกโมงตอนเย็น", "เจอกัน 18:00")
+    ])
+    func convertsMinutesAndTrailingPeriod(raw: String, expected: String) {
+        #expect(policy.finalize(raw, glossary: Glossary(), style: on).text == expected)
+    }
+
+    @Test(arguments: [
+        ("นัดสิบโมงสิบคน", "นัด 10:00 สิบคน"),
+        ("นัดสิบโมงห้าคน", "นัด 10:00 ห้าคน"),
+        ("นัดสิบโมงสิบห้าคน", "นัด 10:00 สิบห้าคน"),
+        ("นัดสิบโมง 20 บาท", "นัด 10:00 20 บาท")
+    ])
+    func doesNotReadACountAsMinutes(raw: String, expected: String) {
+        #expect(policy.finalize(raw, glossary: Glossary(), style: on).text == expected)
+    }
+
+    @Test(arguments: [
         "ตอนบ่ายว่างไหม",
         "กินข้าวเที่ยงกัน",
         "ทุ่มเทมาก",
@@ -71,7 +100,8 @@ struct ThaiSpokenTimeTests {
         "รอสิบนาที",
         "เที่ยงแท้",
         "มีสองคน",
-        "นัดห้าโมงเช้า"
+        "นัดห้าโมงเช้า",
+        "ตื่นหกโมงสิบห้า"
     ])
     func leavesNonTimesAlone(raw: String) {
         #expect(policy.finalize(raw, glossary: Glossary(), style: on).text == raw)
