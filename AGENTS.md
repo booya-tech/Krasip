@@ -62,7 +62,7 @@ A Swift package with three modules, plus a thin SwiftUI app:
 | `KrasipSystem` | Core, macOS frameworks | Microphone, speech engines, Accessibility, hot keys, Keychain |
 | `Krasip` (app) | all three | SwiftUI views and the wiring in `AppController` |
 
-`KrasipCore` has no AppKit and no microphone, which is why its 117 tests run in 0.1 seconds. Keep it that way. Anything touching a macOS framework belongs in `KrasipSystem`.
+`KrasipCore` has no AppKit and no microphone, which is why its 119 tests run in 0.1 seconds. Keep it that way. Anything touching a macOS framework belongs in `KrasipSystem`.
 
 `DictationFlow` is the only type that knows the order of the steps. It takes every dependency as a closure, so tests swap the microphone, recognizer, inserter, clock, and `sleep`. Add a new step there, not in the views.
 
