@@ -107,6 +107,8 @@ The shipped set has 56 sentences across all six categories, including six Thai s
 
 ### First benchmark run (synthetic voice)
 
+> Superseded by a real-voice run. See [`BENCHMARK_RESULTS.md`](BENCHMARK_RESULTS.md).
+
 Run tonight with `KRASIP_LIVE_ASR=1 swift test --filter BenchmarkLiveTests` — Apple's on-device Thai engine, sentences spoken by the macOS Thai voice "Kanya":
 
 | Metric | Result |
