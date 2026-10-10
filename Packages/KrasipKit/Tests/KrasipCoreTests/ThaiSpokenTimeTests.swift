@@ -84,6 +84,29 @@ struct ThaiSpokenTimeTests {
         #expect(policy.finalize(raw, glossary: Glossary(), style: on).text == expected)
     }
 
+    // Some speech models put a space between Thai words, also inside a spoken time.
+    @Test(arguments: [
+        ("เริ่มงาน 8 โมง เช้า เลิก 5 โมง เย็น", "เริ่มงาน 08:00 เลิก 17:00"),
+        ("เจอกัน บ่าย สอง ครึ่ง ที่ ออฟฟิศ", "เจอกัน 14:30 ที่ ออฟฟิศ"),
+        ("นัดสิบโมง ครึ่ง", "นัด 10:30"),
+        ("นัดสอง ทุ่ม ครึ่ง", "นัด 20:30"),
+        ("นัดบ่าย โมง", "นัด 13:00"),
+        ("นัดเที่ยง คืน", "นัด 00:00"),
+        ("ออกตอน 6 โมง 45 ตอน เช้า", "ออกตอน 06:45")
+    ])
+    func convertsTimesWrittenWithSpaces(raw: String, expected: String) {
+        #expect(policy.finalize(raw, glossary: Glossary(), style: on).text == expected)
+    }
+
+    @Test(arguments: [
+        ("เลิกห้าโมง เย็นนี้ไปกินข้าว", "เลิก 17:00 เย็นนี้ไปกินข้าว"),
+        ("นัดสิบโมง เช้าวันจันทร์", "นัด 10:00 เช้าวันจันทร์"),
+        ("นัดสิบโมง ครึ่งวันก็พอ", "นัด 10:00 ครึ่งวันก็พอ")
+    ])
+    func keepsAWordThatStartsTheNextPhrase(raw: String, expected: String) {
+        #expect(policy.finalize(raw, glossary: Glossary(), style: on).text == expected)
+    }
+
     @Test(arguments: [
         "ตอนบ่ายว่างไหม",
         "กินข้าวเที่ยงกัน",
