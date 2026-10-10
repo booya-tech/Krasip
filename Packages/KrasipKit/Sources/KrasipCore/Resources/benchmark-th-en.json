@@ -113,8 +113,8 @@
     {
       "id": "T06",
       "category": "plainThai",
-      "script": "ฝากบอกทุกคนว่าพรุ่งนี้หยุดหนึ่งวัน",
-      "expected": "ฝากบอกทุกคนว่าพรุ่งนี้หยุดหนึ่งวัน",
+      "script": "ฝากบอกทุกคนว่าพรุ่งนี้หยุด 1 วัน",
+      "expected": "ฝากบอกทุกคนว่าพรุ่งนี้หยุด 1 วัน",
       "keyTerms": []
     },
     {
@@ -227,8 +227,8 @@
     {
       "id": "W10",
       "category": "workTerms",
-      "script": "ช่วยเขียน unit test เพิ่มอีกสองเคส",
-      "expected": "ช่วยเขียน unit test เพิ่มอีกสองเคส",
+      "script": "ช่วยเขียน unit test เพิ่มอีก 2 เคส",
+      "expected": "ช่วยเขียน unit test เพิ่มอีก 2 เคส",
       "keyTerms": [
         "unit test"
       ]
@@ -265,11 +265,10 @@
     {
       "id": "W14",
       "category": "workTerms",
-      "script": "ส่ง invoice ให้ลูกค้าทาง email แล้ว",
-      "expected": "ส่ง invoice ให้ลูกค้าทาง email แล้ว",
+      "script": "ส่ง invoice ให้ลูกค้าทางอีเมลแล้ว",
+      "expected": "ส่ง invoice ให้ลูกค้าทางอีเมลแล้ว",
       "keyTerms": [
-        "invoice",
-        "email"
+        "invoice"
       ]
     },
     {
