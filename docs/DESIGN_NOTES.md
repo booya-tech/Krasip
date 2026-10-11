@@ -14,7 +14,7 @@ So the code is split into a Swift package with three modules and a thin app on t
 
 | Module | Depends on | Why it is separate |
 | --- | --- | --- |
-| `KrasipCore` | Foundation only | All the thinking: text policy, glossary, learning, the flow. No AppKit, no microphone, no network — which is why 119 tests run in 0.1 s. |
+| `KrasipCore` | Foundation only | All the thinking: text policy, glossary, learning, the flow. No AppKit, no microphone, no network — which is why 121 tests run in 0.1 s. |
 | `KrasipStorage` | Core + SQLite | One place that knows SQL. |
 | `KrasipSystem` | Core + macOS frameworks | Everything that can break on a new macOS: microphone, speech engines, Accessibility, hot keys, Keychain. |
 | `Krasip` (app) | all three | SwiftUI views and the wiring (`AppController`). |

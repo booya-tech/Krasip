@@ -46,7 +46,11 @@ enum ThaiSpokenTime {
         return "(?<number>\(words)|1[0-2]|[1-9])"
     }()
 
-    private static let half = "(?<half>ครึ่ง)?"
+    // Some speech models put a space between Thai words, so every joint inside a time may hold one.
+    // After such a space, a word that starts the next phrase is left alone: "เย็นนี้", "ครึ่งวัน".
+    private static let half = "(?: ?(?<half>ครึ่ง)(?!วัน|ชั่วโมง|ทาง|ราคา|เดือน|ปี))?"
+    private static let morningWord = "(?:เช้า| เช้า(?!นี้|วัน))"
+    private static let eveningWord = "(?:เย็น| เย็น(?!นี้|วัน))"
 
     private static let tens: [String: Int] = ["": 1, "ยี่": 2, "สาม": 3, "สี่": 4, "ห้า": 5]
 
@@ -89,14 +93,14 @@ enum ThaiSpokenTime {
         // บ่ายหนึ่ง … บ่ายห้า, บ่าย 2, บ่ายสองโมง, บ่ายสองโมงสี่สิบ → 13:00 … 17:59
         form(#"บ่าย ?\#(spokenNumber)(?![0-9])(?: ?โมง\#(minutes))?\#(half)"#) { (1...5).contains($0) ? $0 + 12 : nil },
         // หกโมงเช้า … สิบเอ็ดโมงเช้า → 06:00 … 11:00
-        form(#"(?<![0-9])\#(spokenNumber) ?โมงเช้า\#(minutes)\#(half)"#, hour: morning),
+        form(#"(?<![0-9])\#(spokenNumber) ?โมง\#(morningWord)\#(minutes)\#(half)"#, hour: morning),
         // สี่โมงเย็น … หกโมงเย็น → 16:00 … 18:00
-        form(#"(?<![0-9])\#(spokenNumber) ?โมงเย็น\#(minutes)\#(half)"#, hour: evening),
+        form(#"(?<![0-9])\#(spokenNumber) ?โมง\#(eveningWord)\#(minutes)\#(half)"#, hour: evening),
         // หกโมงสิบห้าตอนเช้า, หกโมงตอนเช้า: the period word follows the minutes and is part of the time.
-        form(#"(?<![0-9])\#(spokenNumber) ?โมง\#(minutes)\#(half) ?ตอนเช้า"#, hour: morning),
-        form(#"(?<![0-9])\#(spokenNumber) ?โมง\#(minutes)\#(half) ?ตอนเย็น"#, hour: evening),
+        form(#"(?<![0-9])\#(spokenNumber) ?โมง\#(minutes)\#(half) ?ตอน ?เช้า"#, hour: morning),
+        form(#"(?<![0-9])\#(spokenNumber) ?โมง\#(minutes)\#(half) ?ตอน ?เย็น"#, hour: evening),
         // เจ็ดโมง … สิบเอ็ดโมง → 07:00 … 11:00, ห้าโมง → 17:00. หกโมง is left alone: it can mean 6 AM or 6 PM.
-        form(#"(?<![0-9])\#(spokenNumber) ?โมง(?!เช้า|เย็น)\#(minutes)\#(half)"#) { number in
+        form(#"(?<![0-9])\#(spokenNumber) ?โมง(?!\#(morningWord)|\#(eveningWord))\#(minutes)\#(half)"#) { number in
             switch number {
             case 7...11: number
             case 5: 17
@@ -104,11 +108,11 @@ enum ThaiSpokenTime {
             }
         },
         // เที่ยงคืน → 00:00
-        phrase(#"เที่ยงคืน\#(minutes)\#(half)"#, hour: 0),
+        phrase(#"เที่ยง ?คืน\#(minutes)\#(half)"#, hour: 0),
         // เที่ยง → 12:00, but not มื้อเที่ยง, ข้าวเที่ยง, ไม่เที่ยง, เที่ยงธรรม, เที่ยงแท้
-        phrase(#"(?<!ข้าว|มื้อ|ไม่|ความ)เที่ยง(?!คืน|ธรรม|แท้)\#(minutes)\#(half)"#, hour: 12),
+        phrase(#"(?<!ข้าว|มื้อ|ไม่|ความ)เที่ยง(?! ?คืน|ธรรม|แท้)\#(minutes)\#(half)"#, hour: 12),
         // บ่ายโมง → 13:00
-        phrase(#"บ่ายโมง\#(minutes)\#(half)"#, hour: 13)
+        phrase(#"บ่าย ?โมง\#(minutes)\#(half)"#, hour: 13)
     ]
 
     private static let morning: @Sendable (Int) -> Int? = { (6...11).contains($0) ? $0 : nil }
