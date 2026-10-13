@@ -107,6 +107,97 @@ struct ThaiSpokenTimeTests {
         #expect(policy.finalize(raw, glossary: Glossary(), style: on).text == expected)
     }
 
+    // After "ตี" the hour is always the first number, one to five, so what follows is minutes.
+    @Test(arguments: [
+        ("พรุ่งนี้ต้องตื่นตีห้าสิบห้า", "พรุ่งนี้ต้องตื่น 05:15"),
+        ("วันนี้จะนอนสักตีหนึ่งสี่สิบห้า", "วันนี้จะนอนสัก 01:45"),
+        ("ตื่นตีสี่สิบห้า", "ตื่น 04:15"),
+        ("ตื่นตีสามสิบ", "ตื่น 03:10"),
+        ("ตื่นตีสามยี่สิบนาที", "ตื่น 03:20"),
+        ("ตื่นตีห้าห้านาที", "ตื่น 05:05"),
+        ("ตื่นตี 5 15", "ตื่น 05:15"),
+        ("ตื่น ตี ห้า สิบห้า", "ตื่น 05:15"),
+        ("ตีห้าสิบห้าตื่นมาออกกำลังกาย", "05:15 ตื่นมาออกกำลังกาย")
+    ])
+    func convertsMinutesAfterEarlyMorningHours(raw: String, expected: String) {
+        #expect(policy.finalize(raw, glossary: Glossary(), style: on).text == expected)
+    }
+
+    @Test(arguments: [
+        ("ตื่นตีห้าสิบคน", "ตื่น 05:00 สิบคน"),
+        ("ตื่นตีสิบห้า", "ตื่นตีสิบห้า"),
+        ("ตื่นตี 55", "ตื่นตี 55")
+    ])
+    func doesNotInventMinutesAfterEarlyMorningHours(raw: String, expected: String) {
+        #expect(policy.finalize(raw, glossary: Glossary(), style: on).text == expected)
+    }
+
+    // "ทุ่มหนึ่ง" and "ทุ่มนึง" are the everyday way to say หนึ่งทุ่ม.
+    @Test(arguments: [
+        ("เจอกันทุ่มหนึ่ง", "เจอกัน 19:00"),
+        ("เจอกันทุ่มนึง", "เจอกัน 19:00"),
+        ("เจอกันทุ่มครึ่ง", "เจอกัน 19:30"),
+        ("เจอกัน ทุ่ม หนึ่ง นะ", "เจอกัน 19:00 นะ"),
+        ("เจอกันทุ่ม 1 นะ", "เจอกัน 19:00 นะ"),
+        ("เจอกันทุ่ม1", "เจอกัน 19:00"),
+        ("นัดสามทุ่มครึ่ง", "นัด 21:30")
+    ])
+    func convertsSevenInTheEveningSaidWithoutANumberFirst(raw: String, expected: String) {
+        #expect(policy.finalize(raw, glossary: Glossary(), style: on).text == expected)
+    }
+
+    @Test(arguments: [
+        "เขาทุ่มหนึ่งล้านบาท",
+        "ทุ่มหนึ่งร้อยเปอร์เซ็นต์",
+        "เขาทุ่ม 1 ล้านบาท",
+        "ทุ่ม 1,000 บาท",
+        "ทุ่ม 100%",
+        "ทุ่ม 1.5 ล้าน",
+        "ทุ่ม 1 ครั้ง",
+        "นัดหกทุ่มครึ่ง",
+        "ทุ่มครึ่งหนึ่งของเงินเก็บ"
+    ])
+    func leavesThrowingAndSpendingAlone(raw: String) {
+        #expect(policy.finalize(raw, glossary: Glossary(), style: on).text == raw)
+    }
+
+    // "หกโมง" and "สี่โมง" alone are unclear, so they convert only when เช้า or เย็น sits just before.
+    @Test(arguments: [
+        ("ตอนเช้าหกโมงสิบห้า", "ตอนเช้า 06:15"),
+        ("พรุ่งนี้เช้าตื่น 6 โมง 15", "พรุ่งนี้เช้าตื่น 06:15"),
+        ("เมื่อเช้าหกโมงผมตื่นแล้ว", "เมื่อเช้า 06:00 ผมตื่นแล้ว"),
+        ("เย็นนี้เจอกันหกโมง", "เย็นนี้เจอกัน 18:00"),
+        ("ตอนเย็นหกโมงครึ่ง", "ตอนเย็น 18:30"),
+        ("เย็นนี้สี่โมงว่างไหม", "เย็นนี้ 16:00 ว่างไหม"),
+        ("ตอน เช้า หก โมง สิบห้า", "ตอน เช้า 06:15")
+    ])
+    func usesAPeriodWordJustBeforeAnUnclearHour(raw: String, expected: String) {
+        #expect(policy.finalize(raw, glossary: Glossary(), style: on).text == expected)
+    }
+
+    @Test(arguments: [
+        "ตื่น 6 โมง 15",
+        "หลังจากนั้นหกโมงยี่สิบไปออกกำลังกาย",
+        "เมื่อเช้าเหนื่อยมาก เดี๋ยวเจอกันหกโมง",
+        "ดื่มน้ำเย็นหกโมง",
+        "ตอนเช้าสี่โมง",
+        "เช้ามา 20 คน หกโมง",
+        "ตอนเช้าว่าง ช่วงบ่ายถึงหกโมงไม่ว่าง"
+    ])
+    func leavesAnUnclearHourAloneWithoutAClearPeriodWord(raw: String) {
+        #expect(policy.finalize(raw, glossary: Glossary(), style: on).text == raw)
+    }
+
+    // Hours that were already clear keep their meaning whatever word comes before.
+    @Test(arguments: [
+        ("เจอกันตอนเย็น 5 โมง 45", "เจอกันตอนเย็น 17:45"),
+        ("ตอนเช้าเจ็ดโมงครึ่ง", "ตอนเช้า 07:30"),
+        ("เมื่อเช้าประชุมเสร็จ ห้าโมงเจอกัน", "เมื่อเช้าประชุมเสร็จ 17:00 เจอกัน")
+    ])
+    func keepsClearHoursAsTheyWere(raw: String, expected: String) {
+        #expect(policy.finalize(raw, glossary: Glossary(), style: on).text == expected)
+    }
+
     @Test(arguments: [
         "ตอนบ่ายว่างไหม",
         "กินข้าวเที่ยงกัน",

@@ -8,10 +8,12 @@ enum ThaiSpokenTime {
     /// One way of saying a time. `regex` may capture a spoken number in the `number` group,
     /// spoken minutes in `minute` or `minuteUnit`, and "ครึ่ง" in the `half` group; `hour` turns
     /// the number (nil for fixed phrases) into a 24-hour hour, or returns nil when the match is
-    /// not a time.
+    /// not a time. When `hour` cannot tell and `asksWordBefore` is set, a period word just before
+    /// the match decides instead.
     private struct Form: Sendable {
         let regex: NSRegularExpression
         let hour: @Sendable (Int?) -> Int?
+        var asksWordBefore = false
     }
 
     static func matches(in text: String) -> [TimeMatch] {
@@ -20,8 +22,13 @@ enum ThaiSpokenTime {
         for form in forms {
             for match in form.regex.matches(in: text, range: whole) {
                 guard let range = Range(match.range, in: text),
-                      !found.contains(where: { $0.range.overlaps(range) }),
-                      let hour = form.hour(group("number", of: match, in: text).flatMap(number)) else { continue }
+                      !found.contains(where: { $0.range.overlaps(range) }) else { continue }
+                let spoken = group("number", of: match, in: text).flatMap(number)
+                var hour = form.hour(spoken)
+                if hour == nil, form.asksWordBefore, let spoken {
+                    hour = periodWord(before: range.lowerBound, in: text).flatMap { $0(spoken) }
+                }
+                guard let hour else { continue }
                 let minute = minute(of: match, in: text)
                 found.append(TimeMatch(range: range, replacement: String(format: "%02d:%02d", hour, minute)))
             }
@@ -57,10 +64,11 @@ enum ThaiSpokenTime {
     /// Spoken minutes after the hour: "สิบห้า", "45", "ห้านาที". Ten and above may stand alone;
     /// one to nine need "นาที", and a number followed by a counting word ("สิบคน") is not minutes.
     /// The atomic group stops "สิบห้าคน" from being read as "สิบ" minutes.
+    private static let counted = "คน|บาท|ตัว|อัน|ชิ้น|ครั้ง|วัน|เดือน|ปี|ชั่วโมง|ข้อ|เครื่อง|%|เปอร์เซ็นต์"
+
     private static let minutes: String = {
         let unit = "หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า"
         let spoken = "(?:ยี่|สาม|สี่|ห้า)?สิบ(?:เอ็ด|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า)?"
-        let counted = "คน|บาท|ตัว|อัน|ชิ้น|ครั้ง|วัน|เดือน|ปี|ชั่วโมง|ข้อ|เครื่อง|%|เปอร์เซ็นต์"
         let tenAndAbove = "(?<minute>(?>\(spoken)|[0-5][0-9](?![0-9])))(?: ?นาที|(?! ?(?:\(counted))))"
         let belowTen = "(?<minuteUnit>\(unit)|[1-9]) ?นาที"
         return "(?: ?(?:\(tenAndAbove)|\(belowTen)))?"
@@ -88,8 +96,15 @@ enum ThaiSpokenTime {
     private static let forms: [Form] = [
         // หนึ่งทุ่ม … ห้าทุ่ม, 1 ทุ่ม … 5 ทุ่ม → 19:00 … 23:00
         form(#"(?<![0-9])\#(spokenNumber) ?ทุ่ม\#(minutes)\#(half)"#) { (1...5).contains($0) ? $0 + 18 : nil },
-        // ตีหนึ่ง … ตีห้า, ตี 1 … ตี 5 → 01:00 … 05:00. No minutes: "ตีห้าสิบห้า" could be 05:15 or 55.
-        form(#"ตี ?\#(spokenNumber)(?![0-9])\#(half)"#) { (1...5).contains($0) ? $0 : nil },
+        // ทุ่มหนึ่ง, ทุ่มนึง, ทุ่ม 1 → 19:00, ทุ่มครึ่ง → 19:30. Not after a number ("หกทุ่มครึ่ง"), and not
+        // "ทุ่ม" as in spending: "ทุ่มหนึ่งล้านบาท", "ทุ่ม 1,000 บาท", "ทุ่มครึ่งหนึ่ง".
+        phrase(
+            #"(?<!(?:หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ|เอ็ด|[0-9]) ?)ทุ่ม"#
+                + #"(?: ?(?:หนึ่ง|นึง|1(?! ?(?:[0-9,.]|นาที|โมง|ทุ่ม|ครึ่ง|เท่า)))(?! ?(?:ล้าน|แสน|หมื่น|พัน|ร้อย|สิบ|\#(counted)))| ?(?<half>ครึ่ง)(?!หนึ่ง|นึง|วัน|ชั่วโมง|ทาง|ราคา|เดือน|ปี))"#,
+            hour: 19
+        ),
+        // ตีหนึ่ง … ตีห้า, ตี 1 … ตี 5 → 01:00 … 05:00. The hour is the first number, so "ตีห้าสิบห้า" is 05:15.
+        form(#"ตี ?\#(spokenNumber)(?![0-9])\#(minutes)\#(half)"#) { (1...5).contains($0) ? $0 : nil },
         // บ่ายหนึ่ง … บ่ายห้า, บ่าย 2, บ่ายสองโมง, บ่ายสองโมงสี่สิบ → 13:00 … 17:59
         form(#"บ่าย ?\#(spokenNumber)(?![0-9])(?: ?โมง\#(minutes))?\#(half)"#) { (1...5).contains($0) ? $0 + 12 : nil },
         // หกโมงเช้า … สิบเอ็ดโมงเช้า → 06:00 … 11:00
@@ -99,8 +114,9 @@ enum ThaiSpokenTime {
         // หกโมงสิบห้าตอนเช้า, หกโมงตอนเช้า: the period word follows the minutes and is part of the time.
         form(#"(?<![0-9])\#(spokenNumber) ?โมง\#(minutes)\#(half) ?ตอน ?เช้า"#, hour: morning),
         form(#"(?<![0-9])\#(spokenNumber) ?โมง\#(minutes)\#(half) ?ตอน ?เย็น"#, hour: evening),
-        // เจ็ดโมง … สิบเอ็ดโมง → 07:00 … 11:00, ห้าโมง → 17:00. หกโมง is left alone: it can mean 6 AM or 6 PM.
-        form(#"(?<![0-9])\#(spokenNumber) ?โมง(?!\#(morningWord)|\#(eveningWord))\#(minutes)\#(half)"#) { number in
+        // เจ็ดโมง … สิบเอ็ดโมง → 07:00 … 11:00, ห้าโมง → 17:00. หกโมง can mean 6 AM or 6 PM and สี่โมง is
+        // just as unclear, so those convert only with เช้า or เย็น just before: "ตอนเช้าหกโมง" → 06:00.
+        form(#"(?<![0-9])\#(spokenNumber) ?โมง(?!\#(morningWord)|\#(eveningWord))\#(minutes)\#(half)"#, asksWordBefore: true) { number in
             switch number {
             case 7...11: number
             case 5: 17
@@ -118,8 +134,37 @@ enum ThaiSpokenTime {
     private static let morning: @Sendable (Int) -> Int? = { (6...11).contains($0) ? $0 : nil }
     private static let evening: @Sendable (Int) -> Int? = { (4...6).contains($0) ? $0 + 12 : nil }
 
-    private static func form(_ pattern: String, hour: @escaping @Sendable (Int) -> Int?) -> Form {
-        Form(regex: regex(pattern), hour: { $0.flatMap(hour) })
+    /// The nearest เช้า or เย็น before `start`, as the rule for reading the hour. Only a few
+    /// letters may sit in between ("เย็นนี้เจอกันหกโมง"), with no number and no other time of day,
+    /// and เย็น meaning cold does not count ("น้ำเย็น").
+    private static func periodWord(before start: String.Index, in text: String) -> (@Sendable (Int) -> Int?)? {
+        let prefix = text[..<start]
+        let morningAt = prefix.range(of: "เช้า", options: .backwards)
+        let eveningAt = prefix.range(of: "เย็น", options: .backwards)
+        let isEvening = switch (morningAt, eveningAt) {
+        case let (morning?, evening?): evening.lowerBound > morning.lowerBound
+        default: eveningAt != nil
+        }
+        guard let word = isEvening ? eveningAt : morningAt else { return nil }
+
+        var between = String(prefix[word.upperBound...].filter { !$0.isWhitespace })
+        if between.hasPrefix("นี้") { between.removeFirst("นี้".count) }
+        guard between.unicodeScalars.count <= 10,
+              !between.contains(where: \.isNumber),
+              !["บ่าย", "คืน", "ทุ่ม", "เที่ยง"].contains(where: between.contains) else { return nil }
+        if isEvening {
+            let cold = ["น้ำ", "ใจ", "อากาศ", "กาแฟ", "ชา", "แอร์"].contains(where: prefix[..<word.lowerBound].hasSuffix)
+            guard !cold, !between.hasPrefix("ชา"), !between.hasPrefix("ตาโฟ") else { return nil }
+        }
+        return isEvening ? evening : morning
+    }
+
+    private static func form(
+        _ pattern: String,
+        asksWordBefore: Bool = false,
+        hour: @escaping @Sendable (Int) -> Int?
+    ) -> Form {
+        Form(regex: regex(pattern), hour: { $0.flatMap(hour) }, asksWordBefore: asksWordBefore)
     }
 
     private static func phrase(_ pattern: String, hour: Int) -> Form {

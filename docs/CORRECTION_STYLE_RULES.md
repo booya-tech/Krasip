@@ -93,6 +93,7 @@ Some Thai-letter words are both an everyday Thai word and the name of a product.
 - Times spoken in English keep the English form: `9:30 AM`, `5 PM`, `10 AM`, `7 o'clock`. A space before AM and PM, both letters uppercase.
 - The model never converts between the two forms.
 - A period word that only marks the time of day is part of the time and is not repeated: `หกโมงสี่สิบห้าตอนเช้า` becomes `06:45`, the same way `สิบโมงเช้า` becomes `10:00`. The 24-hour form already says morning or evening.
+- `หกโมง` and `สี่โมง` on their own are unclear, so they stay as spoken: `ตื่นหกโมงสิบห้า` is not changed. They become digits only when `เช้า` or `เย็น` sits just before: `ตอนเช้าหกโมงสิบห้า` becomes `ตอนเช้า 06:15`, and `เย็นนี้เจอกันหกโมง` becomes `เย็นนี้เจอกัน 18:00`. The word before stays, because it can carry more than the time of day (`เย็นนี้` also says today).
 
 ## 7. URLs, emails, file names, and code
 
