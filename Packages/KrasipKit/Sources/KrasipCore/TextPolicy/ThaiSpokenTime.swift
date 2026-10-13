@@ -57,10 +57,11 @@ enum ThaiSpokenTime {
     /// Spoken minutes after the hour: "สิบห้า", "45", "ห้านาที". Ten and above may stand alone;
     /// one to nine need "นาที", and a number followed by a counting word ("สิบคน") is not minutes.
     /// The atomic group stops "สิบห้าคน" from being read as "สิบ" minutes.
+    private static let counted = "คน|บาท|ตัว|อัน|ชิ้น|ครั้ง|วัน|เดือน|ปี|ชั่วโมง|ข้อ|เครื่อง|%|เปอร์เซ็นต์"
+
     private static let minutes: String = {
         let unit = "หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า"
         let spoken = "(?:ยี่|สาม|สี่|ห้า)?สิบ(?:เอ็ด|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า)?"
-        let counted = "คน|บาท|ตัว|อัน|ชิ้น|ครั้ง|วัน|เดือน|ปี|ชั่วโมง|ข้อ|เครื่อง|%|เปอร์เซ็นต์"
         let tenAndAbove = "(?<minute>(?>\(spoken)|[0-5][0-9](?![0-9])))(?: ?นาที|(?! ?(?:\(counted))))"
         let belowTen = "(?<minuteUnit>\(unit)|[1-9]) ?นาที"
         return "(?: ?(?:\(tenAndAbove)|\(belowTen)))?"
@@ -88,8 +89,15 @@ enum ThaiSpokenTime {
     private static let forms: [Form] = [
         // หนึ่งทุ่ม … ห้าทุ่ม, 1 ทุ่ม … 5 ทุ่ม → 19:00 … 23:00
         form(#"(?<![0-9])\#(spokenNumber) ?ทุ่ม\#(minutes)\#(half)"#) { (1...5).contains($0) ? $0 + 18 : nil },
-        // ตีหนึ่ง … ตีห้า, ตี 1 … ตี 5 → 01:00 … 05:00. No minutes: "ตีห้าสิบห้า" could be 05:15 or 55.
-        form(#"ตี ?\#(spokenNumber)(?![0-9])\#(half)"#) { (1...5).contains($0) ? $0 : nil },
+        // ทุ่มหนึ่ง, ทุ่มนึง → 19:00, ทุ่มครึ่ง → 19:30. Not after a number ("หกทุ่มครึ่ง"), and not
+        // "ทุ่ม" as in spending: "ทุ่มหนึ่งล้านบาท", "ทุ่มครึ่งหนึ่ง".
+        phrase(
+            #"(?<!(?:หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ|เอ็ด|[0-9]) ?)ทุ่ม"#
+                + #"(?: ?(?:หนึ่ง|นึง)(?! ?(?:ล้าน|แสน|หมื่น|พัน|ร้อย|สิบ|\#(counted)))| ?(?<half>ครึ่ง)(?!หนึ่ง|นึง|วัน|ชั่วโมง|ทาง|ราคา|เดือน|ปี))"#,
+            hour: 19
+        ),
+        // ตีหนึ่ง … ตีห้า, ตี 1 … ตี 5 → 01:00 … 05:00. The hour is the first number, so "ตีห้าสิบห้า" is 05:15.
+        form(#"ตี ?\#(spokenNumber)(?![0-9])\#(minutes)\#(half)"#) { (1...5).contains($0) ? $0 : nil },
         // บ่ายหนึ่ง … บ่ายห้า, บ่าย 2, บ่ายสองโมง, บ่ายสองโมงสี่สิบ → 13:00 … 17:59
         form(#"บ่าย ?\#(spokenNumber)(?![0-9])(?: ?โมง\#(minutes))?\#(half)"#) { (1...5).contains($0) ? $0 + 12 : nil },
         // หกโมงเช้า … สิบเอ็ดโมงเช้า → 06:00 … 11:00

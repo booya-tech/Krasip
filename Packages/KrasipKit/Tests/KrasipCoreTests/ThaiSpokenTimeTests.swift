@@ -107,6 +107,53 @@ struct ThaiSpokenTimeTests {
         #expect(policy.finalize(raw, glossary: Glossary(), style: on).text == expected)
     }
 
+    // After "ตี" the hour is always the first number, one to five, so what follows is minutes.
+    @Test(arguments: [
+        ("พรุ่งนี้ต้องตื่นตีห้าสิบห้า", "พรุ่งนี้ต้องตื่น 05:15"),
+        ("วันนี้จะนอนสักตีหนึ่งสี่สิบห้า", "วันนี้จะนอนสัก 01:45"),
+        ("ตื่นตีสี่สิบห้า", "ตื่น 04:15"),
+        ("ตื่นตีสามสิบ", "ตื่น 03:10"),
+        ("ตื่นตีสามยี่สิบนาที", "ตื่น 03:20"),
+        ("ตื่นตีห้าห้านาที", "ตื่น 05:05"),
+        ("ตื่นตี 5 15", "ตื่น 05:15"),
+        ("ตื่น ตี ห้า สิบห้า", "ตื่น 05:15"),
+        ("ตีห้าสิบห้าตื่นมาออกกำลังกาย", "05:15 ตื่นมาออกกำลังกาย")
+    ])
+    func convertsMinutesAfterEarlyMorningHours(raw: String, expected: String) {
+        #expect(policy.finalize(raw, glossary: Glossary(), style: on).text == expected)
+    }
+
+    @Test(arguments: [
+        ("ตื่นตีห้าสิบคน", "ตื่น 05:00 สิบคน"),
+        ("ตื่นตีสิบห้า", "ตื่นตีสิบห้า"),
+        ("ตื่นตี 55", "ตื่นตี 55")
+    ])
+    func doesNotInventMinutesAfterEarlyMorningHours(raw: String, expected: String) {
+        #expect(policy.finalize(raw, glossary: Glossary(), style: on).text == expected)
+    }
+
+    // "ทุ่มหนึ่ง" and "ทุ่มนึง" are the everyday way to say หนึ่งทุ่ม.
+    @Test(arguments: [
+        ("เจอกันทุ่มหนึ่ง", "เจอกัน 19:00"),
+        ("เจอกันทุ่มนึง", "เจอกัน 19:00"),
+        ("เจอกันทุ่มครึ่ง", "เจอกัน 19:30"),
+        ("เจอกัน ทุ่ม หนึ่ง นะ", "เจอกัน 19:00 นะ"),
+        ("นัดสามทุ่มครึ่ง", "นัด 21:30")
+    ])
+    func convertsSevenInTheEveningSaidWithoutANumberFirst(raw: String, expected: String) {
+        #expect(policy.finalize(raw, glossary: Glossary(), style: on).text == expected)
+    }
+
+    @Test(arguments: [
+        "เขาทุ่มหนึ่งล้านบาท",
+        "ทุ่มหนึ่งร้อยเปอร์เซ็นต์",
+        "นัดหกทุ่มครึ่ง",
+        "ทุ่มครึ่งหนึ่งของเงินเก็บ"
+    ])
+    func leavesThrowingAndSpendingAlone(raw: String) {
+        #expect(policy.finalize(raw, glossary: Glossary(), style: on).text == raw)
+    }
+
     @Test(arguments: [
         "ตอนบ่ายว่างไหม",
         "กินข้าวเที่ยงกัน",
