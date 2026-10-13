@@ -59,6 +59,21 @@ The choice is per word, kept in one word list that the training data and the glo
 
 A word is added to the list the first time it comes out wrong, so the list grows from real use.
 
+### Words with two meanings
+
+Some Thai-letter words are both an everyday Thai word and the name of a product. The meaning in the sentence decides.
+
+| Heard as | Meaning | Write |
+| --- | --- | --- |
+| ซูม | To zoom in or out: a camera, a picture, a screen, a map | ซูม |
+| ซูม | The meeting app | Zoom |
+| ซูมคอล | A call on the meeting app | Zoom call |
+
+- `ช่วยซูมกล้องเข้ามาหน่อย` stays as it is.
+- `นัดคุยผ่านซูมตอนบ่าย` becomes `นัดคุยผ่าน Zoom ตอนบ่าย`.
+- Both can appear in one sentence: `ตอน Zoom call ช่วยซูมหน้าจอให้ดูหน่อยนะ`.
+- If the sentence does not make the meaning clear, the word stays as it arrived.
+
 ## 4. Capital letters
 
 - English words inside a sentence are lowercase, also at the start of a sentence: `deadline ของ feature นี้`, `bug นี้เกิด...`, `sprint planning เลื่อน...`.
