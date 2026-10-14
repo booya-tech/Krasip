@@ -440,11 +440,11 @@
       "id": "D09",
       "category": "numbers",
       "script": "ประชุมทีมสิบโมงเช้านะ",
-      "expected": "ประชุมทีม 10:00 นะ",
+      "expected": "ประชุมทีม 10 โมงเช้านะ",
       "keyTerms": [
-        "10:00"
+        "10 โมงเช้า"
       ],
-      "note": "Thai spoken time: สิบโมงเช้า."
+      "note": "A whole hour stays spoken, with the number as a digit."
     },
     {
       "id": "D10",
@@ -454,16 +454,16 @@
       "keyTerms": [
         "14:30"
       ],
-      "note": "Thai spoken time with ครึ่ง."
+      "note": "An hour with minutes becomes the 24-hour clock."
     },
     {
       "id": "D11",
       "category": "numbers",
       "script": "ส่ง report ก่อนบ่ายสาม",
-      "expected": "ส่ง report ก่อน 15:00",
+      "expected": "ส่ง report ก่อนบ่าย 3",
       "keyTerms": [
         "report",
-        "15:00"
+        "บ่าย 3"
       ],
       "note": "Thai time next to an English term."
     },
@@ -471,19 +471,19 @@
       "id": "D12",
       "category": "numbers",
       "script": "เลิกงานหกโมงเย็น",
-      "expected": "เลิกงาน 18:00",
+      "expected": "เลิกงาน 6 โมงเย็น",
       "keyTerms": [
-        "18:00"
+        "6 โมงเย็น"
       ],
-      "note": "โมงเย็น, which หกโมง alone would not convert."
+      "note": "โมงเย็น keeps its spoken words."
     },
     {
       "id": "D13",
       "category": "numbers",
       "script": "กินข้าวเย็นหนึ่งทุ่ม",
-      "expected": "กินข้าวเย็น 19:00",
+      "expected": "กินข้าวเย็น 1 ทุ่ม",
       "keyTerms": [
-        "19:00"
+        "1 ทุ่ม"
       ],
       "note": "Evening hours counted in ทุ่ม."
     },
@@ -491,9 +491,9 @@
       "id": "D14",
       "category": "numbers",
       "script": "ตื่นตีห้าไปวิ่ง",
-      "expected": "ตื่น 05:00 ไปวิ่ง",
+      "expected": "ตื่นตี 5 ไปวิ่ง",
       "keyTerms": [
-        "05:00"
+        "ตี 5"
       ],
       "note": "Early hours counted in ตี."
     },

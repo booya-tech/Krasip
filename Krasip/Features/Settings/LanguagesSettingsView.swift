@@ -81,10 +81,6 @@ struct LanguagesSettingsView: View {
                     Text(AppString.Languages.spokenTimes)
                     Text(AppString.Languages.spokenTimesExample)
                 }
-                Toggle(isOn: $settings.convertThaiTimes) {
-                    Text(AppString.Languages.thaiTimes)
-                    Text(AppString.Languages.thaiTimesExample)
-                }
                 Picker(AppString.Languages.punctuation, selection: $settings.punctuation) {
                     ForEach(PunctuationMode.allCases) { mode in
                         Text(AppString.Languages.punctuationName(mode)).tag(mode)

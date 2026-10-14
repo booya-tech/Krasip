@@ -11,7 +11,8 @@ import Foundation
 /// 2. Protect URLs, emails, and code so nothing below can touch them.
 /// 3. Apply locked glossary aliases (before any formatting); collect `suggest` matches and
 ///    Thai spellings that only sound like an alias (suggested, never applied without the user).
-/// 4. Convert spoken clock times ("ten AM" → "10 AM").
+/// 4. Convert spoken English clock times ("ten AM" → "10 AM") and write Thai spoken times the
+///    way docs/THAI_TIME_RULES.md sets ("บ่ายสองครึ่ง" → "14:30", "หกโมงเย็น" → "6 โมงเย็น").
 /// 5. Protect remaining Latin words and numbers.
 /// 6. Insert a space where Thai text touches English words or digits.
 /// 7. Apply the punctuation mode.
@@ -39,7 +40,7 @@ public struct TextPolicy: Sendable {
             segments = applySpokenTimes(segments, found: SpokenTime.matches(in:), log: &log)
         }
 
-        if style.convertThaiTimes, !decisions.disabledKinds.contains(.spokenTime) {
+        if !decisions.disabledKinds.contains(.spokenTime) {
             segments = applySpokenTimes(segments, found: ThaiSpokenTime.matches(in:), log: &log)
         }
 
