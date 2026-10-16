@@ -36,17 +36,14 @@ public struct TextPolicy: Sendable {
         segments = applyGlossary(segments, glossary: glossary, decisions: decisions, log: &log)
         segments = applySoundAlikes(segments, glossary: glossary, style: style, decisions: decisions, log: &log)
 
-        if style.convertSpokenTimes, !decisions.disabledKinds.contains(.spokenTime) {
-            segments = applySpokenTimes(segments, found: SpokenTime.matches(in:), log: &log)
-        }
-
         if !decisions.disabledKinds.contains(.spokenTime) {
+            segments = applySpokenTimes(segments, found: SpokenTime.matches(in:), log: &log)
             segments = applySpokenTimes(segments, found: ThaiSpokenTime.matches(in:), log: &log)
         }
 
         segments = protectWords(segments)
 
-        if style.spaceBetweenThaiAndLatin, !decisions.disabledKinds.contains(.spacing) {
+        if !decisions.disabledKinds.contains(.spacing) {
             segments = applyScriptSpacing(segments, log: &log)
         }
 

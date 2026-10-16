@@ -35,7 +35,7 @@ So the code is split into a Swift package with three modules and a thin app on t
 
 **Sound-alike suggestions, never sound-alike replacements.** Recognizers spell the same English loanword several ways (ไซต์โปรเจกต์ / ไซด์โปรเจ็กต์). A rough "sound key" folds tone marks, silent letters, and consonants that sound the same, so those spellings compare equal. The spec allows this only as "a high-confidence phonetic match confirmed by the user", so a sound-alike is only ever a suggestion; accepting one saves that spelling as a real alias, and the next time it is an exact match.
 
-**Spoken times are the one built-in rewrite.** The acceptance table requires `ten AM` → `10 AM`, so English clock times with an explicit AM/PM/o'clock marker become digits. Nothing else is converted — "two cats" and Thai number words are left alone — and the rule can be switched off.
+**Spoken times are the one built-in rewrite.** The acceptance table requires `ten AM` → `10 AM`, so English clock times with an explicit AM/PM/o'clock marker become digits. Thai spoken times follow `THAI_TIME_RULES.md`. Nothing else is converted; "two cats" is left alone.
 
 **Silence is never sent to a recognizer.** Whisper-family models invent text from silence ("ขอบคุณครับ"), so a recording with less than ~0.15 s of voiced audio becomes "Didn't catch that".
 

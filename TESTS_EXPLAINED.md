@@ -32,7 +32,7 @@ Run them with `swift test` inside `Packages/KrasipKit`, or ⌘U in Xcode.
 | `emptyTranscriptStaysEmpty` | Only spaces in → empty text out, no crash. |
 | `insertsSpaceBetweenThaiAndEnglish` | "ส่งpull requestให้ทีม" gets a space on each side of the English. |
 | `insertsSpaceBetweenThaiAndDigits` | "ตอน10 AM" becomes "ตอน 10 AM". |
-| `spacingCanBeTurnedOff` | With the spacing setting off, nothing is inserted. |
+| `undoingSpacingKeepsTheTextJoined` | Undoing the spacing rule leaves Thai and English joined, as heard. |
 | `existingSpaceIsNotDuplicated` | A space that is already there is not doubled. |
 | `urlsAreNotBrokenBySpacingOrGlossary` | A URL next to Thai text is spaced from it but never changed inside, even when an alias ("github") appears in it. |
 | `emailsAreProtected` | An alias inside an email address is not replaced. |
@@ -59,7 +59,6 @@ Run them with `swift test` inside `Packages/KrasipKit`, or ⌘U in Xcode.
 | --- | --- |
 | `convertsClockTimes` | Nine spoken forms: AM/PM in any case, "a.m.", "o'clock", "nine thirty", "six oh five", "eleven forty-five", and no space after Thai. |
 | `leavesOtherNumbersAlone` | "two meetings", "ten people", "at nine", and "10 AM" are not touched. |
-| `canBeTurnedOff` | With the setting off, "ten AM" stays as words. |
 
 ### ThaiSpokenTimeTests.swift: Thai times as people type them
 

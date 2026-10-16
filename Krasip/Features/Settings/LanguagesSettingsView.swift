@@ -1,6 +1,6 @@
 // LanguagesSettingsView.swift
 // Krasip
-// Languages tab: which languages to recognize, which speech engine to use, and text formatting rules.
+// Languages tab: which languages to recognize and which speech engine to use.
 
 import SwiftUI
 import KrasipCore
@@ -70,28 +70,6 @@ struct LanguagesSettingsView: View {
                 case .openAI:
                     OpenAISettingsSection()
                 }
-            }
-
-            Section {
-                Toggle(isOn: $settings.spaceBetweenThaiAndLatin) {
-                    Text(AppString.Languages.spacing)
-                    Text(AppString.Languages.spacingExample)
-                }
-                Toggle(isOn: $settings.convertSpokenTimes) {
-                    Text(AppString.Languages.spokenTimes)
-                    Text(AppString.Languages.spokenTimesExample)
-                }
-                Picker(AppString.Languages.punctuation, selection: $settings.punctuation) {
-                    ForEach(PunctuationMode.allCases) { mode in
-                        Text(AppString.Languages.punctuationName(mode)).tag(mode)
-                    }
-                }
-            } header: {
-                Text(AppString.Languages.formattingSection)
-            } footer: {
-                Text(AppString.Languages.formattingHelp)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
             }
         }
         .formStyle(.grouped)
