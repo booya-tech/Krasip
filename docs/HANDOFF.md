@@ -25,7 +25,7 @@ The first run uses Apple's on-device Thai model, which is the honest default and
 
 The glossary is the lever for the weak row. Teach it the ten or twenty terms you actually say, from Settings → Glossary or from History → "Add Preferred Spelling…".
 
-There is also a stronger local setup, Thonburian Whisper plus a fine-tuned correction model, which Krasip talks to as a local Whisper server. It is not in this repo and it needs about 4 GB of models, so it is a separate, opt-in step. Ask before spending an afternoon on it.
+There is also a stronger local setup, Thonburian Whisper plus a correction model trained here, which Krasip talks to as a local Whisper server. It lives in its own repo, [krasip-correction](https://github.com/booya-tech/krasip-correction), and takes one script plus about 4 GB of downloads. Do the steps above first and dictate with Apple's engine for a day, so you can tell the difference yourself.
 
 ## What is done
 
