@@ -42,6 +42,8 @@ Excluded:
 4. Show the raw transcript before insertion when confidence is low.
 5. Save audio only when the user enables it. Text history is local by default.
 
+Note on rule 3 (added 2026-10-16). The optional correction model in `relay/` keeps this rule. It only fixes speech-to-text mistakes, under `CORRECTION_STYLE_RULES.md` section 1, never to make text sound better. It runs on the Mac, and the text never leaves it.
+
 ## User flow
 
 ```text

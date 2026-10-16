@@ -14,7 +14,7 @@ So the code is split into a Swift package with three modules and a thin app on t
 
 | Module | Depends on | Why it is separate |
 | --- | --- | --- |
-| `KrasipCore` | Foundation only | All the thinking: text policy, glossary, learning, the flow. No AppKit, no microphone, no network — which is why 122 tests run in 0.1 s. |
+| `KrasipCore` | Foundation only | All the thinking: text policy, glossary, learning, the flow. No AppKit, no microphone, no network, which is why 121 tests run in 0.1 s. |
 | `KrasipStorage` | Core + SQLite | One place that knows SQL. |
 | `KrasipSystem` | Core + macOS frameworks | Everything that can break on a new macOS: microphone, speech engines, Accessibility, hot keys, Keychain. |
 | `Krasip` (app) | all three | SwiftUI views and the wiring (`AppController`). |
@@ -43,7 +43,7 @@ So the code is split into a Swift package with three modules and a thin app on t
 
 **Thai interface, chosen inside the app.** macOS picks an app's language from the system language, but many Thai developers keep macOS in English. Settings → Languages has its own picker that writes `AppleLanguages` into Krasip's own preferences, with a Restart Now button. The restart launches a fresh copy one second after this one quits, so the two copies never fight over the ⌥ Space hot key.
 
-**No LLM rewriting anywhere.** The cloud adapter sends audio plus a short spelling hint (your glossary terms). The transcript is never sent anywhere to be polished. That is product rule 3, and it is also why every change Krasip makes can be explained in one line.
+**A model may fix what was misheard, never rewrite.** Product rule 3 forbids sending text to an LLM merely to make it sound better. The optional correction model in `relay/` does something narrower. It repairs speech-to-text mistakes, such as ดีพลอย heard for "deploy", and follows `CORRECTION_STYLE_RULES.md` section 1: no polishing, no tone changes, and no added, removed, reordered, or translated words. Two safety checks compare its output with what was heard and undo any piece that breaks those rules. It runs on the Mac, so the text never leaves it. The cloud adapter still sends only audio plus a short spelling hint (your glossary terms). Inside the app, every change Krasip makes can still be explained in one line. The relay's corrections arrive as part of the transcript, and the relay's terminal prints each one as a `heard:` and `fixed:` pair.
 
 ## What the numbers said on the first night
 

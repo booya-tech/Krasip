@@ -24,7 +24,7 @@ Legend: **Test** = checked by an automated test · **Built** = implemented, chec
 | --- | --- | --- |
 | 1. Preserve meaning over polish | Test | The policy only normalizes spacing, applies your rules, converts spoken clock times, and applies your punctuation choice. |
 | 2. Preserve Latin-script terms unless you ask for Thai | Test | English words are protected spans (`englishIsNeverTransliteratedOrChangedWithoutARule`). Only your own glossary rules change them. |
-| 3. Never send text to an LLM to sound better | Built | No rewriting step exists. The cloud adapter sends audio and spelling hints only (`OpenAIRequestTests`). |
+| 3. Never send text to an LLM to sound better | Built | The app has no rewriting step. The cloud adapter sends audio and spelling hints only (`OpenAIRequestTests`). The optional correction model in `relay/` runs on the Mac and only fixes misheard words, under `CORRECTION_STYLE_RULES.md` section 1, with two safety checks that undo anything else. |
 | 4. Show the raw transcript when confidence is low | Test | Review card shows "Heard: …" (`lowConfidenceShowsRawTranscriptForReview`). Threshold in Settings → General. |
 | 5. Audio only when enabled; text history local | Test | "Keep audio for retry" is off by default; history is SQLite on this Mac (`historyCanBeTurnedOff`). |
 

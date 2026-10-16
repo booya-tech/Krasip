@@ -19,10 +19,14 @@ DEVELOPMENT_TEAM = YOURTEAMID
 
 `Config/Base.xcconfig` ends with `#include? "Local.xcconfig"`, so the local file overrides the empty default.
 
+`./scripts/setup.sh` does all of that plus the local speech pipeline: whisper.cpp, the Python
+packages, the two model downloads, the policy runner build, and the app defaults that point Krasip
+at the relay. It is safe to run again.
+
 ## Commands
 
 ```bash
-# tests, about one second, 169 of them
+# tests, about one second, 168 of them
 cd Packages/KrasipKit && swift test
 swift test --filter TextPolicyTests          # one suite
 
@@ -32,6 +36,9 @@ KRASIP_LIVE_ASR=1 swift test
 # app
 xcodebuild -project Krasip.xcodeproj -scheme Krasip -configuration Debug -destination 'platform=macOS' build
 ./scripts/build-release.sh                   # signed app into ./build
+
+# local speech pipeline: speech server on 8081, correction relay on 8085
+./relay/start.sh
 
 # ⌘U in Xcode runs all three package test targets through Krasip.xctestplan
 ```
@@ -67,14 +74,14 @@ A Swift package with three modules, plus a thin SwiftUI app:
 | `KrasipSystem` | Core, macOS frameworks | Microphone, speech engines, Accessibility, hot keys, Keychain |
 | `Krasip` (app) | all three | SwiftUI views and the wiring in `AppController` |
 
-`KrasipCore` has no AppKit and no microphone, which is why its 122 tests run in 0.1 seconds. Keep it that way. Anything touching a macOS framework belongs in `KrasipSystem`.
+`KrasipCore` has no AppKit and no microphone, which is why its 121 tests run in 0.1 seconds. Keep it that way. Anything touching a macOS framework belongs in `KrasipSystem`.
 
 `DictationFlow` is the only type that knows the order of the steps. It takes every dependency as a closure, so tests swap the microphone, recognizer, inserter, clock, and `sleep`. Add a new step there, not in the views.
 
 ### Decisions worth knowing before changing things
 
 - **The text policy works on `[TextSegment]`, not on one `String`.** Each piece remembers where it came from and whether it is protected. "Never change a protected term" is enforced structurally, not by hoping regexes do not overlap. Every change is logged and can be undone.
-- **No LLM rewriting anywhere.** The transcript is never sent somewhere to be improved. The cloud adapter sends audio plus glossary spelling hints only. This is a product rule, not an implementation detail.
+- **A model may fix what was misheard, never rewrite.** The correction model in `relay/` repairs speech-to-text mistakes only, such as ดีพลอย for "deploy". It never polishes, changes tone, adds, removes, reorders, or translates words (`docs/CORRECTION_STYLE_RULES.md` section 1), and two safety checks undo any change that does. It runs on the Mac, so the text never leaves it. The cloud adapter sends audio plus glossary spelling hints only. This is product rule 3, not an implementation detail.
 - **Glossary matching is exact on a normalized form.** Sound-alike matches are only ever suggestions, applied after the user taps Use.
 - **Carbon hot keys**, because `RegisterEventHotKey` is the only API that reports key-up without extra permissions and swallows the keystroke.
 - **Insertion is Accessibility first, paste second**, with the clipboard restored afterwards, and secure fields refused outright. See the ladder in `TextInserter.swift`.
@@ -91,6 +98,8 @@ Krasip/                    the app
   Features/                Overlay, MenuBar, Settings, History, Onboarding, Benchmark
 Packages/KrasipKit/        the three modules and all tests
 Config/                    Base.xcconfig, entitlements, extra Info.plist keys
+relay/                     local speech pipeline: start.sh, the correction relay, the policy runner
+scripts/                   setup.sh, setup-local.sh, build-release.sh
 docs/                      spec, checklist, design notes, manual test plan, benchmark results
 ```
 
@@ -108,7 +117,7 @@ Error types in the package carry their own catalogs and use `String(localized:..
 
 Swift Testing, not XCTest. `@Test` and `#expect`.
 
-- `KrasipCoreTests` (122) is the one that matters. Pure logic, no mocks of the OS.
+- `KrasipCoreTests` (121) is the one that matters. Pure logic, no mocks of the OS.
 - `AcceptanceTests.swift` holds the spec's acceptance table. Treat failures there as blocking.
 - `BenchmarkTests.swift` checks the bundled sentence set stays consistent with the policy.
 - Live speech tests are gated behind `KRASIP_LIVE_ASR=1` and skipped by default.
@@ -131,5 +140,7 @@ What automated tests cannot reach: real microphone input, Accessibility permissi
 ## Speech engines
 
 Three adapters behind one `Transcriber` protocol: Apple on-device (current default), Apple online, and any OpenAI-compatible `/audio/transcriptions` endpoint. A `localhost` endpoint is treated as a local server and needs no API key.
+
+The setup the founders use daily goes through that third adapter. `relay/start.sh` runs whisper.cpp with Thonburian Whisper 8-bit on port 8081 and the correction relay on 8085. Krasip sends audio to the relay, which gets the transcript from whisper.cpp, runs the text policy and the correction model, and answers like any `/audio/transcriptions` server. See `relay/README.md`.
 
 Measured accuracy on real speech is in `docs/BENCHMARK_RESULTS.md`. Short version: plain Thai is flawless, English work terms need the glossary, and URLs and code do not survive at all. Do not add a fourth engine type before the numbers justify it.

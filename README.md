@@ -7,7 +7,7 @@ You say:    วันนี้จะต้องกลับบ้านไป�
 You get:    วันนี้จะต้องกลับบ้านไปทำ side-project
 ```
 
-Krasip keeps English words in English, uses your own spellings from a personal glossary, and never sends your text to an AI to "improve" it. The whole interface is in Thai and English — pick either in Settings → Languages, whatever language macOS is in. Built from [`docs/KRASIP_MVP_SPEC.md`](docs/KRASIP_MVP_SPEC.md) (macOS 14+).
+Krasip keeps English words in English, uses your own spellings from a personal glossary, and never lets an AI polish or rewrite your words. The optional correction model only fixes what the recognizer misheard, and it runs on your Mac. The whole interface is in Thai and English. Pick either in Settings → Languages, whatever language macOS is in. Built from [`docs/KRASIP_MVP_SPEC.md`](docs/KRASIP_MVP_SPEC.md) (macOS 14+).
 
 | Listening | Result | Check before inserting |
 | --- | --- | --- |
@@ -23,31 +23,55 @@ More screens: [glossary](docs/screenshots/settings-glossary.png) · [languages](
 
 ## Quick start
 
-Nothing to configure. Clone it and press ⌘R.
+This gives you the full setup the founders use every day: Thonburian Whisper for speech, then the
+correction model, all running on your Mac. You need an Apple Silicon Mac with 16 GB of memory or more,
+Xcode, and [Homebrew](https://brew.sh).
 
-1. Open `Krasip.xcodeproj` in Xcode.
-2. Choose the **Krasip** scheme and **My Mac**, then press **⌘R**.
-3. The setup guide opens. Allow the **Microphone** and **Accessibility**, and pick a speech engine.
-   On macOS 26 pick **Apple — on this Mac** and download the Thai model once; on macOS 14 or 15 the
-   default is **Apple — online**.
+```bash
+git clone https://github.com/booya-tech/Krasip.git
+cd Krasip
+./scripts/setup.sh     # once; mostly downloads, about 4 GB
+./relay/start.sh       # every time you want to dictate; keep this window open
+```
+
+1. Open `Krasip.xcodeproj` in Xcode, choose the **Krasip** scheme and **My Mac**, and press **⌘R**.
+2. The setup guide opens. Allow the **Microphone** and **Accessibility**.
+3. On the speech engine step, leave the choice as it is. `setup.sh` already picked the OpenAI engine
+   with the address `http://127.0.0.1:8085/v1`, which is the relay on your Mac. No API key is needed.
 4. Click into any text field (Notes is a good first try), hold **⌥ Space**, speak, and let go.
+
+The relay window prints every dictation as a pair of lines, what the speech model heard and what the
+correction model made of it:
+
+```text
+   heard: เดี๋ยว ดี พลอย ขึ้น โปรดักชั่น ตอนเย็น แล้ว ส่ง รีโพล ก่อน บ่าย สาม โมง นะ
+   fixed: เดี๋ยว deploy ขึ้น production ตอนเย็น แล้ว ส่ง report ก่อนบ่าย 3 โมงนะ
+```
+
+If you close that window, dictation fails with "Could not reach the speech service" until you start it again.
 
 Krasip lives in the **menu bar** (a waveform icon). There is no Dock icon unless a Krasip window is open.
 
+### Without the local models
+
+Skip both scripts and press ⌘R. In the setup guide pick Apple's on-device engine and download the Thai
+model once. It is excellent for plain Thai and weak on English work words; see the numbers in
+[`docs/BENCHMARK_RESULTS.md`](docs/BENCHMARK_RESULTS.md).
+
 ### Sign with your own certificate
 
-Without any setup, Xcode signs Krasip to run locally. That builds and runs, but macOS asks for the
+Without a certificate, Xcode signs Krasip to run locally. That builds and runs, but macOS asks for the
 Accessibility permission again after every build, because a locally signed build looks like a new app
 each time. Signing with your own Apple Development certificate keeps the permission between builds.
-A free Apple ID is enough: sign in once under Xcode → Settings → Accounts, then run
+A free Apple ID is enough. Sign in once under Xcode → Settings → Accounts, then run
 
 ```bash
 ./scripts/setup-local.sh
 ```
 
-It writes your team ID into `Config/Local.xcconfig`, which is gitignored so every machine signs with
-its own certificate. With more than one team on the Mac the script lists them and you name the one you
-want, as in `./scripts/setup-local.sh 45C3927649`.
+`setup.sh` runs it for you too. It writes your team ID into `Config/Local.xcconfig`, which is gitignored
+so every machine signs with its own certificate. With more than one team on the Mac the script lists
+them and you name the one you want, as in `./scripts/setup-local.sh 45C3927649`.
 
 ### Everyday use
 
@@ -76,6 +100,8 @@ All three sit behind one small interface (`Transcriber`), so each can be swapped
 | **OpenAI — cloud** | Your chosen endpoint | Paste an API key | Best at mixed Thai-English. Works with any OpenAI-compatible `/audio/transcriptions` endpoint (OpenAI, Groq, …), including a **local Whisper server** at `http://localhost…` (no key needed, audio stays on the Mac). |
 
 The OpenAI adapter sends only the audio plus spelling hints from your glossary. The transcript itself is never sent anywhere.
+
+The local pipeline from the Quick start uses the OpenAI adapter too. `relay/start.sh` runs whisper.cpp with Thonburian Whisper 8-bit on port 8081 and the correction relay on 8085, and Krasip talks to the relay. [`relay/README.md`](relay/README.md) explains how it works, where the models come from, and how to swap in a new correction model.
 
 Run the **Benchmark** window with your own voice to pick the engine that works best for you (the spec's "select an ASR adapter after Thai-English benchmark testing").
 
@@ -138,6 +164,8 @@ Packages/KrasipKit/        Swift package with the pipeline modules and all tests
   Sources/KrasipCore       Pure logic: text policy, glossary, learning, flow, benchmark metrics
   Sources/KrasipStorage    SQLite: history, corrections, glossary, per-app rules
   Sources/KrasipSystem     macOS adapters: microphone, speech engines, insertion, hotkey, Keychain
+relay/                       Local speech pipeline: start.sh, the correction relay, the text policy runner
+scripts/setup.sh             One-time setup for the local speech pipeline and signing
 scripts/build-release.sh     Builds ./build/Krasip.app you can double-click
 docs/                        Spec, spec checklist, manual test plan, design notes, screenshots
 ```
@@ -150,7 +178,7 @@ All user-facing text lives in `Krasip/Core/Utilities/AppString.swift` and is tra
 
 ```bash
 cd Packages/KrasipKit
-swift test                      # 169 tests, about one second
+swift test                      # 168 tests, about one second
 KRASIP_LIVE_ASR=1 swift test  # also runs Apple's on-device Thai recognizer on generated speech (macOS 26)
 ```
 
