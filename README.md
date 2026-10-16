@@ -23,24 +23,31 @@ More screens: [glossary](docs/screenshots/settings-glossary.png) · [languages](
 
 ## Quick start
 
-1. Create `Config/Local.xcconfig` with your own Apple team ID. The file is gitignored, so every
-   machine signs with its own certificate:
-   ```
-   DEVELOPMENT_TEAM = YOURTEAMID
-   ```
-   Your team ID is the 10-character code at [developer.apple.com/account](https://developer.apple.com/account) under Membership details. If you already have a distribution certificate, this prints it too:
-   ```bash
-   security find-identity -v -p codesigning | grep "Apple Distribution"
-   ```
-   The code in brackets on that line is the team ID. Ignore the `Apple Development` lines; their brackets hold a per-certificate ID, not the team.
-2. Open `Krasip.xcodeproj` in Xcode.
-3. Choose the **Krasip** scheme and **My Mac**, then press **⌘R**.
-4. The setup guide opens. Allow the **Microphone** and **Accessibility**, and pick a speech engine.
-5. Click into any text field (Notes is a good first try), hold **⌥ Space**, speak, and let go.
+Nothing to configure. Clone it and press ⌘R.
+
+1. Open `Krasip.xcodeproj` in Xcode.
+2. Choose the **Krasip** scheme and **My Mac**, then press **⌘R**.
+3. The setup guide opens. Allow the **Microphone** and **Accessibility**, and pick a speech engine.
+   On macOS 26 pick **Apple — on this Mac** and download the Thai model once; on macOS 14 or 15 the
+   default is **Apple — online**.
+4. Click into any text field (Notes is a good first try), hold **⌥ Space**, speak, and let go.
 
 Krasip lives in the **menu bar** (a waveform icon). There is no Dock icon unless a Krasip window is open.
 
-> Signing is automatic. Keep signing with the same certificate every build, or macOS will ask for the Accessibility permission again each time.
+### Sign with your own certificate
+
+Without any setup, Xcode signs Krasip to run locally. That builds and runs, but macOS asks for the
+Accessibility permission again after every build, because a locally signed build looks like a new app
+each time. Signing with your own Apple Development certificate keeps the permission between builds.
+A free Apple ID is enough: sign in once under Xcode → Settings → Accounts, then run
+
+```bash
+./scripts/setup-local.sh
+```
+
+It writes your team ID into `Config/Local.xcconfig`, which is gitignored so every machine signs with
+its own certificate. With more than one team on the Mac the script lists them and you name the one you
+want, as in `./scripts/setup-local.sh 45C3927649`.
 
 ### Everyday use
 
@@ -143,7 +150,7 @@ All user-facing text lives in `Krasip/Core/Utilities/AppString.swift` and is tra
 
 ```bash
 cd Packages/KrasipKit
-swift test                      # 168 tests, about one second
+swift test                      # 169 tests, about one second
 KRASIP_LIVE_ASR=1 swift test  # also runs Apple's on-device Thai recognizer on generated speech (macOS 26)
 ```
 

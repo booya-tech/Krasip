@@ -6,7 +6,12 @@ Krasip is a macOS push-to-talk dictation app for Thai mixed with English. Hold â
 
 ## Setup
 
-`Config/Local.xcconfig` holds your Apple team ID and is gitignored. Without it the app will not sign:
+Nothing is needed to build. With no `Config/Local.xcconfig`, Xcode resolves `CODE_SIGN_IDENTITY = -`
+and signs the app to run locally, hardened runtime off. The cost is that macOS asks for the
+Accessibility permission again after every build, because the signature changes each time.
+
+`./scripts/setup-local.sh` fixes that by writing the Apple team ID found on this Mac into
+`Config/Local.xcconfig`, which is gitignored:
 
 ```
 DEVELOPMENT_TEAM = YOURTEAMID
@@ -17,7 +22,7 @@ DEVELOPMENT_TEAM = YOURTEAMID
 ## Commands
 
 ```bash
-# tests, about one second, 164 of them
+# tests, about one second, 169 of them
 cd Packages/KrasipKit && swift test
 swift test --filter TextPolicyTests          # one suite
 
@@ -62,7 +67,7 @@ A Swift package with three modules, plus a thin SwiftUI app:
 | `KrasipSystem` | Core, macOS frameworks | Microphone, speech engines, Accessibility, hot keys, Keychain |
 | `Krasip` (app) | all three | SwiftUI views and the wiring in `AppController` |
 
-`KrasipCore` has no AppKit and no microphone, which is why its 121 tests run in 0.1 seconds. Keep it that way. Anything touching a macOS framework belongs in `KrasipSystem`.
+`KrasipCore` has no AppKit and no microphone, which is why its 122 tests run in 0.1 seconds. Keep it that way. Anything touching a macOS framework belongs in `KrasipSystem`.
 
 `DictationFlow` is the only type that knows the order of the steps. It takes every dependency as a closure, so tests swap the microphone, recognizer, inserter, clock, and `sleep`. Add a new step there, not in the views.
 
@@ -103,7 +108,7 @@ Error types in the package carry their own catalogs and use `String(localized:..
 
 Swift Testing, not XCTest. `@Test` and `#expect`.
 
-- `KrasipCoreTests` (117) is the one that matters. Pure logic, no mocks of the OS.
+- `KrasipCoreTests` (122) is the one that matters. Pure logic, no mocks of the OS.
 - `AcceptanceTests.swift` holds the spec's acceptance table. Treat failures there as blocking.
 - `BenchmarkTests.swift` checks the bundled sentence set stays consistent with the policy.
 - Live speech tests are gated behind `KRASIP_LIVE_ASR=1` and skipped by default.
