@@ -33,9 +33,4 @@ struct SpokenTimeTests {
     func leavesOtherNumbersAlone(raw: String) {
         #expect(policy.finalize(raw, glossary: Glossary()).text == raw)
     }
-
-    @Test func canBeTurnedOff() {
-        let style = TextStyle(convertSpokenTimes: false)
-        #expect(policy.finalize("ตอน ten AM", glossary: Glossary(), style: style).text == "ตอน ten AM")
-    }
 }

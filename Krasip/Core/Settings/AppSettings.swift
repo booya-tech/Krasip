@@ -77,10 +77,7 @@ final class AppSettings {
     var openAIBaseURL: String { didSet { defaults.set(openAIBaseURL, forKey: Key.openAIBaseURL) } }
     var openAISendsLanguageHint: Bool { didSet { defaults.set(openAISendsLanguageHint, forKey: Key.openAILanguageHint) } }
 
-    var spaceBetweenThaiAndLatin: Bool { didSet { defaults.set(spaceBetweenThaiAndLatin, forKey: Key.spacing) } }
-    var convertSpokenTimes: Bool { didSet { defaults.set(convertSpokenTimes, forKey: Key.spokenTimes) } }
     var suggestSoundAlikes: Bool { didSet { defaults.set(suggestSoundAlikes, forKey: Key.soundAlikes) } }
-    var punctuation: PunctuationMode { didSet { defaults.set(punctuation.rawValue, forKey: Key.punctuation) } }
 
     var saveHistory: Bool { didSet { defaults.set(saveHistory, forKey: Key.saveHistory) } }
     var keepAudio: Bool { didSet { defaults.set(keepAudio, forKey: Key.keepAudio) } }
@@ -106,10 +103,7 @@ final class AppSettings {
         openAIBaseURL = defaults.string(forKey: Key.openAIBaseURL) ?? OpenAIConfiguration.defaultBaseURL.absoluteString
         openAISendsLanguageHint = defaults.object(forKey: Key.openAILanguageHint) as? Bool ?? true
 
-        spaceBetweenThaiAndLatin = defaults.object(forKey: Key.spacing) as? Bool ?? true
-        convertSpokenTimes = defaults.object(forKey: Key.spokenTimes) as? Bool ?? true
         suggestSoundAlikes = defaults.object(forKey: Key.soundAlikes) as? Bool ?? true
-        punctuation = defaults.string(forKey: Key.punctuation).flatMap(PunctuationMode.init(rawValue:)) ?? .keep
 
         saveHistory = defaults.object(forKey: Key.saveHistory) as? Bool ?? true
         keepAudio = defaults.object(forKey: Key.keepAudio) as? Bool ?? false
@@ -119,12 +113,7 @@ final class AppSettings {
     }
 
     var textStyle: TextStyle {
-        TextStyle(
-            punctuation: punctuation,
-            spaceBetweenThaiAndLatin: spaceBetweenThaiAndLatin,
-            convertSpokenTimes: convertSpokenTimes,
-            suggestSoundAlikes: suggestSoundAlikes
-        )
+        TextStyle(suggestSoundAlikes: suggestSoundAlikes)
     }
 
     var flowSettings: FlowSettings {
@@ -171,10 +160,7 @@ final class AppSettings {
         static let openAIModel = "openAIModel"
         static let openAIBaseURL = "openAIBaseURL"
         static let openAILanguageHint = "openAISendsLanguageHint"
-        static let spacing = "spaceBetweenThaiAndLatin"
-        static let spokenTimes = "convertSpokenTimes"
         static let soundAlikes = "suggestSoundAlikes"
-        static let punctuation = "punctuationMode"
         static let saveHistory = "saveHistory"
         static let keepAudio = "keepAudio"
         static let retention = "historyRetentionDays"

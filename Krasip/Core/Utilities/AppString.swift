@@ -200,9 +200,16 @@ enum AppString {
         static let noAppRules = String(localized: "No app rules yet.")
         static let addApp = String(localized: "Add App")
         static let punctuation = String(localized: "Punctuation")
-        static let punctuationDefault = String(localized: "Default punctuation")
         static let autoInsert = String(localized: "Insert right away")
         static let removeRule = String(localized: "Remove this rule")
+
+        static func punctuationName(_ mode: PunctuationMode) -> String {
+            switch mode {
+            case .keep: String(localized: "Keep as heard")
+            case .noTrailingPeriod: String(localized: "Drop the final period")
+            case .none: String(localized: "Remove punctuation")
+            }
+        }
         static let feedbackSection = String(localized: "Sounds and startup")
         static let playSounds = String(localized: "Play sounds when listening starts and stops")
         static let launchAtLogin = String(localized: "Open Krasip when you log in")
@@ -230,13 +237,6 @@ enum AppString {
         static let languagesHelp = String(localized: "Krasip listens for Thai first and keeps English words in English.")
         static let engineSection = String(localized: "Speech engine")
         static let engine = String(localized: "Engine")
-        static let formattingSection = String(localized: "Formatting")
-        static let formattingHelp = String(localized: "These rules never translate or reword. Every change is listed so you can undo it.")
-        static let spacing = String(localized: "Add a space between Thai and English")
-        static let spacingExample = String(localized: "ไปทำside-project → ไปทำ side-project")
-        static let spokenTimes = String(localized: "Write spoken times as numbers")
-        static let spokenTimesExample = String(localized: "ten AM → 10 AM")
-        static let punctuation = String(localized: "Punctuation")
         static let downloadModel = String(localized: "Download")
         static let modelChecking = String(localized: "Checking…")
         static let modelUnsupported = String(localized: "Not available on this Mac. Choose another engine.")
@@ -296,14 +296,6 @@ enum AppString {
 
         static func modelDownloading(_ fraction: Double) -> String {
             String(localized: "Downloading… \(fraction.formatted(.percent.precision(.fractionLength(0))))")
-        }
-
-        static func punctuationName(_ mode: PunctuationMode) -> String {
-            switch mode {
-            case .keep: String(localized: "Keep as heard")
-            case .noTrailingPeriod: String(localized: "Drop the final period")
-            case .none: String(localized: "Remove punctuation")
-            }
         }
     }
 

@@ -99,7 +99,7 @@ Hotkey → Dictation → Transcription → Text policy (+ Glossary) → Insertio
 4. Spoken clock times → digits: `ten AM` → `10 AM`.
 5. Protect the remaining English words and numbers exactly as heard.
 6. One space where Thai touches English or digits: `ทำside-project` → `ทำ side-project`.
-7. Your punctuation choice (keep / drop final period / remove).
+7. Punctuation is kept as heard, unless a per-app rule drops the final period or removes punctuation.
 8. Tidy spaces.
 
 Every change is returned in the spec's format, e.g. `side project -> side-project (glossary)`, shown in the overlay and History, and can be undone.

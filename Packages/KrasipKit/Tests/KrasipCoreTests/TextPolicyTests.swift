@@ -52,9 +52,10 @@ struct TextPolicyTests {
         #expect(policy.finalize("ตอน10 AM", glossary: Glossary()).text == "ตอน 10 AM")
     }
 
-    @Test func spacingCanBeTurnedOff() {
-        let style = TextStyle(spaceBetweenThaiAndLatin: false)
-        #expect(policy.finalize("ส่งpull request", glossary: Glossary(), style: style).text == "ส่งpull request")
+    @Test func undoingSpacingKeepsTheTextJoined() {
+        var decisions = PolicyDecisions()
+        decisions.disabledKinds.insert(.spacing)
+        #expect(policy.finalize("ส่งpull request", glossary: Glossary(), decisions: decisions).text == "ส่งpull request")
     }
 
     @Test func existingSpaceIsNotDuplicated() {

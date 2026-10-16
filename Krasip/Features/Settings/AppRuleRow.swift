@@ -19,9 +19,8 @@ struct AppRuleRow: View {
                 .lineLimit(1)
             Spacer()
             Picker(AppString.General.punctuation, selection: punctuation) {
-                Text(AppString.General.punctuationDefault).tag(PunctuationMode?.none)
                 ForEach(PunctuationMode.allCases) { mode in
-                    Text(AppString.Languages.punctuationName(mode)).tag(Optional(mode))
+                    Text(AppString.General.punctuationName(mode)).tag(mode)
                 }
             }
             .labelsHidden()
@@ -45,12 +44,12 @@ struct AppRuleRow: View {
         return NSImage(systemSymbolName: "app", accessibilityDescription: nil) ?? NSImage()
     }
 
-    private var punctuation: Binding<PunctuationMode?> {
+    private var punctuation: Binding<PunctuationMode> {
         Binding {
-            style.punctuationMode
+            style.punctuationMode ?? TextStyle.standard.punctuation
         } set: { newValue in
             var updated = style
-            updated.punctuationMode = newValue
+            updated.punctuationMode = newValue == TextStyle.standard.punctuation ? nil : newValue
             app.appStyles.save(updated)
         }
     }

@@ -1,6 +1,6 @@
 // TextStyle.swift
 // KrasipKit
-// Formatting choices the text policy applies, globally or per destination app.
+// Formatting choices the text policy applies. Spacing and spoken times always run; punctuation can differ per destination app.
 
 import Foundation
 
@@ -18,22 +18,14 @@ public enum PunctuationMode: String, Codable, CaseIterable, Identifiable, Sendab
 
 public struct TextStyle: Codable, Equatable, Hashable, Sendable {
     public var punctuation: PunctuationMode
-    /// Insert one space where Thai text touches English words or digits ("ทำside" → "ทำ side").
-    public var spaceBetweenThaiAndLatin: Bool
-    /// Turn spoken English clock times into digits ("ten AM" → "10 AM").
-    public var convertSpokenTimes: Bool
     /// Offer glossary spellings for Thai words that sound like a saved alias (always asks first).
     public var suggestSoundAlikes: Bool
 
     public init(
         punctuation: PunctuationMode = .keep,
-        spaceBetweenThaiAndLatin: Bool = true,
-        convertSpokenTimes: Bool = true,
         suggestSoundAlikes: Bool = true
     ) {
         self.punctuation = punctuation
-        self.spaceBetweenThaiAndLatin = spaceBetweenThaiAndLatin
-        self.convertSpokenTimes = convertSpokenTimes
         self.suggestSoundAlikes = suggestSoundAlikes
     }
 
