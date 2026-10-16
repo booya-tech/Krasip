@@ -17,6 +17,11 @@ Config/Local.xcconfig
 Packages/KrasipKit/.build/
 Packages/KrasipKit/.swiftpm/
 
+# Correction relay: Python packages and the speech server log
+relay/.venv/
+relay/speech.log
+__pycache__/
+
 # macOS
 .DS_Store
 
