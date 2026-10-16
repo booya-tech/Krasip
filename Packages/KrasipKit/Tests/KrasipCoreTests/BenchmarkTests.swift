@@ -18,10 +18,10 @@ struct BenchmarkTests {
 
     @Test func perfectTranscriptsOfTheScriptProduceTheExpectedText() throws {
         // If the recognizer heard the script perfectly, the text policy must produce the
-        // expected output exactly. Thai time conversion is on, matching the app's own default.
+        // expected output exactly.
         let set = try BenchmarkSet.bundled()
         let glossary = Glossary(set.glossary)
-        let style = TextStyle(convertThaiTimes: true)
+        let style = TextStyle()
         for item in set.items {
             let result = TextPolicy().finalize(item.script, glossary: glossary, style: style)
             #expect(result.text == item.expected, "\(item.id): \(result.text)")

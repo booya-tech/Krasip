@@ -27,7 +27,6 @@ struct SpokenTimeTests {
     @Test(arguments: [
         "มี two meetings วันนี้",
         "ten people มาแล้ว",
-        "ตอนสิบโมง",
         "at nine แล้วกัน",
         "10 AM อยู่แล้ว"
     ])

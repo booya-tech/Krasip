@@ -58,8 +58,24 @@ Run them with `swift test` inside `Packages/KrasipKit`, or ⌘U in Xcode.
 | Test | What it checks |
 | --- | --- |
 | `convertsClockTimes` | Nine spoken forms: AM/PM in any case, "a.m.", "o'clock", "nine thirty", "six oh five", "eleven forty-five", and no space after Thai. |
-| `leavesOtherNumbersAlone` | "two meetings", "ten people", Thai "สิบโมง", "at nine", and "10 AM" are not touched. |
+| `leavesOtherNumbersAlone` | "two meetings", "ten people", "at nine", and "10 AM" are not touched. |
 | `canBeTurnedOff` | With the setting off, "ten AM" stays as words. |
+
+### ThaiSpokenTimeTests.swift: Thai times as people type them
+
+Follows `docs/THAI_TIME_RULES.md`. There is no setting, so every test runs the standard style.
+
+| Test | What it checks |
+| --- | --- |
+| `keepsWholeHoursAsSpokenWithDigits` | A whole hour keeps its words with the number as a digit: `หกโมงเย็น` to `6 โมงเย็น`, `บ่ายสอง` to `บ่าย 2`, `ตีห้า` to `ตี 5`. `เที่ยง`, `บ่ายโมง`, `ทุ่มนึง`, and `เที่ยงคืน` stay as they are, and a space the speech model put inside the time is removed. |
+| `writesAClockForAClearHourWithMinutes` | An hour with minutes becomes the 24-hour clock with a leading zero: `บ่ายสองครึ่ง` to `14:30`, `ห้าโมงครึ่ง` to `17:30`, `ตีสองครึ่ง` to `02:30`, and the old way of counting, `สี่โมงเช้าครึ่ง` to `10:30`. |
+| `writesAClockForAnHourSaidTheTwentyFourHourWay` | `สิบสี่โมง`, `14 โมง`, and `สิบแปดนาฬิกา` always become a clock, also without minutes. |
+| `leavesAnUnclearHourSpokenWithoutAPeriodWord` | `หกโมงครึ่ง` can be morning or evening, so it becomes `6 โมงครึ่ง`, never a guessed clock. `เย็น` meaning cold, or a period word too far back, does not decide it. |
+| `usesAPeriodWordJustBeforeTheHour` | `เช้า` or `เย็น` just before the hour decides it: `ตอนเช้าหกโมงครึ่ง` to `ตอนเช้า 06:30`, `เย็นนี้เจอกันหกโมงครึ่ง` to `18:30`. A whole hour still stays spoken. |
+| `keepsClearHoursAsTheyWere` | A clear hour keeps its meaning whatever word comes before: `เจ็ดโมงครึ่ง` after `ตอนเช้า` is still 07:30. |
+| `doesNotReadOtherWordsAsMinutes` | A count (`สิบคน`, `20 บาท`), a word that starts the next phrase (`เย็นนี้`, `ครึ่งวัน`), and `อีกสิบนาที` before the hour are not minutes. |
+| `leavesNonTimesAlone` | Spending (`ทุ่มหนึ่งล้านบาท`), effort (`ทุ่มเท`), lengths of time (`สองชั่วโมงครึ่ง`), meals (`มื้อเที่ยง`), and `ซื้อนาฬิกา` are not touched. |
+| `timeSurvivesPunctuationRemoval` | A clock time keeps its colon when punctuation is removed. |
 
 ### GlossaryMatcherTests.swift — exact normalized alias matching
 

@@ -22,8 +22,6 @@ public struct TextStyle: Codable, Equatable, Hashable, Sendable {
     public var spaceBetweenThaiAndLatin: Bool
     /// Turn spoken English clock times into digits ("ten AM" → "10 AM").
     public var convertSpokenTimes: Bool
-    /// Turn Thai clock times into digits ("สิบโมงเช้า" → "10:00").
-    public var convertThaiTimes: Bool
     /// Offer glossary spellings for Thai words that sound like a saved alias (always asks first).
     public var suggestSoundAlikes: Bool
 
@@ -31,13 +29,11 @@ public struct TextStyle: Codable, Equatable, Hashable, Sendable {
         punctuation: PunctuationMode = .keep,
         spaceBetweenThaiAndLatin: Bool = true,
         convertSpokenTimes: Bool = true,
-        convertThaiTimes: Bool = false,
         suggestSoundAlikes: Bool = true
     ) {
         self.punctuation = punctuation
         self.spaceBetweenThaiAndLatin = spaceBetweenThaiAndLatin
         self.convertSpokenTimes = convertSpokenTimes
-        self.convertThaiTimes = convertThaiTimes
         self.suggestSoundAlikes = suggestSoundAlikes
     }
 
