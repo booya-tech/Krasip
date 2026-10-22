@@ -47,7 +47,7 @@ The full requirement-by-requirement table is in [`SPEC_CHECKLIST.md`](SPEC_CHECK
 
 ## What was verified without you
 
-- **169 automated tests** pass (⌘U, or `swift test` in `Packages/KrasipKit`), including all five rows of the spec's acceptance table and a 20-run stability check. Each test is explained in plain English in [`../TESTS_EXPLAINED.md`](../TESTS_EXPLAINED.md).
+- **168 automated tests** pass (⌘U, or `swift test` in `Packages/KrasipKit`), including all five rows of the spec's acceptance table and a 20-run stability check. Each test is explained in plain English in [`../TESTS_EXPLAINED.md`](../TESTS_EXPLAINED.md).
 - **Live Thai speech recognition** against the on-device model, driven by generated speech (`KRASIP_LIVE_ASR=1 swift test`, skipped unless you ask for it).
 - **A real-voice benchmark** of 55 sentences, scored per category in [`BENCHMARK_RESULTS.md`](BENCHMARK_RESULTS.md).
 - **A full overlay simulation** with a fake microphone (`--simulate-dictation`): panel size and position in every phase, auto-dismiss, hands-free tapping, Esc, review-then-insert, and the resulting history and stats. Run in both English and Thai.

@@ -22,7 +22,7 @@ DEVELOPMENT_TEAM = YOURTEAMID
 ## Commands
 
 ```bash
-# tests, about one second, 169 of them
+# tests, about one second, 168 of them
 cd Packages/KrasipKit && swift test
 swift test --filter TextPolicyTests          # one suite
 
@@ -67,14 +67,14 @@ A Swift package with three modules, plus a thin SwiftUI app:
 | `KrasipSystem` | Core, macOS frameworks | Microphone, speech engines, Accessibility, hot keys, Keychain |
 | `Krasip` (app) | all three | SwiftUI views and the wiring in `AppController` |
 
-`KrasipCore` has no AppKit and no microphone, which is why its 122 tests run in 0.1 seconds. Keep it that way. Anything touching a macOS framework belongs in `KrasipSystem`.
+`KrasipCore` has no AppKit and no microphone, which is why its 121 tests run in 0.1 seconds. Keep it that way. Anything touching a macOS framework belongs in `KrasipSystem`.
 
 `DictationFlow` is the only type that knows the order of the steps. It takes every dependency as a closure, so tests swap the microphone, recognizer, inserter, clock, and `sleep`. Add a new step there, not in the views.
 
 ### Decisions worth knowing before changing things
 
 - **The text policy works on `[TextSegment]`, not on one `String`.** Each piece remembers where it came from and whether it is protected. "Never change a protected term" is enforced structurally, not by hoping regexes do not overlap. Every change is logged and can be undone.
-- **No LLM rewriting anywhere.** The transcript is never sent somewhere to be improved. The cloud adapter sends audio plus glossary spelling hints only. This is a product rule, not an implementation detail.
+- **No cloud LLM rewriting. Local correction only, behind safety checks.** The transcript is never sent to a cloud service to be improved. The cloud adapter sends audio plus glossary spelling hints only. The one rewriting step is the local correction model (see Speech engines): it runs on the Mac, and its `guard.py` and `safety.py` checks undo any change that looks risky. The app itself never calls an LLM. This is a product rule, not an implementation detail.
 - **Glossary matching is exact on a normalized form.** Sound-alike matches are only ever suggestions, applied after the user taps Use.
 - **Carbon hot keys**, because `RegisterEventHotKey` is the only API that reports key-up without extra permissions and swallows the keystroke.
 - **Insertion is Accessibility first, paste second**, with the clipboard restored afterwards, and secure fields refused outright. See the ladder in `TextInserter.swift`.
@@ -108,7 +108,7 @@ Error types in the package carry their own catalogs and use `String(localized:..
 
 Swift Testing, not XCTest. `@Test` and `#expect`.
 
-- `KrasipCoreTests` (122) is the one that matters. Pure logic, no mocks of the OS.
+- `KrasipCoreTests` (121) is the one that matters. Pure logic, no mocks of the OS.
 - `AcceptanceTests.swift` holds the spec's acceptance table. Treat failures there as blocking.
 - `BenchmarkTests.swift` checks the bundled sentence set stays consistent with the policy.
 - Live speech tests are gated behind `KRASIP_LIVE_ASR=1` and skipped by default.
@@ -131,5 +131,7 @@ What automated tests cannot reach: real microphone input, Accessibility permissi
 ## Speech engines
 
 Three adapters behind one `Transcriber` protocol: Apple on-device (current default), Apple online, and any OpenAI-compatible `/audio/transcriptions` endpoint. A `localhost` endpoint is treated as a local server and needs no API key.
+
+The daily-use setup is that local endpoint, served by the private `krasip-correction` repo (`scripts/start.sh`). Its relay sends the audio to whisper-server running Thonburian large-v3 8-bit, then corrects the text with Qwen3-4B (4-bit, MLX) plus a LoRA add-on, currently `run8`, then runs the guard and safety checks. Krasip sees only an OpenAI-compatible server. The relay prints `model: runN` on startup; check it, because starting from the wrong folder once ran an old model for days.
 
 Measured accuracy on real speech is in `docs/BENCHMARK_RESULTS.md`. Short version: plain Thai is flawless, English work terms need the glossary, and URLs and code do not survive at all. Do not add a fourth engine type before the numbers justify it.
