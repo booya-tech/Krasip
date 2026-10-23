@@ -6,7 +6,12 @@ Krasip is a macOS push-to-talk dictation app for Thai mixed with English. Hold â
 
 ## Setup
 
-`Config/Local.xcconfig` holds your Apple team ID and is gitignored. Without it the app will not sign:
+Nothing is needed to build. With no `Config/Local.xcconfig`, Xcode resolves `CODE_SIGN_IDENTITY = -`
+and signs the app to run locally, hardened runtime off. The cost is that macOS asks for the
+Accessibility permission again after every build, because the signature changes each time.
+
+`./scripts/setup-local.sh` fixes that by writing the Apple team ID found on this Mac into
+`Config/Local.xcconfig`, which is gitignored:
 
 ```
 DEVELOPMENT_TEAM = YOURTEAMID
@@ -17,7 +22,7 @@ DEVELOPMENT_TEAM = YOURTEAMID
 ## Commands
 
 ```bash
-# tests, about one second, 164 of them
+# tests, about one second, 168 of them
 cd Packages/KrasipKit && swift test
 swift test --filter TextPolicyTests          # one suite
 
@@ -69,7 +74,7 @@ A Swift package with three modules, plus a thin SwiftUI app:
 ### Decisions worth knowing before changing things
 
 - **The text policy works on `[TextSegment]`, not on one `String`.** Each piece remembers where it came from and whether it is protected. "Never change a protected term" is enforced structurally, not by hoping regexes do not overlap. Every change is logged and can be undone.
-- **No LLM rewriting anywhere.** The transcript is never sent somewhere to be improved. The cloud adapter sends audio plus glossary spelling hints only. This is a product rule, not an implementation detail.
+- **No cloud LLM rewriting. Local correction only, behind safety checks.** The transcript is never sent to a cloud service to be improved. The cloud adapter sends audio plus glossary spelling hints only. The one rewriting step is the local correction model (see Speech engines): it runs on the Mac, and its `guard.py` and `safety.py` checks undo any change that looks risky. The app itself never calls an LLM. This is a product rule, not an implementation detail.
 - **Glossary matching is exact on a normalized form.** Sound-alike matches are only ever suggestions, applied after the user taps Use.
 - **Carbon hot keys**, because `RegisterEventHotKey` is the only API that reports key-up without extra permissions and swallows the keystroke.
 - **Insertion is Accessibility first, paste second**, with the clipboard restored afterwards, and secure fields refused outright. See the ladder in `TextInserter.swift`.
@@ -103,7 +108,7 @@ Error types in the package carry their own catalogs and use `String(localized:..
 
 Swift Testing, not XCTest. `@Test` and `#expect`.
 
-- `KrasipCoreTests` (117) is the one that matters. Pure logic, no mocks of the OS.
+- `KrasipCoreTests` (121) is the one that matters. Pure logic, no mocks of the OS.
 - `AcceptanceTests.swift` holds the spec's acceptance table. Treat failures there as blocking.
 - `BenchmarkTests.swift` checks the bundled sentence set stays consistent with the policy.
 - Live speech tests are gated behind `KRASIP_LIVE_ASR=1` and skipped by default.
@@ -126,5 +131,7 @@ What automated tests cannot reach: real microphone input, Accessibility permissi
 ## Speech engines
 
 Three adapters behind one `Transcriber` protocol: Apple on-device (current default), Apple online, and any OpenAI-compatible `/audio/transcriptions` endpoint. A `localhost` endpoint is treated as a local server and needs no API key.
+
+The daily-use setup is that local endpoint, served by the private `krasip-correction` repo (`scripts/start.sh`). Its relay sends the audio to whisper-server running Thonburian large-v3 8-bit, then corrects the text with Qwen3-4B (4-bit, MLX) plus a LoRA add-on, currently `run8`, then runs the guard and safety checks. Krasip sees only an OpenAI-compatible server. The relay prints `model: runN` on startup; check it, because starting from the wrong folder once ran an old model for days.
 
 Measured accuracy on real speech is in `docs/BENCHMARK_RESULTS.md`. Short version: plain Thai is flawless, English work terms need the glossary, and URLs and code do not survive at all. Do not add a fourth engine type before the numbers justify it.

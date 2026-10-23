@@ -1,16 +1,31 @@
-# Handoff — the morning after
+# Handoff
 
-Krasip is built, from an empty folder to a running macOS app, against every criterion in [`KRASIP_MVP_SPEC.md`](KRASIP_MVP_SPEC.md). This page says what is finished, what was checked by machine, and the short list that needs your hands.
+Krasip is a finished macOS app, built against every criterion in [`KRASIP_MVP_SPEC.md`](KRASIP_MVP_SPEC.md). This page is for someone opening the repo for the first time: how to run it, what to expect on the first try, what was checked by machine, and the short list that needs your hands.
 
-## Start here (5 minutes)
+## Run it (5 minutes)
 
-1. Open `Krasip.xcodeproj` in Xcode, pick the **Krasip** scheme and **My Mac**, press **⌘R**.
-   (Or double-click `build/Krasip.app`, which is already built and signed with your Apple Development certificate.)
-2. The setup guide opens. Allow **Microphone** and **Accessibility**, then pick a speech engine. On macOS 26 choose **Apple — on this Mac** and download the Thai model once.
-3. Click into Notes, hold **⌥ Space**, say *"วันนี้จะต้องกลับบ้านไปทำ side project"*, let go. The text appears at your cursor, with **side-project** spelled your way.
-4. Want the app itself in Thai? Settings → Languages → **Show Krasip in** → ไทย → **Restart Now**.
+1. Clone the repo and open `Krasip.xcodeproj` in Xcode. There is nothing to configure first.
+2. Pick the **Krasip** scheme and **My Mac**, then press **⌘R**.
+3. The setup guide opens. Allow **Microphone** and **Accessibility**. On macOS 26 pick **Apple — on this Mac** and download the Thai model once. On macOS 14 or 15 that engine does not exist and the app uses **Apple — online** instead.
+4. Click into Notes, hold **⌥ Space**, say *"วันนี้จะต้องกลับบ้านไปทำ side project"*, let go. The text appears at your cursor, with **side-project** spelled that way by the text policy.
+5. Want the app itself in Thai? Settings → Languages → **Show Krasip in** → ไทย → **Restart Now**.
 
-One thing to know before you press ⌘R: the earlier prototype, from before the rename, is still running on this Mac (process 13752, built into a `WispFlow_Clone` derived-data folder). Two copies fight over ⌥ Space, so quit that one from its menu bar icon first.
+Two gotchas. Only one copy of Krasip can own ⌥ Space, so quit an older build before running a new one (`ps aux | grep -i krasip`). And macOS asks for Accessibility again after every build unless you sign with your own certificate; `./scripts/setup-local.sh` sets that up once, see the README.
+
+## What to expect from the recognizer
+
+The first run uses Apple's on-device Thai model, which is the honest default and needs no setup. Measured on real speech in [`BENCHMARK_RESULTS.md`](BENCHMARK_RESULTS.md):
+
+| What you dictate | How it goes |
+| --- | --- |
+| Plain Thai | Flawless. 0.00 character error rate on all eight test sentences. |
+| Numbers, dates, Thai spoken times | Good, 71% of key terms kept. |
+| Thai with English work terms | Weak, 21%. English words spoken with a Thai accent come back Thai-spelled. |
+| URLs, emails, code | Does not survive at all, 0%. |
+
+The glossary is the lever for the weak row. Teach it the ten or twenty terms you actually say, from Settings → Glossary or from History → "Add Preferred Spelling…".
+
+There is also a stronger local setup, Thonburian Whisper plus a correction model trained here, which Krasip talks to as a local Whisper server. It lives in its own repo, [krasip-correction](https://github.com/booya-tech/krasip-correction), and takes one script plus about 4 GB of downloads. Do the steps above first and dictate with Apple's engine for a day, so you can tell the difference yourself.
 
 ## What is done
 
@@ -32,32 +47,30 @@ The full requirement-by-requirement table is in [`SPEC_CHECKLIST.md`](SPEC_CHECK
 
 ## What was verified without you
 
-- **164 automated tests** pass (⌘U, or `swift test` in `Packages/KrasipKit`), including all five rows of the spec's acceptance table and a 20-run stability check. Each test is explained in plain English in [`../TESTS_EXPLAINED.md`](../TESTS_EXPLAINED.md).
-- **Live Thai speech recognition** on this Mac's on-device model, driven by generated speech (`KRASIP_LIVE_ASR=1 swift test`).
-- **A 50-sentence benchmark** run end to end. Plain Thai came back near-perfect; English terms spoken by a robot Thai voice came back Thai-spelled 91% of the time. That is a worst case, not your accuracy — but it is exactly the risk the spec warned about, and the reason the glossary exists. Numbers are in [`SPEC_CHECKLIST.md`](SPEC_CHECKLIST.md#first-benchmark-run-synthetic-voice).
+- **168 automated tests** pass (⌘U, or `swift test` in `Packages/KrasipKit`), including all five rows of the spec's acceptance table and a 20-run stability check. Each test is explained in plain English in [`../TESTS_EXPLAINED.md`](../TESTS_EXPLAINED.md).
+- **Live Thai speech recognition** against the on-device model, driven by generated speech (`KRASIP_LIVE_ASR=1 swift test`, skipped unless you ask for it).
+- **A real-voice benchmark** of 55 sentences, scored per category in [`BENCHMARK_RESULTS.md`](BENCHMARK_RESULTS.md).
 - **A full overlay simulation** with a fake microphone (`--simulate-dictation`): panel size and position in every phase, auto-dismiss, hands-free tapping, Esc, review-then-insert, and the resulting history and stats. Run in both English and Thai.
 - **Every screen rendered to PNG** in both languages (`--render-previews`), which is where the screenshots in the README come from.
-- **Debug and Release both build with zero warnings** and are signed.
+- **Debug and Release both build with zero warnings.**
 
 ## What needs your hands
 
 A real microphone, real permissions, and other apps. About 15 minutes, in [`MANUAL_TEST_PLAN.md`](MANUAL_TEST_PLAN.md):
 
 1. Dictating with your own voice.
-2. Insertion into Notes, Slack, a browser field, a code editor, and Terminal — the one part no test can fake.
+2. Insertion into Notes, Slack, a browser field, a code editor, and Terminal. The one part no test can fake.
 3. The password-field refusal and the "Copied — paste with Command+V" fallback.
 4. The Thai interface end to end.
-5. Recording the benchmark sentences in your own voice, then choosing between the Apple and OpenAI engines with real numbers.
+5. Recording the benchmark sentences in your own voice, then choosing an engine with your own numbers.
 
 ## Honest limits
 
-- The recognizer, not Krasip, decides how English words come out. Expect to teach it 10–20 terms in the first week; the History → "Make Rule…" path exists for exactly that.
+- The recognizer, not Krasip, decides how English words come out. Expect to teach it 10 to 20 terms in the first week; History → "Make Rule…" exists for exactly that.
 - No streaming partial transcripts. The spec asked for recorded-audio requests first.
-- Signed for development only. Sharing it with someone else needs a Developer ID certificate and notarization.
-- The benchmark ships 56 sentences; the spec's quality plan asks for 200+ of your own. The Benchmark window can add and import more.
+- Signed for development only. Sending a build to someone outside the team needs a Developer ID certificate and notarization.
+- The benchmark ships 56 sentences; the spec's quality plan asks for 200 or more of your own. The Benchmark window can add and import more.
 
 ## Where things are
 
-`README.md` has the map of the code, the pipeline, and troubleshooting. [`DESIGN_NOTES.md`](DESIGN_NOTES.md) explains why each part is shaped the way it is, including the trade-offs worth arguing with.
-
-Nothing is committed — the working tree is yours to stage.
+`README.md` has the map of the code, the pipeline, and troubleshooting. [`DESIGN_NOTES.md`](DESIGN_NOTES.md) explains why each part is shaped the way it is, including the trade-offs worth arguing with. `CLAUDE.md` and `AGENTS.md` are the same briefing for coding agents.
