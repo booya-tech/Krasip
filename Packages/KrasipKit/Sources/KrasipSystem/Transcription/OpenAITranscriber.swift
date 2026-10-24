@@ -29,7 +29,9 @@ public struct OpenAIConfiguration: Codable, Equatable, Sendable {
     }
 
     var requiresAPIKey: Bool { !isLocal }
-    var usesVerboseJSON: Bool { model.lowercased().contains("whisper") }
+    /// Local servers are whisper.cpp-style whatever the model is called, and their segment
+    /// scores are the only confidence Krasip gets from them.
+    var usesVerboseJSON: Bool { isLocal || model.lowercased().contains("whisper") }
     var supportsLogprobs: Bool { model.lowercased().hasPrefix("gpt-4o") }
 }
 

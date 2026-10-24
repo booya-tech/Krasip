@@ -45,6 +45,12 @@ struct OpenAIRequestTests {
         #expect(text.contains("push code ขึ้น GitHub"))
     }
 
+    @Test func localServersUseVerboseJSONWhateverTheModelName() {
+        let local = OpenAIConfiguration(baseURL: URL(string: "http://127.0.0.1:8085/v1")!, model: "thonburian-8bit")
+        let request = OpenAIRequest.make(configuration: local, apiKey: "", wav: Data(), languages: [.thai], vocabulary: [], boundary: "B")
+        #expect(body(request).contains("name=\"response_format\"\r\n\r\nverbose_json\r\n"))
+    }
+
     @Test func languageHintCanBeTurnedOff() {
         let configuration = OpenAIConfiguration(sendLanguageHint: false)
         let request = OpenAIRequest.make(configuration: configuration, apiKey: "k", wav: Data(), languages: [.thai], vocabulary: [], boundary: "B")
