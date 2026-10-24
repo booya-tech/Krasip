@@ -60,6 +60,28 @@ Run them with `swift test` inside `Packages/KrasipKit`, or ⌘U in Xcode.
 | `convertsClockTimes` | Nine spoken forms: AM/PM in any case, "a.m.", "o'clock", "nine thirty", "six oh five", "eleven forty-five", and no space after Thai. |
 | `leavesOtherNumbersAlone` | "two meetings", "ten people", "at nine", and "10 AM" are not touched. |
 
+### SpokenSymbolTests.swift: the spoken name of a symbol becomes the symbol
+
+Every input is verbatim raw output from the speech model on a real recording. The table decides which names count, so these tests only ever check the text that comes out and the change that was logged.
+
+| Test | What it checks |
+| --- | --- |
+| `writesTheSymbolTheUserSpoke` | The eleven recorded sentences: `เครื่องหมายตกใจ` to `!`, `hashtag` to `#`, `100 ดอลลาร์` to `$100`, the two brackets, `colon`, `semicolon`, `แห่ง` to `&`, `ดอกจัน` to `*`, `เท่ากับ` to `=`, and `hash sign` in an all-English sentence. |
+| `logsEverySymbolAsAChange` | Each of those sentences logs a `spoken symbol` change whose before is a piece of the raw text and whose after is in the final text. |
+| `logsTheSpokenPhraseAndTheSymbolItBecame` | The logged change for `ว้าว เครื่องหมายตกใจ` is the space plus the whole phrase turning into `!`, which is what the undo button reverses. |
+| `logsBothBracketsOfOneSentence` | One sentence with two symbols logs two changes, in the order they were said. |
+| `movesTheCurrencySymbolInFrontOfTheNumber` | `100 ดอลลาร์` is logged as one change covering the number too, because `$` moves in front of it. |
+| `leavesTextWithoutASpokenSymbolAlone` | `sharp` without a marker, `ดอลล่า` with no number in front, the mangled `colon ใส่`, a URL and an email holding table names, and `android` and `hashed` all come through byte-identical with no change logged. |
+| `bareNameNeedsNoMarkerButAMarkerNameDoes` | `hash` alone is enough; `sharp` needs `เครื่องหมาย` before it. |
+| `currencyNeedsDigitsInFront` | `20 dollars` becomes `$20`; the same word with no number stays a word. |
+| `theEnglishSuffixIsIgnoredInAThaiSentence` | The `sign` suffix is only honoured when nothing in the text is Thai, because in a Thai sentence the model turns `colon sign` into `colon ใส่`. |
+| `protectedSpansKeepTheirSymbolNames` | A URL, an email, and a backtick code fragment holding `hash`, `and`, or `colon` are untouched. |
+| `aColonBetweenDigitsStaysATime` | The Thai time rule claims its colon first, so `บ่ายสองครึ่ง` is still `14:30` even next to a spoken colon. |
+| `theUserCanUndoTheWholeRule` | Undoing the change turns the rule off and the raw text comes back. |
+| `runningThePolicyAgainChangesNothingFurther` | Finalizing the output of all eleven sentences again changes nothing. |
+| `theSymbolIsProtectedFromLaterRules` | The new piece of text is marked protected, so spacing and punctuation leave the symbol alone. |
+| `theLongerSpellingOfANameWins` | `ดอกจันทน์` is not read as `ดอกจัน` plus a leftover tail, and `hashtag` wins over `hash`. |
+
 ### ThaiSpokenTimeTests.swift: Thai times as people type them
 
 Follows `docs/THAI_TIME_RULES.md`. There is no setting, so every test runs the standard style.
