@@ -251,6 +251,7 @@ A fake microphone, a fixed transcript, and a fake inserter stand in for the real
 | --- | --- |
 | `buildsMultipartRequestForGPT4oTranscribe` | The request has the right URL, key header, model, language hint, confidence request, spelling hints, and file. |
 | `whisperModelsUseVerboseJSONAndExamplePrompt` | Whisper models get segment timings and a mixed Thai-English example prompt. |
+| `localServersUseVerboseJSONWhateverTheModelName` | A local server gets asked for segment scores even when its model name has no "whisper" in it, so unsure results can be caught. |
 | `languageHintCanBeTurnedOff` | The language hint can be left out. |
 | `customEndpointIsUsed` | Other OpenAI-compatible services (e.g. Groq) work. |
 | `parsesJSONWithLogprobs` | Confidence is computed from token probabilities. |
