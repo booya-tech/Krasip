@@ -8,6 +8,9 @@ import Foundation
 ///
 /// Order of rules:
 /// 1. Normalize Unicode and whitespace.
+/// 1b. Put back the `@` of an email address the model wrote as a dotted token
+///    ("support.at.grasip.app" → "support@grasip.app", "อีเมล admin.example.com" →
+///    "อีเมล admin@example.com"), before step 2 seals every dotted token as code or a URL.
 /// 2. Protect URLs, emails, and code so nothing below can touch them.
 /// 3. Apply locked glossary aliases (before any formatting); collect `suggest` matches and
 ///    Thai spellings that only sound like an alias (suggested, never applied without the user).
@@ -32,7 +35,10 @@ public struct TextPolicy: Sendable {
         decisions: PolicyDecisions = PolicyDecisions()
     ) -> FinalText {
         var log = ChangeLog()
-        let normalized = normalize(rawText, log: &log)
+        var normalized = normalize(rawText, log: &log)
+        if !decisions.disabledKinds.contains(.spokenSymbol) {
+            normalized = repairDottedEmails(normalized, log: &log)
+        }
         var segments = normalized.isEmpty ? [] : [TextSegment(text: normalized, origin: .transcript)]
 
         segments = protectStructured(segments)
@@ -108,6 +114,19 @@ public struct TextPolicy: Sendable {
             log.add(.normalization, before: "extra or unusual spaces", after: "single spaces", key: "whitespace")
         }
         return result
+    }
+
+    // MARK: - 1b. Email addresses written as a dotted token
+
+    private func repairDottedEmails(_ text: String, log: inout ChangeLog) -> String {
+        var repaired = ""
+        var cursor = text.startIndex
+        for match in DottedEmailRepair.matches(in: text) {
+            log.add(.spokenSymbol, before: String(text[match.range]), after: match.replacement, key: "spokenSymbol")
+            repaired += text[cursor..<match.range.lowerBound] + match.replacement
+            cursor = match.range.upperBound
+        }
+        return repaired + text[cursor...]
     }
 
     // MARK: - 2. Structured spans
@@ -208,11 +227,15 @@ public struct TextPolicy: Sendable {
     // MARK: - 4b. Spoken symbols
 
     private func applySpokenSymbols(_ segments: [TextSegment], log: inout ChangeLog) -> [TextSegment] {
-        replaceInOpenTranscript(segments) { segment in
-            SpokenSymbol.matches(in: segment.text).map { match in
+        segments.indices.flatMap { index -> [TextSegment] in
+            let segment = segments[index]
+            guard isOpenTranscript(segment) else { return [segment] }
+            let neighbours = (before: segments[..<index].last?.text.last, after: segments[(index + 1)...].first?.text.first)
+            let pieces = SpokenSymbol.matches(in: segment.text, neighbours: neighbours).map { match in
                 log.add(.spokenSymbol, before: String(segment.text[match.range]), after: match.replacement, key: "spokenSymbol")
                 return (match.range, TextSegment(text: match.replacement, origin: .spokenSymbol, protection: .spokenSymbol))
             }
+            return split(segment, pieces)
         }
     }
 
