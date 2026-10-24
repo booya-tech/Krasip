@@ -13,6 +13,9 @@ import Foundation
 ///    Thai spellings that only sound like an alias (suggested, never applied without the user).
 /// 4. Convert spoken English clock times ("ten AM" → "10 AM") and write Thai spoken times the
 ///    way docs/THAI_TIME_RULES.md sets ("บ่ายสองครึ่ง" → "14:30", "หกโมงเย็น" → "6 โมงเย็น").
+/// 4b. Turn a spoken symbol name into the symbol ("เครื่องหมายตกใจ" → "!", "100 ดอลลาร์" → "$100"),
+///    after the times so the two rules never contend for the same colon, and before words are
+///    protected because several names are English words.
 /// 5. Protect remaining Latin words and numbers.
 /// 6. Insert a space where Thai text touches English words or digits.
 /// 7. Apply the punctuation mode.
@@ -39,6 +42,10 @@ public struct TextPolicy: Sendable {
         if !decisions.disabledKinds.contains(.spokenTime) {
             segments = applySpokenTimes(segments, found: SpokenTime.matches(in:), log: &log)
             segments = applySpokenTimes(segments, found: ThaiSpokenTime.matches(in:), log: &log)
+        }
+
+        if !decisions.disabledKinds.contains(.spokenSymbol) {
+            segments = applySpokenSymbols(segments, log: &log)
         }
 
         segments = protectWords(segments)
@@ -194,6 +201,17 @@ public struct TextPolicy: Sendable {
             found(segment.text).map { match in
                 log.add(.spokenTime, before: String(segment.text[match.range]), after: match.replacement, key: "spokenTime")
                 return (match.range, TextSegment(text: match.replacement, origin: .spokenTime, protection: .spokenTime))
+            }
+        }
+    }
+
+    // MARK: - 4b. Spoken symbols
+
+    private func applySpokenSymbols(_ segments: [TextSegment], log: inout ChangeLog) -> [TextSegment] {
+        replaceInOpenTranscript(segments) { segment in
+            SpokenSymbol.matches(in: segment.text).map { match in
+                log.add(.spokenSymbol, before: String(segment.text[match.range]), after: match.replacement, key: "spokenSymbol")
+                return (match.range, TextSegment(text: match.replacement, origin: .spokenSymbol, protection: .spokenSymbol))
             }
         }
     }

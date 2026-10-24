@@ -3937,6 +3937,17 @@
         }
       }
     },
+    "spoken symbol": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เครื่องหมายที่พูด"
+          }
+        }
+      }
+    },
     "spoken time": {
       "extractionState": "manual",
       "localizations": {
