@@ -20,20 +20,50 @@ struct SpokenSymbolTests {
     static let recordings: [(String, String)] = [
         ("ว้าว เครื่องหมายตกใจ", "ว้าว!"),
         ("ใส่ hashtag กระซิบด้วย", "ใส่ #กระซิบด้วย"),
-        ("ใส่เครื่องหมายชาร์ปข้างหน้าเลข", "ใส่#ข้างหน้าเลข"),
+        ("ใส่เครื่องหมายชาร์ปข้างหน้าเลข", "ใส่ # ข้างหน้าเลข"),
         ("ราคา 100 ดอลลาร์", "ราคา $100"),
         ("งบวงเล็บเปิดประมาณวงเล็บปิด 50,000", "งบ(ประมาณ) 50,000"),
         ("หัวข้อเครื่องหมาย colon ทดสอบระบบ", "หัวข้อ: ทดสอบระบบ"),
         ("ปิดบรรทัดด้วยเครื่องหมาย semicolon นะ", "ปิดบรรทัดด้วย; นะ"),
-        ("ชื่อบริษัท Johnson เครื่องหมายแห่ง Johnson", "ชื่อบริษัท Johnson& Johnson"),
-        ("ดูที่เครื่องหมายดอกจันท้ายประโยค", "ดูที่*ท้ายประโยค"),
-        ("hex เครื่องหมายเท่ากับ 10", "hex= 10"),
-        ("push a hash sign before the number", "push a #before the number")
+        ("ชื่อบริษัท Johnson เครื่องหมายแห่ง Johnson", "ชื่อบริษัท Johnson & Johnson"),
+        ("ดูที่เครื่องหมายดอกจันท้ายประโยค", "ดูที่ * ท้ายประโยค"),
+        ("hex เครื่องหมายเท่ากับ 10", "hex = 10"),
+        ("push a hash sign before the number", "push a # before the number")
+    ]
+
+    /// A symbol that sits between two things needs one space on each side, and the edges of the
+    /// text and a line break count as a separator already.
+    static let standaloneEdges: [(String, String)] = [
+        ("เครื่องหมายเท่ากับ 10", "= 10"),
+        ("10 เครื่องหมายเท่ากับ", "10 ="),
+        ("hex\nเครื่องหมายเท่ากับ 10", "hex\n= 10"),
+        ("hex เครื่องหมายเท่ากับ\n10", "hex =\n10"),
+        ("hexเครื่องหมายเท่ากับ 10", "hex = 10"),
+        ("hex เครื่องหมายเท่ากับ10", "hex = 10"),
+        ("a hash sign b", "a # b")
     ]
 
     @Test(arguments: recordings)
     func writesTheSymbolTheUserSpoke(raw: String, expected: String) {
         #expect(written(raw) == expected)
+    }
+
+    @Test(arguments: standaloneEdges)
+    func keepsOneSpaceOnEachSideOfAStandaloneSymbol(raw: String, expected: String) {
+        let once = written(raw)
+        #expect(once == expected)
+        #expect(!once.contains("  "))
+    }
+
+    @Test
+    func aStandaloneSymbolSwallowsNoSpace() {
+        let spaced = result("hex เครื่องหมายเท่ากับ 10").changes.filter { $0.kind == .spokenSymbol }
+        #expect(spaced.map(\.before) == ["เครื่องหมายเท่ากับ"])
+        #expect(spaced.map(\.after) == ["="])
+
+        let unspaced = result("ดูที่เครื่องหมายดอกจันท้ายประโยค").changes.filter { $0.kind == .spokenSymbol }
+        #expect(unspaced.map(\.before) == ["เครื่องหมายดอกจัน"])
+        #expect(unspaced.map(\.after) == [" * "])
     }
 
     @Test(arguments: recordings)
@@ -84,7 +114,7 @@ struct SpokenSymbolTests {
     func bareNameNeedsNoMarkerButAMarkerNameDoes() {
         #expect(written("ใส่ hash กระซิบ") == "ใส่ #กระซิบ")
         #expect(written("นี้ดู sharp ขึ้นเยอะ") == "นี้ดู sharp ขึ้นเยอะ")
-        #expect(written("นี้ดูเครื่องหมายชาร์ปขึ้นเยอะ") == "นี้ดู#ขึ้นเยอะ")
+        #expect(written("นี้ดูเครื่องหมายชาร์ปขึ้นเยอะ") == "นี้ดู # ขึ้นเยอะ")
     }
 
     @Test
@@ -125,7 +155,7 @@ struct SpokenSymbolTests {
         #expect(written(raw, decisions: decisions) == raw)
     }
 
-    @Test(arguments: recordings)
+    @Test(arguments: recordings + standaloneEdges)
     func runningThePolicyAgainChangesNothingFurther(raw: String, expected: String) {
         let once = written(raw)
         #expect(once == expected)
@@ -141,7 +171,7 @@ struct SpokenSymbolTests {
 
     @Test
     func theLongerSpellingOfANameWins() {
-        #expect(written("ดูที่เครื่องหมายดอกจันทน์ท้ายประโยค") == "ดูที่*ท้ายประโยค")
+        #expect(written("ดูที่เครื่องหมายดอกจันทน์ท้ายประโยค") == "ดูที่ * ท้ายประโยค")
         #expect(written("ใส่ hashtag กระซิบ") == "ใส่ #กระซิบ")
     }
 }

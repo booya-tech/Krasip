@@ -28,6 +28,9 @@ enum SpokenSymbol {
     private enum Attach {
         case left
         case right
+        /// Sits between two things instead of binding to one of them. It swallows no spaces
+        /// and keeps exactly one on each side.
+        case standalone
     }
 
     private struct Entry {
@@ -45,7 +48,7 @@ enum SpokenSymbol {
     private static let entries: [Entry] = [
         Entry(symbol: "!", names: ["ตกใจ", "อัศเจรีย์", "exclamation"], trigger: .marker, attach: .left),
         Entry(symbol: "#", names: ["แฮชแท็ก", "hashtag", "แฮช", "hash"], trigger: .bare, attach: .right),
-        Entry(symbol: "#", names: ["ชาร์ป", "sharp"], trigger: .marker, attach: .right),
+        Entry(symbol: "#", names: ["ชาร์ป", "sharp"], trigger: .marker, attach: .standalone),
         Entry(symbol: "$", names: ["ดอลลาร์", "ดอลล่า", "dollar", "dollars"], trigger: .afterNumber, attach: .right),
         Entry(symbol: "(", names: ["วงเล็บเปิด", "วงเล็บซ้าย"], trigger: .bare, attach: .right),
         Entry(symbol: ")", names: ["วงเล็บปิด", "วงเล็บขวา"], trigger: .bare, attach: .left),
@@ -53,9 +56,9 @@ enum SpokenSymbol {
         Entry(symbol: ";", names: ["เซมิโคลอน", "semicolon", "อัฒภาค"], trigger: .marker, attach: .left),
         // แห่ง is what the model heard for a spoken แอนด์. It is safe only because the marker is
         // required, and nobody says "เครื่องหมายแห่ง" meaning anything else.
-        Entry(symbol: "&", names: ["แอนด์", "แห่ง", "and", "ampersand"], trigger: .marker, attach: .left),
-        Entry(symbol: "*", names: ["ดอกจัน", "ดอกจันทน์", "asterisk"], trigger: .marker, attach: .left),
-        Entry(symbol: "=", names: ["เท่ากับ", "equals", "equal"], trigger: .marker, attach: .left)
+        Entry(symbol: "&", names: ["แอนด์", "แห่ง", "and", "ampersand"], trigger: .marker, attach: .standalone),
+        Entry(symbol: "*", names: ["ดอกจัน", "ดอกจันทน์", "asterisk"], trigger: .marker, attach: .standalone),
+        Entry(symbol: "=", names: ["เท่ากับ", "equals", "equal"], trigger: .marker, attach: .standalone)
     ]
 
     private static let thaiMarker = "เครื่องหมาย"
@@ -111,6 +114,7 @@ enum SpokenSymbol {
         var start = occurrence.lowerBound
         var end = occurrence.upperBound
         var replacement = entry.symbol
+        var usedEnglishMarker = false
 
         switch entry.trigger {
         case .marker, .bare:
@@ -125,6 +129,7 @@ enum SpokenSymbol {
             if allowsEnglishMarker, let markerEnd = englishMarkerEnd(after: end, in: text) {
                 end = markerEnd
                 marked = true
+                usedEnglishMarker = true
             }
             guard entry.trigger == .bare || marked else { return nil }
 
@@ -134,7 +139,11 @@ enum SpokenSymbol {
             replacement = entry.symbol + text[digits]
         }
 
-        switch entry.attach {
+        // "hash sign" names the symbol rather than prefixing the word after it, so a symbol
+        // that would bind rightwards stands on its own once the English suffix is what matched.
+        let attach: Attach = usedEnglishMarker && entry.attach == .right ? .standalone : entry.attach
+
+        switch attach {
         case .left:
             while start > text.startIndex, text[text.index(before: start)] == " " {
                 start = text.index(before: start)
@@ -143,8 +152,28 @@ enum SpokenSymbol {
             while end < text.endIndex, text[end] == " " {
                 end = text.index(after: end)
             }
+        case .standalone:
+            replacement = spaced(replacement, from: start, to: end, in: text)
         }
         return SymbolMatch(range: start..<end, replacement: replacement)
+    }
+
+    /// One space on each side of a standalone symbol, added only where the text has none.
+    /// An edge of the text and a line break both count as a separator already.
+    private static func spaced(
+        _ symbol: String,
+        from start: String.Index,
+        to end: String.Index,
+        in text: String
+    ) -> String {
+        var spaced = symbol
+        if start > text.startIndex, !text[text.index(before: start)].isWhitespace {
+            spaced = " " + spaced
+        }
+        if end < text.endIndex, !text[end].isWhitespace {
+            spaced += " "
+        }
+        return spaced
     }
 
     private static func occurrences(of name: String, in text: String) -> [Range<String.Index>] {
