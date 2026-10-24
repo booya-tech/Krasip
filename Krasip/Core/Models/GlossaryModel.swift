@@ -170,7 +170,10 @@ final class GlossaryModel {
         ("API", ["เอพีไอ"]),
         ("sprint", ["สปรินต์"]),
         ("refactor", ["รีแฟกเตอร์"]),
-        ("release", ["รีลีส"])
+        ("release", ["รีลีส"]),
+        ("Hashmap", ["hash map", "hashmap", "แฮชแมป"]),
+        ("hash table", ["hash table", "แฮชเทเบิล"]),
+        ("hash function", ["hash function"])
     ]
 
     func starterEntries(mode: GlossaryEntry.Mode) -> [GlossaryEntry] {

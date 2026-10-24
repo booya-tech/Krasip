@@ -38,6 +38,9 @@ enum SpokenSymbol {
         let names: [String]
         let trigger: Trigger
         let attach: Attach
+        /// Words that must not follow the name. A name that is also an ordinary English word
+        /// belongs in a phrase with these, so the entry stays quiet and the text is left alone.
+        var blockedFollowers: [String] = []
     }
 
     /// Every spelling here was measured from real recordings. The speech model flips between the
@@ -47,7 +50,17 @@ enum SpokenSymbol {
     /// the model already writes `%` itself after a number.
     private static let entries: [Entry] = [
         Entry(symbol: "!", names: ["ตกใจ", "อัศเจรีย์", "exclamation"], trigger: .marker, attach: .left),
-        Entry(symbol: "#", names: ["แฮชแท็ก", "hashtag", "แฮช", "hash"], trigger: .bare, attach: .right),
+        Entry(
+            symbol: "#",
+            names: ["แฮชแท็ก", "hashtag", "hash tag", "แฮช แท็ก", "แฮช", "hash"],
+            trigger: .bare,
+            attach: .right,
+            blockedFollowers: [
+                "map", "maps", "table", "tables", "function", "functions", "key", "keys",
+                "value", "values", "code", "codes", "join", "index", "set", "algorithm",
+                "collision", "bucket"
+            ]
+        ),
         Entry(symbol: "#", names: ["ชาร์ป", "sharp"], trigger: .marker, attach: .standalone),
         Entry(symbol: "$", names: ["ดอลลาร์", "ดอลล่า", "dollar", "dollars"], trigger: .afterNumber, attach: .right),
         Entry(symbol: "(", names: ["วงเล็บเปิด", "วงเล็บซ้าย"], trigger: .bare, attach: .right),
@@ -63,6 +76,19 @@ enum SpokenSymbol {
 
     private static let thaiMarker = "เครื่องหมาย"
     private static let englishMarker = "sign"
+
+    /// A count word just before the name repeats the symbol, so "double hash tag" is "##". It
+    /// sits between the marker and the name, as in "เครื่องหมายดับเบิลโคลอน".
+    ///
+    /// The Thai สอง, meaning two, is deliberately absent. It is an everyday number word and no
+    /// recording shows how the model renders it in front of a symbol name, so it would fire on
+    /// ordinary speech far more often than on a spoken symbol.
+    private static let counts: [(word: String, times: Int)] = [
+        ("double", 2),
+        ("ดับเบิล", 2),
+        ("triple", 3),
+        ("ทริปเปิล", 3)
+    ]
 
     /// Non-overlapping matches, left to right.
     static func matches(in text: String) -> [SymbolMatch] {
@@ -110,11 +136,18 @@ enum SpokenSymbol {
         allowsEnglishMarker: Bool
     ) -> SymbolMatch? {
         guard hasWordBoundary(around: occurrence, name: name, in: text) else { return nil }
+        guard !isBlocked(entry.blockedFollowers, after: occurrence.upperBound, in: text) else { return nil }
 
         var start = occurrence.lowerBound
         var end = occurrence.upperBound
-        var replacement = entry.symbol
         var usedEnglishMarker = false
+
+        var times = 1
+        if let count = count(before: start, in: text) {
+            start = count.start
+            times = count.times
+        }
+        var replacement = String(repeating: entry.symbol, count: times)
 
         switch entry.trigger {
         case .marker, .bare:
@@ -136,7 +169,7 @@ enum SpokenSymbol {
         case .afterNumber:
             guard let digits = digitRun(before: start, in: text) else { return nil }
             start = digits.lowerBound
-            replacement = entry.symbol + text[digits]
+            replacement += text[digits]
         }
 
         // "hash sign" names the symbol rather than prefixing the word after it, so a symbol
@@ -200,6 +233,34 @@ enum SpokenSymbol {
             return false
         }
         return true
+    }
+
+    /// Whether the word right after the name is one the entry refuses. Only the immediately next
+    /// word counts, so "hash the map" is still a symbol while "hash map" is left as spoken.
+    private static func isBlocked(_ followers: [String], after end: String.Index, in text: String) -> Bool {
+        guard !followers.isEmpty else { return false }
+        let wordStart = skippingSpaces(after: end, in: text)
+        var wordEnd = wordStart
+        while wordEnd < text.endIndex, text[wordEnd].isLatinOrDigit {
+            wordEnd = text.index(after: wordEnd)
+        }
+        guard wordStart < wordEnd else { return false }
+        let next = text[wordStart..<wordEnd].lowercased()
+        return followers.contains(next)
+    }
+
+    /// A count word sitting just before `start`, and how many times it repeats the symbol.
+    private static func count(before start: String.Index, in text: String) -> (start: String.Index, times: Int)? {
+        let cursor = skippingSpaces(before: start, in: text)
+        for count in counts {
+            guard let range = text[..<cursor].range(
+                of: count.word,
+                options: [.caseInsensitive, .backwards, .anchored]
+            ) else { continue }
+            guard hasWordBoundary(around: range, name: count.word, in: text) else { continue }
+            return (range.lowerBound, count.times)
+        }
+        return nil
     }
 
     /// The start of a เครื่องหมาย sitting just before `start`. The model emits both

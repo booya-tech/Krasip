@@ -66,6 +66,10 @@ Every recorded input is verbatim raw output from the speech model on a real reco
 
 Most symbols sit flush against one word, `ว้าว เครื่องหมายตกใจ` to `ว้าว!`. The four that sit between two things, `=`, `&`, `*`, and `#` said as `เครื่องหมายชาร์ป`, stand on their own instead and get one space on each side, so `hex เครื่องหมายเท่ากับ 10` becomes `hex = 10` and not `hex= 10`. The hashtag `#`, the bare `แหซทัก`, is a different row and still binds to the word after it.
 
+`hash` is the name of `#` and an ordinary English word at the same time, so that row carries a list of words that must not follow it. A developer saying `hash map`, `hash table`, or `hash function` gets the words back untouched, while `hash the map` still gets the symbol, because only the word immediately after the name is checked. The preferred spelling of those phrases is a glossary job instead: `Hashmap`, `hash table`, and `hash function` are offered in the starter terms, and the glossary runs first and protects what it writes, so the rule never sees a phrase the user has saved.
+
+A count word in front of the name repeats the symbol, so `double hash tag` is `##` and `triple hash tag` is `###`. It sits between the `เครื่องหมาย` prefix and the name, which is how the phrase is said: `เครื่องหมายดับเบิลโคลอน`. Only `double`, `triple`, and their Thai spellings count. The Thai `สอง` is left out on purpose, because it is an everyday number word and no recording shows how the model writes it in front of a symbol name.
+
 | Test | What it checks |
 | --- | --- |
 | `writesTheSymbolTheUserSpoke` | The eleven recorded sentences, with their spacing: `เครื่องหมายตกใจ` to `!`, `hashtag` to `#`, `100 ดอลลาร์` to `$100`, the two brackets, `colon`, `semicolon`, `แห่ง` to `&`, `ดอกจัน` to `*`, `เท่ากับ` to `=`, and `hash sign` in an all-English sentence. |
@@ -82,9 +86,17 @@ Most symbols sit flush against one word, `ว้าว เครื่องห�
 | `protectedSpansKeepTheirSymbolNames` | A URL, an email, and a backtick code fragment holding `hash`, `and`, or `colon` are untouched. |
 | `aColonBetweenDigitsStaysATime` | The Thai time rule claims its colon first, so `บ่ายสองครึ่ง` is still `14:30` even next to a spoken colon. |
 | `theUserCanUndoTheWholeRule` | Undoing the change turns the rule off and the raw text comes back. |
-| `runningThePolicyAgainChangesNothingFurther` | Finalizing the output of all eleven sentences and all seven spacing cases again changes nothing, so inserting a space never pushes the text further. |
+| `runningThePolicyAgainChangesNothingFurther` | Finalizing the output of all eleven sentences, all seven spacing cases, and all eight spaced-name and count cases again changes nothing, so inserting a space never pushes the text further. |
 | `theSymbolIsProtectedFromLaterRules` | The new piece of text is marked protected, so spacing and punctuation leave the symbol alone. |
-| `theLongerSpellingOfANameWins` | `ดอกจันทน์` is not read as `ดอกจัน` plus a leftover tail, and `hashtag` wins over `hash`. |
+| `theLongerSpellingOfANameWins` | `ดอกจันทน์` is not read as `ดอกจัน` plus a leftover tail, `hashtag` wins over `hash`, and the spaced `hash tag` wins over `hash` so no `tag` is left stranded. |
+| `writesASpacedNameAndRepeatsForACountWord` | `hash tag` and `แฮช แท็ก` said as two words give one `#`, and a count word in front repeats it: `double hash tag` to `##`, `triple hash tag` to `###`, `double colon sign` to `::`, `เครื่องหมายดับเบิลโคลอน` to `::`. |
+| `logsTheCountWordAsPartOfThePhrase` | The count word is inside the logged change, so undo puts `double hash tag` back whole instead of leaving `double` behind. |
+| `leavesAnOrdinaryHashPhraseAlone` | `hash map`, `hash function`, `hash table`, `hash join`, `hash key`, `hash value`, `hash collision`, and an already written `Hashmap` all come through byte-identical with no change logged. |
+| `onlyTheWordRightAfterTheNameCanBlockTheSymbol` | `hash the map` still becomes `#the map`, because `map` is not the next word, and `HASH MAP` is blocked too, so the list ignores case. |
+| `aNameAtTheEndOfTheTextStillBecomesTheSymbol` | `hash` with nothing after it is still `#`, so the missing next word is not treated as a blocked one. |
+| `aCountWordWithNoSymbolNameIsLeftAlone` | `double trouble` and `ดับเบิลเบอร์เกอร์` are untouched, because a count word only counts in front of a name. |
+| `aGlossaryEntryClaimsThePhraseBeforeTheRuleRuns` | With the starter `Hashmap` entry saved, `ใช้ hash map เก็บค่า` becomes `ใช้ Hashmap เก็บค่า` and no spoken-symbol change is logged at all. |
+| `withNoGlossaryEntryThePhraseStaysAsSpoken` | With an empty glossary the same sentence stays `ใช้ hash map เก็บค่า`, so the rule protects itself and does not lean on the glossary. |
 
 ### ThaiSpokenTimeTests.swift: Thai times as people type them
 

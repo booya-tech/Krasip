@@ -43,6 +43,31 @@ struct SpokenSymbolTests {
         ("a hash sign b", "a # b")
     ]
 
+    /// The model splits a glued name into two words as often as not, and a count word in front
+    /// of the name repeats the symbol.
+    static let spacedNamesAndCounts: [(String, String)] = [
+        ("hash tag", "#"),
+        ("ใส่ hash tag krasip", "ใส่ #krasip"),
+        ("ใส่ แฮช แท็ก krasip", "ใส่ #krasip"),
+        ("double hash tag", "##"),
+        ("double colon sign", "::"),
+        ("triple hash tag", "###"),
+        ("เครื่องหมายดับเบิลโคลอน", "::"),
+        ("ดับเบิล แฮช แท็ก", "##")
+    ]
+
+    /// `hash` is an ordinary English word as well as the name of `#`. In each of these the
+    /// developer means the word, so the rule stands down and the text is left as spoken.
+    static let hashAsAnOrdinaryWord: [String] = [
+        "ใช้ hash map เก็บค่า",
+        "เขียน hash function ใหม่",
+        "the hash table is full",
+        "ใช้ hash join ให้เร็วขึ้น",
+        "เก็บ hash key กับ hash value",
+        "แก้ hash collision ด้วย bucket",
+        "ใช้ Hashmap เก็บค่า"
+    ]
+
     @Test(arguments: recordings)
     func writesTheSymbolTheUserSpoke(raw: String, expected: String) {
         #expect(written(raw) == expected)
@@ -155,7 +180,7 @@ struct SpokenSymbolTests {
         #expect(written(raw, decisions: decisions) == raw)
     }
 
-    @Test(arguments: recordings + standaloneEdges)
+    @Test(arguments: recordings + standaloneEdges + spacedNamesAndCounts)
     func runningThePolicyAgainChangesNothingFurther(raw: String, expected: String) {
         let once = written(raw)
         #expect(once == expected)
@@ -173,5 +198,66 @@ struct SpokenSymbolTests {
     func theLongerSpellingOfANameWins() {
         #expect(written("ดูที่เครื่องหมายดอกจันทน์ท้ายประโยค") == "ดูที่ * ท้ายประโยค")
         #expect(written("ใส่ hashtag กระซิบ") == "ใส่ #กระซิบ")
+        #expect(written("ใส่ hash tag krasip") == "ใส่ #krasip")
+    }
+
+    @Test(arguments: spacedNamesAndCounts)
+    func writesASpacedNameAndRepeatsForACountWord(raw: String, expected: String) {
+        #expect(written(raw) == expected)
+    }
+
+    @Test
+    func logsTheCountWordAsPartOfThePhrase() {
+        let changes = result("double hash tag").changes.filter { $0.kind == .spokenSymbol }
+        #expect(changes.map(\.before) == ["double hash tag"])
+        #expect(changes.map(\.after) == ["##"])
+
+        let thai = result("เครื่องหมายดับเบิลโคลอน").changes.filter { $0.kind == .spokenSymbol }
+        #expect(thai.map(\.before) == ["เครื่องหมายดับเบิลโคลอน"])
+        #expect(thai.map(\.after) == ["::"])
+    }
+
+    @Test(arguments: hashAsAnOrdinaryWord)
+    func leavesAnOrdinaryHashPhraseAlone(raw: String) {
+        #expect(written(raw) == raw)
+        #expect(result(raw).changes.allSatisfy { $0.kind != .spokenSymbol })
+    }
+
+    @Test
+    func onlyTheWordRightAfterTheNameCanBlockTheSymbol() {
+        #expect(written("hash the map") == "#the map")
+        #expect(written("HASH MAP") == "HASH MAP")
+    }
+
+    @Test
+    func aNameAtTheEndOfTheTextStillBecomesTheSymbol() {
+        #expect(written("ใส่ hash") == "ใส่ #")
+        #expect(written("hash") == "#")
+    }
+
+    @Test
+    func aCountWordWithNoSymbolNameIsLeftAlone() {
+        #expect(written("double trouble") == "double trouble")
+        #expect(result("double trouble").changes.allSatisfy { $0.kind != .spokenSymbol })
+        #expect(written("ดับเบิลเบอร์เกอร์") == "ดับเบิลเบอร์เกอร์")
+    }
+
+    /// The glossary runs before this rule and its output is protected, so a saved spelling
+    /// settles the phrase and the rule never sees it.
+    @Test
+    func aGlossaryEntryClaimsThePhraseBeforeTheRuleRuns() {
+        let glossary = Glossary([GlossaryEntry(
+            aliases: ["hash map", "hashmap", "แฮชแมป"],
+            preferredOutput: "Hashmap",
+            mode: .locked
+        )])
+        let final = policy.finalize("ใช้ hash map เก็บค่า", glossary: glossary)
+        #expect(final.text == "ใช้ Hashmap เก็บค่า")
+        #expect(final.changes.allSatisfy { $0.kind != .spokenSymbol })
+    }
+
+    @Test
+    func withNoGlossaryEntryThePhraseStaysAsSpoken() {
+        #expect(written("ใช้ hash map เก็บค่า") == "ใช้ hash map เก็บค่า")
     }
 }
