@@ -92,7 +92,10 @@ struct SpokenSymbolTests {
         ("ส่ง Email ไปที่ admin.example.com", "ส่ง Email ไปที่ admin@example.com"),
         ("ส่ง e-mail ถึง admin.example.com", "ส่ง e-mail ถึง admin@example.com"),
         ("ใส่ bcc admin.example.com ด้วย", "ใส่ bcc admin@example.com ด้วย"),
-        ("ส่งอีเมลไปที่ admin.example.com.", "ส่งอีเมลไปที่ admin@example.com.")
+        ("ส่งอีเมลไปที่ admin.example.com.", "ส่งอีเมลไปที่ admin@example.com."),
+        ("ส่งอีเมลไปที่ info.example.com", "ส่งอีเมลไปที่ info@example.com"),
+        ("ส่งสำเนาไปที่ support.example.co", "ส่งสำเนาไปที่ support@example.co"),
+        ("cc sales.example.com", "cc sales@example.com")
     ]
 
     /// "at" is an everyday English word and แอท is the start of longer Thai words, so none of
@@ -123,6 +126,13 @@ struct SpokenSymbolTests {
         "เปิด https://admin.example.com",
         "ไฟล์ report.final.pdf ส่งแล้ว",
         "ส่ง docs.example.com ให้หน่อย",
+        "ส่งอีเมลไปที่ docs.example.com",
+        "ส่งอีเมลไปที่ api.example.dev",
+        "ส่งอีเมลไปที่ blog.example.com",
+        "ส่งสำเนาไปที่ shop.example.com",
+        "ส่งอีเมลไปที่ at.example.com",
+        "กินเมลอนที่ shop.example.com",
+        "cc john.example.com",
         "example.at",
         "at.example.com",
         "v1.at.2",

@@ -27,6 +27,17 @@ enum DottedEmailRepair {
     /// A token starting with one of these is a server's address, not a person's.
     private static let hostPrefixes: Set<String> = ["www", "mail", "webmail", "smtp", "imap"]
 
+    /// "docs.example.com" and "docs@example.com" are said differently, but the model writes the dot
+    /// for both. The lone-dot repair therefore only trusts a first label that is a typical mailbox
+    /// name. A website's prefix (docs, api, shop, blog) never qualifies, and a person's name is left
+    /// as the model wrote it, because a missing `@` costs less than a wrong one.
+    private static let mailboxNames: Set<String> = [
+        "admin", "info", "support", "contact", "sales", "hello", "hi", "help", "hr", "billing", "noreply",
+        "no-reply", "team", "office", "service", "press", "jobs", "careers", "security", "webmaster",
+        "postmaster", "accounts", "accounting", "finance", "legal", "marketing", "feedback", "enquiries",
+        "inquiries", "orders", "abuse", "privacy", "booking", "reservations"
+    ]
+
     /// A run of labels joined by dots, not inside a URL, a path, an existing address, or code.
     private static let dottedToken: NSRegularExpression = {
         let pattern = #"(?<![A-Za-z0-9_\-.@/:`])[A-Za-z0-9_\-]+(?:\.[A-Za-z0-9_\-]+)+"#
@@ -59,7 +70,7 @@ enum DottedEmailRepair {
             local = labels[..<at]
             domain = labels[(at + 1)...]
             guard labels[at - 1].containsLatin, labels[at + 1].containsLatin else { return nil }
-        } else if labels.count == 3, cued {
+        } else if labels.count == 3, cued, mailboxNames.contains(labels[0].lowercased()) {
             local = labels[..<1]
             domain = labels[1...]
         } else {
