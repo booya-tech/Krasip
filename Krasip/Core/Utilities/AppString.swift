@@ -144,6 +144,7 @@ enum AppString {
             case .normalization: String(localized: "cleanup")
             case .glossary: String(localized: "glossary")
             case .spokenTime: String(localized: "spoken time")
+            case .spokenSymbol: String(localized: "spoken symbol")
             case .spacing: String(localized: "spacing")
             case .punctuation: String(localized: "punctuation")
             }

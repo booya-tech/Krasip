@@ -10,6 +10,7 @@ public struct TextChange: Codable, Equatable, Hashable, Identifiable, Sendable, 
         case normalization
         case glossary
         case spokenTime
+        case spokenSymbol
         case spacing
         case punctuation
 
@@ -18,6 +19,7 @@ public struct TextChange: Codable, Equatable, Hashable, Identifiable, Sendable, 
             case .normalization: "cleanup"
             case .glossary: "glossary"
             case .spokenTime: "spoken time"
+            case .spokenSymbol: "spoken symbol"
             case .spacing: "spacing"
             case .punctuation: "punctuation"
             }
@@ -50,6 +52,7 @@ public struct TextSegment: Equatable, Sendable {
         case transcript
         case glossary(UUID)
         case spokenTime
+        case spokenSymbol
         case insertedSpace
     }
 
@@ -63,6 +66,7 @@ public struct TextSegment: Equatable, Sendable {
         case code
         case glossaryOutput
         case spokenTime
+        case spokenSymbol
     }
 
     public var text: String

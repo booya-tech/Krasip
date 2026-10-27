@@ -15,7 +15,7 @@ struct ChangeRow: View {
                 .foregroundStyle(.tint)
                 .frame(width: 14)
             Text(visible(change.before))
-                .strikethrough(change.kind == .glossary || change.kind == .spokenTime, color: .secondary)
+                .strikethrough(change.kind == .glossary || change.kind == .spokenTime || change.kind == .spokenSymbol, color: .secondary)
                 .foregroundStyle(.secondary)
             Image(systemName: "arrow.right")
                 .font(.caption2)
@@ -42,6 +42,7 @@ struct ChangeRow: View {
         switch change.kind {
         case .glossary: "text.book.closed"
         case .spokenTime: "clock"
+        case .spokenSymbol: "number"
         case .spacing: "arrow.left.and.right"
         case .punctuation: "textformat"
         case .normalization: "wand.and.stars"
