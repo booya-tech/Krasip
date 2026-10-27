@@ -77,7 +77,48 @@ struct SpokenSymbolTests {
         ("เครื่องหมายแอท", "@"),
         ("support เครื่องหมายแอท krasip.app", "support@krasip.app"),
         ("at sign", "@"),
-        ("type the at sign here", "type the @ here")
+        ("type the at sign here", "type the @ here"),
+        ("add sign", "@"),
+        ("แอดไซน์", "@"),
+        ("เครื่องหมาย add", "@"),
+        ("support แอดไซน์ krasip", "support@krasip")
+    ]
+
+    /// An address spoken in parts. The first four are verbatim raw output from real recordings of
+    /// "patompong.beam@gmail.com" and another address, in a normal voice and a whisper.
+    static let spokenEmails: [(String, String)] = [
+        (
+            "ช่วยร่างอีเมลนี้ให้หน่อย ปลายทางอีเมลคือ patompong.beam at sign gmail.com แล้วก็ส่งอีเมลนี้ไปตอน 6 โมงเช้าของวันพรุ่งนี้ให้หน่อยนะ",
+            "ช่วยร่างอีเมลนี้ให้หน่อย ปลายทางอีเมลคือ patompong.beam@gmail.com แล้วก็ส่งอีเมลนี้ไปตอน 6 โมงเช้าของวันพรุ่งนี้ให้หน่อยนะ"
+        ),
+        (
+            "ปลายทางอีเมลคือ patombong.beam แอดไซน์ gmail.com แล้วก็ช่วยส่ง",
+            "ปลายทางอีเมลคือ patombong.beam@gmail.com แล้วก็ช่วยส่ง"
+        ),
+        ("p-a-t-o-m-p-o-n-g .p-e-a-m แอดไซน์ gmail.com", "patompong.peam@gmail.com"),
+        ("p-o-o-y-a dot p-a-n-n-a-c-h-a-i แอดไซน์ gmail dot com", "pooya.pannachai@gmail.com"),
+        ("ช่วยส่งข้อมูลนี้ไปให้ emailartridge at gmail.com", "ช่วยส่งข้อมูลนี้ไปให้ emailartridge@gmail.com"),
+        ("beam add sign gmail.com", "beam@gmail.com"),
+        ("beam at-sign krasip.app", "beam@krasip.app"),
+        ("ส่งไปที่ beam แอทไซน์ krasip.co.th ด้วย", "ส่งไปที่ beam@krasip.co.th ด้วย"),
+        ("ส่งไปที่ beam at sign gmail.com.", "ส่งไปที่ beam@gmail.com."),
+        ("mail beam at outlook.com then call", "mail beam@outlook.com then call"),
+        ("ส่งไปที่ beam.p at sign gmail.com", "ส่งไปที่ beam.p@gmail.com")
+    ]
+
+    static let everyConversion: [(String, String)] = [
+        recordings, standaloneEdges, spacedNamesAndCounts, atSignNames, dottedEmails, spokenEmails
+    ].flatMap { $0 }
+
+    /// Near misses of a spoken address, which must come back unchanged.
+    static let notASpokenEmail: [String] = [
+        "add sign up here",
+        "click add sign-in button",
+        "add sign out to the menu",
+        "I work at google.com",
+        "meet at gmail",
+        "ส่ง e-mail ให้หน่อย",
+        "patompong.beamassign@gmail.com"
     ]
 
     /// The model writes the `@` of a spoken address as a dot, or keeps the word "at" as a label.
@@ -273,7 +314,7 @@ struct SpokenSymbolTests {
         #expect(written(raw, decisions: decisions) == raw)
     }
 
-    @Test(arguments: recordings + standaloneEdges + spacedNamesAndCounts + atSignNames + dottedEmails)
+    @Test(arguments: everyConversion)
     func runningThePolicyAgainChangesNothingFurther(raw: String, expected: String) {
         let once = written(raw)
         #expect(once == expected)
@@ -407,6 +448,29 @@ struct SpokenSymbolTests {
             #expect(Bool(false), "no spoken-symbol change to undo")
             return
         }
+        var decisions = PolicyDecisions()
+        decisions.undo(change)
+        #expect(written(raw, decisions: decisions) == raw)
+    }
+
+    @Test(arguments: spokenEmails)
+    func assemblesAnEmailAddressSpokenInParts(raw: String, expected: String) {
+        #expect(written(raw) == expected)
+    }
+
+    @Test(arguments: notASpokenEmail)
+    func leavesNearMissesOfASpokenEmailAlone(raw: String) {
+        #expect(written(raw) == raw)
+        #expect(result(raw).changes.allSatisfy { $0.kind != .spokenSymbol })
+    }
+
+    @Test
+    func logsTheSpokenAddressAsOneChangeTheUserCanUndo() {
+        let raw = "ส่งไปที่ patompong.beam at sign gmail.com ด้วย"
+        let changes = result(raw).changes.filter { $0.kind == .spokenSymbol }
+        #expect(changes.map(\.before) == ["patompong.beam at sign gmail.com"])
+        #expect(changes.map(\.after) == ["patompong.beam@gmail.com"])
+        guard let change = changes.first else { return }
         var decisions = PolicyDecisions()
         decisions.undo(change)
         #expect(written(raw, decisions: decisions) == raw)

@@ -8,7 +8,8 @@ import Foundation
 ///
 /// Order of rules:
 /// 1. Normalize Unicode and whitespace.
-/// 1b. Put back the `@` of an email address the model wrote as a dotted token
+/// 1b. Assemble an email address spoken in parts ("beam at sign gmail dot com" →
+///    "beam@gmail.com"), then put back the `@` of one the model wrote as a dotted token
 ///    ("support.at.grasip.app" → "support@grasip.app", "อีเมล admin.example.com" →
 ///    "อีเมล admin@example.com"), before step 2 seals every dotted token as code or a URL.
 /// 2. Protect URLs, emails, and code so nothing below can touch them.
@@ -37,7 +38,8 @@ public struct TextPolicy: Sendable {
         var log = ChangeLog()
         var normalized = normalize(rawText, log: &log)
         if !decisions.disabledKinds.contains(.spokenSymbol) {
-            normalized = repairDottedEmails(normalized, log: &log)
+            normalized = repairEmails(normalized, found: SpokenEmail.matches(in:), log: &log)
+            normalized = repairEmails(normalized, found: DottedEmailRepair.matches(in:), log: &log)
         }
         var segments = normalized.isEmpty ? [] : [TextSegment(text: normalized, origin: .transcript)]
 
@@ -116,12 +118,12 @@ public struct TextPolicy: Sendable {
         return result
     }
 
-    // MARK: - 1b. Email addresses written as a dotted token
+    // MARK: - 1b. Email addresses spoken in parts or written as a dotted token
 
-    private func repairDottedEmails(_ text: String, log: inout ChangeLog) -> String {
+    private func repairEmails(_ text: String, found: (String) -> [SymbolMatch], log: inout ChangeLog) -> String {
         var repaired = ""
         var cursor = text.startIndex
-        for match in DottedEmailRepair.matches(in: text) {
+        for match in found(text) {
             log.add(.spokenSymbol, before: String(text[match.range]), after: match.replacement, key: "spokenSymbol")
             repaired += text[cursor..<match.range.lowerBound] + match.replacement
             cursor = match.range.upperBound
