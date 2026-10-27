@@ -68,6 +68,99 @@ struct SpokenSymbolTests {
         "ใช้ Hashmap เก็บค่า"
     ]
 
+    /// `@` said by name. The bare Thai name only counts with a Latin token on each side, and the
+    /// symbol then joins the two into one address.
+    static let atSignNames: [(String, String)] = [
+        ("support แอท krasip", "support@krasip"),
+        ("support แอท krasip.app", "support@krasip.app"),
+        ("user1 แอท gmail.com", "user1@gmail.com"),
+        ("เครื่องหมายแอท", "@"),
+        ("support เครื่องหมายแอท krasip.app", "support@krasip.app"),
+        ("at sign", "@"),
+        ("type the at sign here", "type the @ here")
+    ]
+
+    /// The model writes the `@` of a spoken address as a dot, or keeps the word "at" as a label.
+    /// The first comes from a real recording, the rest vary its cue word.
+    static let dottedEmails: [(String, String)] = [
+        ("ส่งไปที่ support.at.grasip.app ได้เลยครับ", "ส่งไปที่ support@grasip.app ได้เลยครับ"),
+        ("ส่งสำเนาไปที่ admin.example.com ด้วย", "ส่งสำเนาไปที่ admin@example.com ด้วย"),
+        ("ส่งอีเมลไปที่ admin.example.com", "ส่งอีเมลไปที่ admin@example.com"),
+        ("cc admin.example.com", "cc admin@example.com"),
+        ("ส่งอีเมล์ไปที่ admin.example.com", "ส่งอีเมล์ไปที่ admin@example.com"),
+        ("ส่งเมลหา admin.example.com ด้วย", "ส่งเมลหา admin@example.com ด้วย"),
+        ("ส่ง Email ไปที่ admin.example.com", "ส่ง Email ไปที่ admin@example.com"),
+        ("ส่ง e-mail ถึง admin.example.com", "ส่ง e-mail ถึง admin@example.com"),
+        ("ใส่ bcc admin.example.com ด้วย", "ใส่ bcc admin@example.com ด้วย"),
+        ("ส่งอีเมลไปที่ admin.example.com.", "ส่งอีเมลไปที่ admin@example.com."),
+        ("ส่งอีเมลไปที่ info.example.com", "ส่งอีเมลไปที่ info@example.com"),
+        ("ส่งสำเนาไปที่ support.example.co", "ส่งสำเนาไปที่ support@example.co"),
+        ("cc sales.example.com", "cc sales@example.com")
+    ]
+
+    /// "at" is an everyday English word and แอท is the start of longer Thai words, so none of
+    /// these is an `@`.
+    static let atAsAnOrdinaryWord: [String] = [
+        "meet me at noon",
+        "look at this",
+        "แอทแลนติก",
+        "ที่ at",
+        "ไปแอทมา",
+        "support แอทมา",
+        "ไปแอท krasip",
+        "ราคา 2 แอท 3 บาท",
+        "ส่งไปที่ support at krasip"
+    ]
+
+    /// Dotted text from everyday dictation. A wrong `@` here is worse than a missing one, so every
+    /// line must come back byte-identical.
+    static let ordinaryDottedText: [String] = [
+        "file.txt",
+        "github.com",
+        "www.example.com",
+        "v1.2.3",
+        "3.14",
+        "e.g.",
+        "Node.js",
+        "ดูที่ api.github.com/users",
+        "เปิด https://admin.example.com",
+        "ไฟล์ report.final.pdf ส่งแล้ว",
+        "ส่ง docs.example.com ให้หน่อย",
+        "ส่งอีเมลไปที่ docs.example.com",
+        "ส่งอีเมลไปที่ api.example.dev",
+        "ส่งอีเมลไปที่ blog.example.com",
+        "ส่งสำเนาไปที่ shop.example.com",
+        "ส่งอีเมลไปที่ at.example.com",
+        "กินเมลอนที่ shop.example.com",
+        "cc john.example.com",
+        "example.at",
+        "at.example.com",
+        "v1.at.2",
+        "Array.prototype.at.call",
+        "ดูที่ www.foo.at.example.com",
+        "https://foo.at.example.com/x",
+        "ส่งไปที่ admin.example.com",
+        "ส่งมาที่ admin.example.com",
+        "เข้าไปที่ admin.example.com",
+        "ส่งสำเนาไปที่ support.app.grasip.app",
+        "ส่งอีเมล https://admin.example.com",
+        "ส่งอีเมลไปที่ admin.example.com/login",
+        "ส่งอีเมลไปที่ file.txt",
+        "ส่งอีเมลไปที่ v1.2.3",
+        "ส่งอีเมลไปที่ www.example.com",
+        "ส่งอีเมลไปที่ mail.google.com",
+        "ส่งสำเนา report.final.pdf ให้หน่อย",
+        "อีเมล obj.method.call()",
+        "เมลไป `admin.example.com`",
+        "ขอ cc admin.example.com:8080",
+        "account admin.example.com",
+        "gmail admin.example.com",
+        "ซื้อเมล็ดกาแฟจาก shop.example.com",
+        "ส่งอีเมลมา\nadmin.example.com",
+        "ส่งอีเมลมาด้วยนะครับพี่ เดี๋ยวผมเช็คให้อีกที admin.example.com",
+        "อีเมลอยู่ที่ john@example.com"
+    ]
+
     @Test(arguments: recordings)
     func writesTheSymbolTheUserSpoke(raw: String, expected: String) {
         #expect(written(raw) == expected)
@@ -180,7 +273,7 @@ struct SpokenSymbolTests {
         #expect(written(raw, decisions: decisions) == raw)
     }
 
-    @Test(arguments: recordings + standaloneEdges + spacedNamesAndCounts)
+    @Test(arguments: recordings + standaloneEdges + spacedNamesAndCounts + atSignNames + dottedEmails)
     func runningThePolicyAgainChangesNothingFurther(raw: String, expected: String) {
         let once = written(raw)
         #expect(once == expected)
@@ -259,5 +352,63 @@ struct SpokenSymbolTests {
     @Test
     func withNoGlossaryEntryThePhraseStaysAsSpoken() {
         #expect(written("ใช้ hash map เก็บค่า") == "ใช้ hash map เก็บค่า")
+    }
+
+    @Test(arguments: atSignNames)
+    func writesTheAtSignTheUserSpoke(raw: String, expected: String) {
+        #expect(written(raw) == expected)
+    }
+
+    @Test
+    func logsTheSpokenAtWithTheSpacesItJoined() {
+        let changes = result("support แอท krasip.app").changes.filter { $0.kind == .spokenSymbol }
+        #expect(changes.map(\.before) == [" แอท "])
+        #expect(changes.map(\.after) == ["@"])
+    }
+
+    @Test(arguments: atAsAnOrdinaryWord)
+    func leavesAnOrdinaryAtAlone(raw: String) {
+        #expect(written(raw) == raw)
+        #expect(result(raw).changes.allSatisfy { $0.kind != .spokenSymbol })
+    }
+
+    @Test(arguments: dottedEmails)
+    func putsBackTheAtOfADottedEmail(raw: String, expected: String) {
+        #expect(written(raw) == expected)
+    }
+
+    @Test
+    func logsTheWholeAddressAsOneChange() {
+        let label = result("ส่งไปที่ support.at.grasip.app ได้เลยครับ").changes.filter { $0.kind == .spokenSymbol }
+        #expect(label.map(\.before) == ["support.at.grasip.app"])
+        #expect(label.map(\.after) == ["support@grasip.app"])
+
+        let dot = result("ส่งสำเนาไปที่ admin.example.com ด้วย").changes.filter { $0.kind == .spokenSymbol }
+        #expect(dot.map(\.before) == ["admin.example.com"])
+        #expect(dot.map(\.after) == ["admin@example.com"])
+    }
+
+    @Test
+    func theRepairedAddressIsProtectedAsAnEmail() {
+        let segments = result("ส่งสำเนาไปที่ admin.example.com ด้วย").segments
+        #expect(segments.contains { $0.text == "admin@example.com" && $0.protection == .email })
+    }
+
+    @Test(arguments: ordinaryDottedText)
+    func leavesDottedTextThatIsNotAnEmailAlone(raw: String) {
+        #expect(written(raw) == raw)
+        #expect(result(raw).changes.allSatisfy { $0.kind != .spokenSymbol })
+    }
+
+    @Test
+    func theUserCanUndoTheEmailRepair() {
+        let raw = "ส่งสำเนาไปที่ admin.example.com ด้วย"
+        guard let change = result(raw).changes.first(where: { $0.kind == .spokenSymbol }) else {
+            #expect(Bool(false), "no spoken-symbol change to undo")
+            return
+        }
+        var decisions = PolicyDecisions()
+        decisions.undo(change)
+        #expect(written(raw, decisions: decisions) == raw)
     }
 }

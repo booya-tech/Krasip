@@ -70,6 +70,10 @@ Most symbols sit flush against one word, `ว้าว เครื่องห�
 
 A count word in front of the name repeats the symbol, so `double hash tag` is `##` and `triple hash tag` is `###`. It sits between the `เครื่องหมาย` prefix and the name, which is how the phrase is said: `เครื่องหมายดับเบิลโคลอน`. Only `double`, `triple`, and their Thai spellings count. The Thai `สอง` is left out on purpose, because it is an everyday number word and no recording shows how the model writes it in front of a symbol name.
 
+`@` needs more care, because a wrong `@` in a URL or a file name is worse than a missing one. Said by name, `เครื่องหมายแอท` and the English `at sign` work like any other marker name. The bare `แอท` only counts with a Latin word directly on each side, as in `support แอท krasip`, because inside a Thai run it could be the start of `แอทแลนติก`. The bare English `at` never counts, because it is an everyday word. The `@` then joins the two words into one address, `support@krasip`.
+
+The model usually does not write the word at all. Measured on real recordings it kept "at" as a label, `support.at.grasip.app`, or wrote a dot, `admin.example.com`. The first is put back whenever `at` sits between two labels and an email-shaped domain follows. The second looks exactly like a website, so it is only put back when an email word such as `อีเมล`, `สำเนา`, `cc`, or `mail` comes just before it, and the token has exactly three parts. The first part must also be a name people use for a mailbox, such as `admin`, `info`, `support`, `sales`, or `hello`. A website's prefix like `docs`, `api`, `shop`, or `blog` never qualifies, because a website and an address are said differently but the model writes the same dot for both. `ส่งไปที่` is not enough, because it comes before a website just as often. Both repairs run before websites and code are protected, because that step would otherwise lock the dotted word as it stands.
+
 | Test | What it checks |
 | --- | --- |
 | `writesTheSymbolTheUserSpoke` | The eleven recorded sentences, with their spacing: `เครื่องหมายตกใจ` to `!`, `hashtag` to `#`, `100 ดอลลาร์` to `$100`, the two brackets, `colon`, `semicolon`, `แห่ง` to `&`, `ดอกจัน` to `*`, `เท่ากับ` to `=`, and `hash sign` in an all-English sentence. |
@@ -86,7 +90,7 @@ A count word in front of the name repeats the symbol, so `double hash tag` is `#
 | `protectedSpansKeepTheirSymbolNames` | A URL, an email, and a backtick code fragment holding `hash`, `and`, or `colon` are untouched. |
 | `aColonBetweenDigitsStaysATime` | The Thai time rule claims its colon first, so `บ่ายสองครึ่ง` is still `14:30` even next to a spoken colon. |
 | `theUserCanUndoTheWholeRule` | Undoing the change turns the rule off and the raw text comes back. |
-| `runningThePolicyAgainChangesNothingFurther` | Finalizing the output of all eleven sentences, all seven spacing cases, and all eight spaced-name and count cases again changes nothing, so inserting a space never pushes the text further. |
+| `runningThePolicyAgainChangesNothingFurther` | Finalizing the output of all eleven sentences, all seven spacing cases, all eight spaced-name and count cases, and every `@` case below again changes nothing, so inserting a space or an `@` never pushes the text further. |
 | `theSymbolIsProtectedFromLaterRules` | The new piece of text is marked protected, so spacing and punctuation leave the symbol alone. |
 | `theLongerSpellingOfANameWins` | `ดอกจันทน์` is not read as `ดอกจัน` plus a leftover tail, `hashtag` wins over `hash`, and the spaced `hash tag` wins over `hash` so no `tag` is left stranded. |
 | `writesASpacedNameAndRepeatsForACountWord` | `hash tag` and `แฮช แท็ก` said as two words give one `#`, and a count word in front repeats it: `double hash tag` to `##`, `triple hash tag` to `###`, `double colon sign` to `::`, `เครื่องหมายดับเบิลโคลอน` to `::`. |
@@ -97,6 +101,14 @@ A count word in front of the name repeats the symbol, so `double hash tag` is `#
 | `aCountWordWithNoSymbolNameIsLeftAlone` | `double trouble` and `ดับเบิลเบอร์เกอร์` are untouched, because a count word only counts in front of a name. |
 | `aGlossaryEntryClaimsThePhraseBeforeTheRuleRuns` | With the starter `Hashmap` entry saved, `ใช้ hash map เก็บค่า` becomes `ใช้ Hashmap เก็บค่า` and no spoken-symbol change is logged at all. |
 | `withNoGlossaryEntryThePhraseStaysAsSpoken` | With an empty glossary the same sentence stays `ใช้ hash map เก็บค่า`, so the rule protects itself and does not lean on the glossary. |
+| `writesTheAtSignTheUserSpoke` | `support แอท krasip` becomes `support@krasip`, and still does when the next word is a web address like `krasip.app`. `เครื่องหมายแอท` and `at sign` alone become `@`, and `type the at sign here` gets `@` as a word of its own, the same way `hash sign` does. |
+| `logsTheSpokenAtWithTheSpacesItJoined` | The logged change for `support แอท krasip.app` is ` แอท ` with both spaces becoming `@`, so undo puts the spaces back too. |
+| `leavesAnOrdinaryAtAlone` | `meet me at noon`, `look at this`, `แอทแลนติก`, `ที่ at`, `แอท` with Thai on either side, `2 แอท 3` between numbers, and the bare English `support at krasip` all come through byte-identical with no change logged. |
+| `putsBackTheAtOfADottedEmail` | The recorded `support.at.grasip.app` becomes `support@grasip.app`, and `admin.example.com`, `info.example.com`, or `sales.example.com` becomes an address after each email word: `สำเนา`, `อีเมล`, `อีเมล์`, `เมล`, `Email`, `e-mail`, `cc`, and `bcc`. A full stop after the address stays a full stop. |
+| `logsTheWholeAddressAsOneChange` | Each repair logs the whole address before and after, so the user sees which address was changed. |
+| `theRepairedAddressIsProtectedAsAnEmail` | Once its `@` is back, the address is caught by the ordinary email protection, so no later rule touches it. |
+| `leavesDottedTextThatIsNotAnEmailAlone` | Forty-four everyday dotted lines come through byte-identical with no change logged: file names, versions, `3.14`, `e.g.`, `Node.js`, websites with and without `www`, `https://`, a path, or a port, an `at` label at the start or the end or between numbers, `Array.prototype.at.call`, a three-part file name after `สำเนา`, `mail.google.com` after `อีเมล`, an address after `ส่งไปที่` with no email word, a website prefix after an email word (`docs`, `api`, `blog`, `shop`, `at`), a person's name after `cc`, an email word too far back or on the line above, `เมล็ด` which only starts like `เมล`, and an address that already has its `@`. |
+| `theUserCanUndoTheEmailRepair` | Undoing the repair turns the rule off and the dotted token comes back as the model wrote it. |
 
 ### ThaiSpokenTimeTests.swift: Thai times as people type them
 

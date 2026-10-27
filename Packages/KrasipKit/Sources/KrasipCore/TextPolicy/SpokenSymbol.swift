@@ -22,6 +22,9 @@ enum SpokenSymbol {
         case bare
         /// Only directly after a number, and the symbol moves in front of that number.
         case afterNumber
+        /// Only with a Latin token directly on each side. Thai has no spaces, so a Thai name
+        /// standing in a Thai run could be the inside of a longer word.
+        case betweenLatin
     }
 
     /// Which side the symbol sticks to, and so which side's spaces the match swallows.
@@ -31,6 +34,9 @@ enum SpokenSymbol {
         /// Sits between two things instead of binding to one of them. It swallows no spaces
         /// and keeps exactly one on each side.
         case standalone
+        /// Joins the two things on either side into one, as in an email address. It swallows
+        /// the spaces on both sides and adds none.
+        case flush
     }
 
     private struct Entry {
@@ -46,8 +52,9 @@ enum SpokenSymbol {
     /// Every spelling here was measured from real recordings. The speech model flips between the
     /// Thai and the English name of the same symbol, so most entries carry both.
     ///
-    /// `@` is absent because the model writes "." instead of the word, and `%` is absent because
-    /// the model already writes `%` itself after a number.
+    /// The bare English "at" is absent on purpose, because it is an everyday word. An `@` the model
+    /// wrote as a dot is repaired by `DottedEmailRepair`, and `%` is absent because the model
+    /// already writes `%` itself after a number.
     private static let entries: [Entry] = [
         Entry(symbol: "!", names: ["ตกใจ", "อัศเจรีย์", "exclamation"], trigger: .marker, attach: .left),
         Entry(
@@ -71,7 +78,9 @@ enum SpokenSymbol {
         // required, and nobody says "เครื่องหมายแห่ง" meaning anything else.
         Entry(symbol: "&", names: ["แอนด์", "แห่ง", "and", "ampersand"], trigger: .marker, attach: .standalone),
         Entry(symbol: "*", names: ["ดอกจัน", "ดอกจันทน์", "asterisk"], trigger: .marker, attach: .standalone),
-        Entry(symbol: "=", names: ["เท่ากับ", "equals", "equal"], trigger: .marker, attach: .standalone)
+        Entry(symbol: "=", names: ["เท่ากับ", "equals", "equal"], trigger: .marker, attach: .standalone),
+        Entry(symbol: "@", names: ["แอท", "at"], trigger: .marker, attach: .flush),
+        Entry(symbol: "@", names: ["แอท"], trigger: .betweenLatin, attach: .flush)
     ]
 
     private static let thaiMarker = "เครื่องหมาย"
@@ -90,13 +99,18 @@ enum SpokenSymbol {
         ("ทริปเปิล", 3)
     ]
 
+    /// The characters just outside `text`, when it is one piece of a longer text. Earlier rules
+    /// seal a URL such as `krasip.app` into its own piece, so a name at the edge of this piece can
+    /// still have a Latin token beside it.
+    typealias Neighbours = (before: Character?, after: Character?)
+
     /// Non-overlapping matches, left to right.
-    static func matches(in text: String) -> [SymbolMatch] {
+    static func matches(in text: String, neighbours: Neighbours = (nil, nil)) -> [SymbolMatch] {
         // In a Thai sentence the model mangles "colon sign" into "colon ใส่", so the English
         // suffix is only trusted when nothing in the text is Thai.
         let allowsEnglishMarker = !text.containsThai
         var found: [SymbolMatch] = []
-        for candidate in candidates(in: text, allowsEnglishMarker: allowsEnglishMarker) {
+        for candidate in candidates(in: text, neighbours: neighbours, allowsEnglishMarker: allowsEnglishMarker) {
             guard !found.contains(where: { $0.range.overlaps(candidate.range) }) else { continue }
             found.append(candidate)
         }
@@ -105,7 +119,7 @@ enum SpokenSymbol {
 
     /// Earliest first, and the longer match first where two start together, so "แฮช" never wins
     /// over "แฮชแท็ก" and "ดอกจัน" never leaves the tail of "ดอกจันทน์" behind.
-    private static func candidates(in text: String, allowsEnglishMarker: Bool) -> [SymbolMatch] {
+    private static func candidates(in text: String, neighbours: Neighbours, allowsEnglishMarker: Bool) -> [SymbolMatch] {
         var candidates: [SymbolMatch] = []
         for entry in entries {
             for name in entry.names {
@@ -115,6 +129,7 @@ enum SpokenSymbol {
                         name: name,
                         at: occurrence,
                         in: text,
+                        neighbours: neighbours,
                         allowsEnglishMarker: allowsEnglishMarker
                     ) else { continue }
                     candidates.append(match)
@@ -133,6 +148,7 @@ enum SpokenSymbol {
         name: String,
         at occurrence: Range<String.Index>,
         in text: String,
+        neighbours: Neighbours,
         allowsEnglishMarker: Bool
     ) -> SymbolMatch? {
         guard hasWordBoundary(around: occurrence, name: name, in: text) else { return nil }
@@ -170,11 +186,20 @@ enum SpokenSymbol {
             guard let digits = digitRun(before: start, in: text) else { return nil }
             start = digits.lowerBound
             replacement += text[digits]
+
+        case .betweenLatin:
+            let before = skippingSpaces(before: start, in: text)
+            let after = skippingSpaces(after: end, in: text)
+            let left = before > text.startIndex ? text[text.index(before: before)] : neighbours.before
+            let right = after < text.endIndex ? text[after] : neighbours.after
+            // A domain starts with a letter, so "2 แอท 3" stays as spoken.
+            guard left?.isLatinOrDigit == true, right?.scriptClass == .latin else { return nil }
         }
 
         // "hash sign" names the symbol rather than prefixing the word after it, so a symbol
         // that would bind rightwards stands on its own once the English suffix is what matched.
-        let attach: Attach = usedEnglishMarker && entry.attach == .right ? .standalone : entry.attach
+        let binds = entry.attach == .right || entry.attach == .flush
+        let attach: Attach = usedEnglishMarker && binds ? .standalone : entry.attach
 
         switch attach {
         case .left:
@@ -187,6 +212,9 @@ enum SpokenSymbol {
             }
         case .standalone:
             replacement = spaced(replacement, from: start, to: end, in: text)
+        case .flush:
+            start = skippingSpaces(before: start, in: text)
+            end = skippingSpaces(after: end, in: text)
         }
         return SymbolMatch(range: start..<end, replacement: replacement)
     }
