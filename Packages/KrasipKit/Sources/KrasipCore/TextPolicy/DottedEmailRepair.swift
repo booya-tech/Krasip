@@ -80,7 +80,8 @@ enum DottedEmailRepair {
         return local.joined(separator: ".") + "@" + domain.joined(separator: ".")
     }
 
-    private static func isEmailDomain(_ labels: ArraySlice<String>) -> Bool {
+    /// Ends in a top-level domain, never a file extension.
+    static func isEmailDomain(_ labels: ArraySlice<String>) -> Bool {
         guard labels.count >= 2, let last = labels.last?.lowercased() else { return false }
         return (2...6).contains(last.count)
             && last.allSatisfy { $0.isASCII && $0.isLetter }

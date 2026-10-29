@@ -80,8 +80,22 @@ enum SpokenSymbol {
         Entry(symbol: "*", names: ["ดอกจัน", "ดอกจันทน์", "asterisk"], trigger: .marker, attach: .standalone),
         Entry(symbol: "=", names: ["เท่ากับ", "equals", "equal"], trigger: .marker, attach: .standalone),
         Entry(symbol: "@", names: ["แอท", "at"], trigger: .marker, attach: .flush),
-        Entry(symbol: "@", names: ["แอท"], trigger: .betweenLatin, attach: .flush)
+        Entry(symbol: "@", names: ["แอท"], trigger: .betweenLatin, attach: .flush),
+        // The model hears a spoken "at sign" as "add sign" too. "add" is an everyday word, so the
+        // marker is required and the sign-up phrases stay as spoken.
+        Entry(
+            symbol: "@",
+            names: ["add"],
+            trigger: .marker,
+            attach: .flush,
+            blockedFollowers: ["up", "in", "out", "on", "off"]
+        ),
+        // "at sign" heard as one Thai word. It already holds its own marker.
+        Entry(symbol: "@", names: atSignInThai, trigger: .betweenLatin, attach: .flush),
+        Entry(symbol: "@", names: atSignInThai, trigger: .bare, attach: .standalone)
     ]
+
+    private static let atSignInThai = ["แอดไซน์", "แอทไซน์", "แอด ไซน์", "แอท ไซน์"]
 
     private static let thaiMarker = "เครื่องหมาย"
     private static let englishMarker = "sign"
@@ -152,7 +166,6 @@ enum SpokenSymbol {
         allowsEnglishMarker: Bool
     ) -> SymbolMatch? {
         guard hasWordBoundary(around: occurrence, name: name, in: text) else { return nil }
-        guard !isBlocked(entry.blockedFollowers, after: occurrence.upperBound, in: text) else { return nil }
 
         var start = occurrence.lowerBound
         var end = occurrence.upperBound
@@ -195,6 +208,8 @@ enum SpokenSymbol {
             // A domain starts with a letter, so "2 แอท 3" stays as spoken.
             guard left?.isLatinOrDigit == true, right?.scriptClass == .latin else { return nil }
         }
+
+        guard !isBlocked(entry.blockedFollowers, after: end, in: text) else { return nil }
 
         // "hash sign" names the symbol rather than prefixing the word after it, so a symbol
         // that would bind rightwards stands on its own once the English suffix is what matched.
@@ -263,8 +278,9 @@ enum SpokenSymbol {
         return true
     }
 
-    /// Whether the word right after the name is one the entry refuses. Only the immediately next
-    /// word counts, so "hash the map" is still a symbol while "hash map" is left as spoken.
+    /// Whether the word right after the spoken phrase is one the entry refuses. Only the
+    /// immediately next word counts, so "hash the map" is still a symbol while "hash map" is left
+    /// as spoken. The phrase includes an English marker, so "add sign up" checks "up".
     private static func isBlocked(_ followers: [String], after end: String.Index, in text: String) -> Bool {
         guard !followers.isEmpty else { return false }
         let wordStart = skippingSpaces(after: end, in: text)
@@ -306,7 +322,9 @@ enum SpokenSymbol {
             options: [.caseInsensitive, .anchored],
             range: cursor..<text.endIndex
         ) else { return nil }
-        guard marker.upperBound == text.endIndex || !text[marker.upperBound].isLatinOrDigit else { return nil }
+        // "sign-in" and "sign-up" are words of their own, never the marker.
+        guard marker.upperBound == text.endIndex
+            || !(text[marker.upperBound].isLatinOrDigit || text[marker.upperBound] == "-") else { return nil }
         return marker.upperBound
     }
 
