@@ -43,28 +43,24 @@ static float clouds(float2 p) {
         return half4(0.0h);
     }
 
-    // Two noise fields drifting against each other make the clouds churn.
-    float drift = time * 0.08 + level * 0.35;
-    float2 warp = float2(clouds(centred * 1.6 + drift),
-                         clouds(centred * 1.6 - drift + 4.3));
-    float density = clouds(centred * 2.1 + (warp - 0.5) * 1.9 + drift * 0.6);
+    // Slow drifting cloud field. The warp keeps the horizon from looking straight.
+    float drift = time * 0.05 + level * 0.25;
+    float2 warp = float2(clouds(centred * 0.8 + drift),
+                         clouds(centred * 0.8 - drift + 4.3));
+    float density = clouds(centred * 0.9 + (warp - 0.5) * 0.8 + drift * 0.5);
 
-    // The clouds drive the shading; gravity only tilts it, so no flat split appears.
-    float ramp = clamp(density * 1.75 - 0.42 - centred.y * 0.22, 0.0, 1.0);
-    ramp = ramp * ramp * (3.0 - 2.0 * ramp);
+    // Height through the sky: 0 is the blue floor, 1 is the pale top.
+    float height = clamp(0.42 - centred.y * 0.80 + (density - 0.5) * 0.34, 0.0, 1.0);
 
-    const half3 ink = half3(0.039h, 0.047h, 0.051h);
-    const half3 mint = half3(0.812h, 1.0h, 0.886h);
+    const half3 deep = half3(0.161h, 0.447h, 0.957h);
+    const half3 cream = half3(0.976h, 0.980h, 0.953h);
+    const half3 ice = half3(0.839h, 0.925h, 0.984h);
 
-    half3 colour = mix(ink, mint, half(ramp));
+    // Blue burns off into a warm white band, which cools again towards the top.
+    half3 colour = mix(deep, cream, half(smoothstep(0.22, 0.62, height)));
+    colour = mix(colour, ice, half(0.85 * smoothstep(0.70, 1.0, height)));
 
-    // A small bright core where the cloud is thickest, so it reads as lit.
-    colour = mix(colour, half3(1.0h), half(pow(ramp, 4.0) * 0.6));
-
-    // Darken towards the edge so the sphere keeps its volume.
-    colour *= half(1.0 - 0.45 * smoothstep(0.55, 1.0, radius));
-
-    // Feather the outer edge instead of a hard cut, so it reads as a sphere.
-    float alpha = 1.0 - smoothstep(0.94, 1.0, radius);
+    // Hard round edge, antialiased only. The reference orb has no soft halo.
+    float alpha = 1.0 - smoothstep(0.985, 1.0, radius);
     return half4(colour * half(alpha), half(alpha));
 }

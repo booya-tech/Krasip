@@ -10,8 +10,8 @@ struct OverlayCardView: View {
 
     var body: some View {
         card
-            .padding(.horizontal, isBare ? 14 : 16)
-            .padding(.vertical, isBare ? 14 : 14)
+            .padding(.horizontal, isBare ? 10 : 16)
+            .padding(.vertical, isBare ? 10 : 14)
             .frame(width: width, alignment: isBare ? .center : .leading)
             .background {
                 if !isBare {

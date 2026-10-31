@@ -17,7 +17,7 @@ struct ListeningCard: View {
                 barCount: 11,
                 barWidth: 2,
                 maxHeight: 12,
-                tint: RecordingOrb.mint.opacity(0.9)
+                tint: RecordingOrb.accent.opacity(0.9)
             )
         }
         .frame(maxWidth: .infinity)

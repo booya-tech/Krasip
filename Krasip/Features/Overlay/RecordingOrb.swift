@@ -25,7 +25,6 @@ struct RecordingOrb: View {
                 )
         }
         .frame(width: diameter, height: diameter)
-        .shadow(color: Self.mint.opacity(0.18 + Double(smoothed) * 0.22), radius: 8)
         .onChange(of: level) { _, newValue in
             withAnimation(.linear(duration: 0.08)) {
                 smoothed = smoothed * 0.7 + newValue * 0.3
@@ -34,5 +33,6 @@ struct RecordingOrb: View {
         .accessibilityHidden(true)
     }
 
-    static let mint = Color(red: 0.812, green: 1.0, blue: 0.886)
+    /// The pale blue at the top of the orb, reused by the level meter.
+    static let accent = Color(red: 0.839, green: 0.925, blue: 0.984)
 }
