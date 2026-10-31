@@ -38,8 +38,9 @@ public struct TextPolicy: Sendable {
         var log = ChangeLog()
         var normalized = normalize(rawText, log: &log)
         if !decisions.disabledKinds.contains(.spokenSymbol) {
-            normalized = repairEmails(normalized, found: SpokenEmail.matches(in:), log: &log)
-            normalized = repairEmails(normalized, found: DottedEmailRepair.matches(in:), log: &log)
+            normalized = repairTokens(normalized, found: SpokenEmail.matches(in:), log: &log)
+            normalized = repairTokens(normalized, found: DottedEmailRepair.matches(in:), log: &log)
+            normalized = repairTokens(normalized, found: PortRepair.matches(in:), log: &log)
         }
         var segments = normalized.isEmpty ? [] : [TextSegment(text: normalized, origin: .transcript)]
 
@@ -120,7 +121,7 @@ public struct TextPolicy: Sendable {
 
     // MARK: - 1b. Email addresses spoken in parts or written as a dotted token
 
-    private func repairEmails(_ text: String, found: (String) -> [SymbolMatch], log: inout ChangeLog) -> String {
+    private func repairTokens(_ text: String, found: (String) -> [SymbolMatch], log: inout ChangeLog) -> String {
         var repaired = ""
         var cursor = text.startIndex
         for match in found(text) {

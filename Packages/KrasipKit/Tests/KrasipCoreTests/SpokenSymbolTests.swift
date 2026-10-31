@@ -44,6 +44,17 @@ struct SpokenSymbolTests {
         ("เรียก function fetchUser วงเล็บเปิด id วงเล็บปิด ก่อน render", "เรียก function fetchUser (id) ก่อน render")
     ]
 
+    /// Verbatim raw output from the benchmark recordings of 31 October: an underscore said in Thai,
+    /// "เท่ากับ" heard as "ทั้งกับ", and a port written with the slashes of a URL scheme.
+    static let benchmarkSlips: [(String, String)] = [
+        ("ตัวแปร API อันเดอร์สกอร์ key ห้าม commit ขึ้น Git", "ตัวแปร API_key ห้าม commit ขึ้น Git"),
+        ("ตัวแปร user อันเดอร์สกอล id", "ตัวแปร user_id"),
+        ("ตั้ง timeout เครื่องหมายทั้งกับ 30 วินาที", "ตั้ง timeout = 30 วินาที"),
+        ("เปิด localhost://3000 ดูก่อน", "เปิด localhost:3000 ดูก่อน"),
+        ("เปิด 127.0.0.1://8085 ดูก่อน", "เปิด 127.0.0.1:8085 ดูก่อน"),
+        ("เรียก localhost://3000/api ก่อน", "เรียก localhost:3000/api ก่อน")
+    ]
+
     /// A symbol that sits between two things needs one space on each side, and the edges of the
     /// text and a line break count as a separator already.
     static let standaloneEdges: [(String, String)] = [
@@ -120,7 +131,7 @@ struct SpokenSymbolTests {
     ]
 
     static let everyConversion: [(String, String)] = [
-        recordings, standaloneEdges, emptyBrackets, spacedNamesAndCounts, atSignNames, dottedEmails, spokenEmails
+        recordings, standaloneEdges, emptyBrackets, benchmarkSlips, spacedNamesAndCounts, atSignNames, dottedEmails, spokenEmails
     ].flatMap { $0 }
 
     /// Near misses of a spoken address, which must come back unchanged.
@@ -220,6 +231,11 @@ struct SpokenSymbolTests {
         #expect(written(raw) == expected)
     }
 
+    @Test(arguments: benchmarkSlips)
+    func repairsTheBenchmarkSlips(raw: String, expected: String) {
+        #expect(written(raw) == expected)
+    }
+
     @Test(arguments: emptyBrackets)
     func writesAnEmptyPairAsACall(raw: String, expected: String) {
         #expect(written(raw) == expected)
@@ -280,7 +296,12 @@ struct SpokenSymbolTests {
         "ราคาเป็นดอลล่ารึบาท",
         "ใส่ colon ใส่หลังคำว่า node",
         "เปิด https://example.com/hash-and-colon แล้วเมลไป hash@dollar.com",
-        "ใช้ android แล้ว hashed password"
+        "ใช้ android แล้ว hashed password",
+        "ทั้งกับเขาและเธอ",
+        "อันเดอร์สกอร์คือขีดล่าง",
+        "เปิด http://127.0.0.1:8085/v1 ดูก่อน",
+        "เปิด https://example.com ดูก่อน",
+        "เปิด http://127.0.0.1://0x5.0.1"
     ])
     func leavesTextWithoutASpokenSymbolAlone(raw: String) {
         #expect(written(raw) == raw)

@@ -82,7 +82,9 @@ enum SpokenSymbol {
         // required, and nobody says "เครื่องหมายแห่ง" meaning anything else.
         Entry(symbol: "&", names: ["แอนด์", "แห่ง", "and", "ampersand"], trigger: .marker, attach: .standalone),
         Entry(symbol: "*", names: ["ดอกจัน", "ดอกจันทน์", "asterisk"], trigger: .marker, attach: .standalone),
-        Entry(symbol: "=", names: ["เท่ากับ", "equals", "equal"], trigger: .marker, attach: .standalone),
+        // ทั้งกับ is what the model heard for เท่ากับ. Like แห่ง, it is safe only behind the marker.
+        Entry(symbol: "=", names: ["เท่ากับ", "ทั้งกับ", "equals", "equal"], trigger: .marker, attach: .standalone),
+        Entry(symbol: "_", names: ["อันเดอร์สกอร์", "อันเดอร์สกอล", "underscore"], trigger: .betweenLatin, attach: .flush),
         Entry(symbol: "@", names: ["แอท", "at"], trigger: .marker, attach: .flush),
         Entry(symbol: "@", names: ["แอท"], trigger: .betweenLatin, attach: .flush),
         // The model hears a spoken "at sign" as "add sign" too. "add" is an everyday word, so the
