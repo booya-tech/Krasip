@@ -6,7 +6,7 @@ import SwiftUI
 
 struct RecordingOrb: View {
     let level: Float
-    var diameter: CGFloat = 76
+    var diameter: CGFloat = 44
 
     @State private var smoothed: Float = 0
 
@@ -25,7 +25,7 @@ struct RecordingOrb: View {
                 )
         }
         .frame(width: diameter, height: diameter)
-        .shadow(color: Self.mint.opacity(0.35 + Double(smoothed) * 0.35), radius: 14)
+        .shadow(color: Self.mint.opacity(0.35 + Double(smoothed) * 0.35), radius: 10)
         .onChange(of: level) { _, newValue in
             withAnimation(.linear(duration: 0.08)) {
                 smoothed = smoothed * 0.7 + newValue * 0.3
@@ -34,5 +34,5 @@ struct RecordingOrb: View {
         .accessibilityHidden(true)
     }
 
-    static let mint = Color(red: 0.243, green: 0.812, blue: 0.431)
+    static let mint = Color(red: 0.812, green: 1.0, blue: 0.886)
 }

@@ -10,9 +10,9 @@ struct OverlayCardView: View {
 
     var body: some View {
         card
-            .padding(.horizontal, 16)
-            .padding(.vertical, 14)
-            .frame(width: width, alignment: .leading)
+            .padding(.horizontal, isListening ? 12 : 16)
+            .padding(.vertical, isListening ? 12 : 14)
+            .frame(width: width, alignment: isListening ? .center : .leading)
             .background(VisualEffectBackground(material: .hudWindow, cornerRadius: 16))
             .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(.white.opacity(0.12)))
             .fixedSize(horizontal: false, vertical: true)
@@ -43,8 +43,14 @@ struct OverlayCardView: View {
         switch phase {
         case .review, .finished: 440
         case .notice: 380
+        case .listening: 120
         default: 340
         }
+    }
+
+    private var isListening: Bool {
+        if case .listening = phase { return true }
+        return false
     }
 
     private var phaseKey: String {

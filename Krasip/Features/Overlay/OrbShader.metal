@@ -53,8 +53,8 @@ static float clouds(float2 p) {
     float ramp = clamp(0.62 - centred.y * 0.55 + (density - 0.5) * 0.85, 0.0, 1.0);
 
     const half3 ink = half3(0.039h, 0.047h, 0.051h);
-    const half3 mint = half3(0.243h, 0.812h, 0.431h);
-    const half3 paper = half3(0.965h, 1.0h, 0.980h);
+    const half3 mint = half3(0.812h, 1.0h, 0.886h);
+    const half3 paper = half3(1.0h, 1.0h, 1.0h);
 
     half3 colour = ramp < 0.5
         ? mix(ink, mint, half(ramp * 2.0))
