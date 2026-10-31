@@ -37,6 +37,9 @@ enum SpokenSymbol {
         /// Joins the two things on either side into one, as in an email address. It swallows
         /// the spaces on both sides and adds none.
         case flush
+        /// Sticks to the name before it like `left`, and keeps a word after it apart, so
+        /// "fetchUser()ก่อน" reads "fetchUser() ก่อน" while "fetchUser().then" stays as it is.
+        case call
     }
 
     private struct Entry {
@@ -72,8 +75,7 @@ enum SpokenSymbol {
         Entry(symbol: "$", names: ["ดอลลาร์", "ดอลล่า", "dollar", "dollars"], trigger: .afterNumber, attach: .right),
         Entry(symbol: "(", names: openBracket, trigger: .bare, attach: .right),
         Entry(symbol: ")", names: closeBracket, trigger: .bare, attach: .left),
-        // An empty pair is a function call, as in "fetchUser()", so it sticks to the name before it.
-        Entry(symbol: "()", names: emptyBrackets, trigger: .bare, attach: .left),
+        Entry(symbol: "()", names: emptyBrackets, trigger: .bare, attach: .call),
         Entry(symbol: ":", names: ["โคลอน", "colon"], trigger: .marker, attach: .left),
         Entry(symbol: ";", names: ["เซมิโคลอน", "semicolon", "อัฒภาค"], trigger: .marker, attach: .left),
         // แห่ง is what the model heard for a spoken แอนด์. It is safe only because the marker is
@@ -226,8 +228,11 @@ enum SpokenSymbol {
 
         switch attach {
         case .left:
-            while start > text.startIndex, text[text.index(before: start)] == " " {
-                start = text.index(before: start)
+            start = skippingSpaces(before: start, in: text)
+        case .call:
+            start = skippingSpaces(before: start, in: text)
+            if end < text.endIndex, text[end].isLetter {
+                replacement += " "
             }
         case .right:
             while end < text.endIndex, text[end] == " " {
