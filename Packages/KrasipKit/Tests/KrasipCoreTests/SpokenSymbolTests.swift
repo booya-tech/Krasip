@@ -31,6 +31,19 @@ struct SpokenSymbolTests {
         ("push a hash sign before the number", "push a # before the number")
     ]
 
+    /// An empty pair is a function call, so it sticks to the name before it and keeps a word after
+    /// it apart. Whisper writes the two names with or without a space between them, and runs the
+    /// Thai word after them straight on.
+    static let emptyBrackets: [(String, String)] = [
+        ("เรียก function fetchUser วงเล็บเปิดวงเล็บปิดก่อน render", "เรียก function fetchUser() ก่อน render"),
+        ("เรียก fetchUser วงเล็บเปิดวงเล็บปิด render", "เรียก fetchUser() render"),
+        ("เรียก fetchUser วงเล็บเปิดวงเล็บปิด", "เรียก fetchUser()"),
+        ("เรียก function fetchUser วงเล็บเปิดวงเล็บปิด ก่อน render", "เรียก function fetchUser() ก่อน render"),
+        ("เรียก function fetchUser วงเล็บเปิด วงเล็บปิด ก่อน render", "เรียก function fetchUser() ก่อน render"),
+        ("เรียก fetchUserวงเล็บซ้ายวงเล็บขวา", "เรียก fetchUser()"),
+        ("เรียก function fetchUser วงเล็บเปิด id วงเล็บปิด ก่อน render", "เรียก function fetchUser (id) ก่อน render")
+    ]
+
     /// A symbol that sits between two things needs one space on each side, and the edges of the
     /// text and a line break count as a separator already.
     static let standaloneEdges: [(String, String)] = [
@@ -107,7 +120,7 @@ struct SpokenSymbolTests {
     ]
 
     static let everyConversion: [(String, String)] = [
-        recordings, standaloneEdges, spacedNamesAndCounts, atSignNames, dottedEmails, spokenEmails
+        recordings, standaloneEdges, emptyBrackets, spacedNamesAndCounts, atSignNames, dottedEmails, spokenEmails
     ].flatMap { $0 }
 
     /// Near misses of a spoken address, which must come back unchanged.
@@ -204,6 +217,11 @@ struct SpokenSymbolTests {
 
     @Test(arguments: recordings)
     func writesTheSymbolTheUserSpoke(raw: String, expected: String) {
+        #expect(written(raw) == expected)
+    }
+
+    @Test(arguments: emptyBrackets)
+    func writesAnEmptyPairAsACall(raw: String, expected: String) {
         #expect(written(raw) == expected)
     }
 
