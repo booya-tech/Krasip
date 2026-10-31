@@ -1,6 +1,6 @@
 // ListeningCard.swift
 // Krasip
-// Overlay card while recording: "● Listening…", level meter, timer, and how to finish or cancel.
+// Overlay card while recording: the animated orb, a level meter under it, the timer, and how to finish or cancel.
 
 import SwiftUI
 import KrasipCore
@@ -10,17 +10,26 @@ struct ListeningCard: View {
     let listening: FlowPhase.Listening
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 10) {
-                PulsingDot()
+        VStack(spacing: 12) {
+            RecordingOrb(level: app.flow.level)
+                .padding(.top, 4)
+
+            LevelMeter(
+                level: app.flow.level,
+                barCount: 22,
+                barWidth: 3,
+                maxHeight: 24,
+                tint: RecordingOrb.mint.opacity(0.9)
+            )
+
+            HStack(spacing: 8) {
                 Text(AppString.Overlay.listening)
-                    .font(.system(size: 14, weight: .semibold))
-                Spacer(minLength: 8)
-                LevelMeter(level: app.flow.level)
+                    .font(.system(size: 13, weight: .semibold))
                 Text(Self.format(app.flow.elapsed))
                     .font(.system(size: 12, weight: .medium).monospacedDigit())
                     .foregroundStyle(.secondary)
             }
+
             HStack {
                 Text(hint)
                     .font(.system(size: 11))
@@ -30,6 +39,7 @@ struct ListeningCard: View {
                 KeyHint(key: "esc", label: AppString.Overlay.cancel)
             }
         }
+        .frame(maxWidth: .infinity)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(AppString.Overlay.listening)
     }
