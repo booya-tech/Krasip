@@ -49,20 +49,20 @@ static float clouds(float2 p) {
                          clouds(centred * 1.6 - drift + 4.3));
     float density = clouds(centred * 2.1 + (warp - 0.5) * 1.9 + drift * 0.6);
 
-    // Vertical ramp so the top stays light and the bottom sinks to near-black.
-    float ramp = clamp(0.62 - centred.y * 0.55 + (density - 0.5) * 0.85, 0.0, 1.0);
+    // The clouds drive the shading; gravity only tilts it, so no flat split appears.
+    float ramp = clamp(density * 1.75 - 0.42 - centred.y * 0.22, 0.0, 1.0);
+    ramp = ramp * ramp * (3.0 - 2.0 * ramp);
 
     const half3 ink = half3(0.039h, 0.047h, 0.051h);
     const half3 mint = half3(0.812h, 1.0h, 0.886h);
-    const half3 paper = half3(1.0h, 1.0h, 1.0h);
 
-    half3 colour = ramp < 0.5
-        ? mix(ink, mint, half(ramp * 2.0))
-        : mix(mint, paper, half((ramp - 0.5) * 2.0));
+    half3 colour = mix(ink, mint, half(ramp));
 
-    // A soft mint rim keeps the orb readable against the dark card.
-    float rim = smoothstep(0.78, 1.0, radius);
-    colour = mix(colour, mint, half(rim * 0.45));
+    // A small bright core where the cloud is thickest, so it reads as lit.
+    colour = mix(colour, half3(1.0h), half(pow(ramp, 4.0) * 0.6));
+
+    // Darken towards the edge so the sphere keeps its volume.
+    colour *= half(1.0 - 0.45 * smoothstep(0.55, 1.0, radius));
 
     // Feather the outer edge instead of a hard cut, so it reads as a sphere.
     float alpha = 1.0 - smoothstep(0.94, 1.0, radius);

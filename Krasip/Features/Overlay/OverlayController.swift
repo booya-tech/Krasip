@@ -47,6 +47,7 @@ final class OverlayController {
             } else {
                 panel.hasShadow = true
             }
+            panel.invalidateShadow()
             place()
             panel.orderFrontRegardless()
         }

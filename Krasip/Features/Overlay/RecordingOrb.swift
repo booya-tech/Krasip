@@ -25,7 +25,7 @@ struct RecordingOrb: View {
                 )
         }
         .frame(width: diameter, height: diameter)
-        .shadow(color: Self.mint.opacity(0.35 + Double(smoothed) * 0.35), radius: 10)
+        .shadow(color: Self.mint.opacity(0.18 + Double(smoothed) * 0.22), radius: 8)
         .onChange(of: level) { _, newValue in
             withAnimation(.linear(duration: 0.08)) {
                 smoothed = smoothed * 0.7 + newValue * 0.3
