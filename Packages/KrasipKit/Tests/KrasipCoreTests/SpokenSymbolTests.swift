@@ -52,7 +52,11 @@ struct SpokenSymbolTests {
         ("ตั้ง timeout เครื่องหมายทั้งกับ 30 วินาที", "ตั้ง timeout = 30 วินาที"),
         ("เปิด localhost://3000 ดูก่อน", "เปิด localhost:3000 ดูก่อน"),
         ("เปิด 127.0.0.1://8085 ดูก่อน", "เปิด 127.0.0.1:8085 ดูก่อน"),
-        ("เรียก localhost://3000/api ก่อน", "เรียก localhost:3000/api ก่อน")
+        ("เรียก localhost://3000/api ก่อน", "เรียก localhost:3000/api ก่อน"),
+        // Said slowly on its own, the pauses come back as commas, or the marker comes along.
+        ("API, underscore, key", "API_key"),
+        ("API เครื่องหมาย underscore key", "API_key"),
+        ("API underscore key", "API_key")
     ]
 
     /// A symbol that sits between two things needs one space on each side, and the edges of the
@@ -301,7 +305,10 @@ struct SpokenSymbolTests {
         "อันเดอร์สกอร์คือขีดล่าง",
         "เปิด http://127.0.0.1:8085/v1 ดูก่อน",
         "เปิด https://example.com ดูก่อน",
-        "เปิด http://127.0.0.1://0x5.0.1"
+        "เปิด http://127.0.0.1://0x5.0.1",
+        "I want to underscore this point",
+        "I want to underscore, this point",
+        "Python, underscore, and Java are fine"
     ])
     func leavesTextWithoutASpokenSymbolAlone(raw: String) {
         #expect(written(raw) == raw)

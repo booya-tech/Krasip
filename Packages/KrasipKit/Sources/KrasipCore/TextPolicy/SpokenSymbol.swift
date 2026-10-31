@@ -84,7 +84,17 @@ enum SpokenSymbol {
         Entry(symbol: "*", names: ["ดอกจัน", "ดอกจันทน์", "asterisk"], trigger: .marker, attach: .standalone),
         // ทั้งกับ is what the model heard for เท่ากับ. Like แห่ง, it is safe only behind the marker.
         Entry(symbol: "=", names: ["เท่ากับ", "ทั้งกับ", "equals", "equal"], trigger: .marker, attach: .standalone),
-        Entry(symbol: "_", names: ["อันเดอร์สกอร์", "อันเดอร์สกอล", "underscore"], trigger: .betweenLatin, attach: .flush),
+        // "underscore" is also an English verb, and the verb is followed by an ordinary word.
+        Entry(
+            symbol: "_",
+            names: ["อันเดอร์สกอร์", "อันเดอร์สกอล", "underscore"],
+            trigger: .betweenLatin,
+            attach: .flush,
+            blockedFollowers: [
+                "the", "a", "an", "this", "that", "these", "those", "and", "or", "how", "why", "what",
+                "our", "my", "your", "his", "her", "its", "their", "it", "to", "is", "was"
+            ]
+        ),
         Entry(symbol: "@", names: ["แอท", "at"], trigger: .marker, attach: .flush),
         Entry(symbol: "@", names: ["แอท"], trigger: .betweenLatin, attach: .flush),
         // The model hears a spoken "at sign" as "add sign" too. "add" is an everyday word, so the
@@ -213,8 +223,12 @@ enum SpokenSymbol {
             replacement += text[digits]
 
         case .betweenLatin:
-            let before = skippingSpaces(before: start, in: text)
-            let after = skippingSpaces(after: end, in: text)
+            // A marker may come along with the name, as in "API เครื่องหมาย underscore key".
+            if let markerStart = thaiMarkerStart(before: start, in: text) {
+                start = markerStart
+            }
+            let before = skippingPauses(before: start, in: text)
+            let after = skippingPauses(after: end, in: text)
             let left = before > text.startIndex ? text[text.index(before: before)] : neighbours.before
             let right = after < text.endIndex ? text[after] : neighbours.after
             // A domain starts with a letter, so "2 แอท 3" stays as spoken.
@@ -243,8 +257,8 @@ enum SpokenSymbol {
         case .standalone:
             replacement = spaced(replacement, from: start, to: end, in: text)
         case .flush:
-            start = skippingSpaces(before: start, in: text)
-            end = skippingSpaces(after: end, in: text)
+            start = skippingPauses(before: start, in: text)
+            end = skippingPauses(after: end, in: text)
         }
         return SymbolMatch(range: start..<end, replacement: replacement)
     }
@@ -298,7 +312,7 @@ enum SpokenSymbol {
     /// as spoken. The phrase includes an English marker, so "add sign up" checks "up".
     private static func isBlocked(_ followers: [String], after end: String.Index, in text: String) -> Bool {
         guard !followers.isEmpty else { return false }
-        let wordStart = skippingSpaces(after: end, in: text)
+        let wordStart = skippingPauses(after: end, in: text)
         var wordEnd = wordStart
         while wordEnd < text.endIndex, text[wordEnd].isLatinOrDigit {
             wordEnd = text.index(after: wordEnd)
@@ -357,6 +371,24 @@ enum SpokenSymbol {
         var cursor = start
         while cursor > text.startIndex, text[text.index(before: cursor)] == " " {
             cursor = text.index(before: cursor)
+        }
+        return cursor
+    }
+
+    /// Said slowly, the name comes back between commas: "API, underscore, key". Those commas are
+    /// pauses inside the phrase, so a symbol that joins two words swallows them with the spaces.
+    private static func skippingPauses(before start: String.Index, in text: String) -> String.Index {
+        var cursor = start
+        while cursor > text.startIndex, " ,".contains(text[text.index(before: cursor)]) {
+            cursor = text.index(before: cursor)
+        }
+        return cursor
+    }
+
+    private static func skippingPauses(after end: String.Index, in text: String) -> String.Index {
+        var cursor = end
+        while cursor < text.endIndex, " ,".contains(text[cursor]) {
+            cursor = text.index(after: cursor)
         }
         return cursor
     }
