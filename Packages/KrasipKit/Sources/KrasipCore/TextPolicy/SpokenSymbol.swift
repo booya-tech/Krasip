@@ -37,6 +37,9 @@ enum SpokenSymbol {
         /// Joins the two things on either side into one, as in an email address. It swallows
         /// the spaces on both sides and adds none.
         case flush
+        /// Joins like `flush`, and the word after takes the capitals of the name's first word when
+        /// that word is all capitals: "API underscore key" reads "API_KEY", "user_id" stays.
+        case snake
         /// Sticks to the name before it like `left`, and keeps a word after it apart, so
         /// "fetchUser()ก่อน" reads "fetchUser() ก่อน" while "fetchUser().then" stays as it is.
         case call
@@ -89,7 +92,7 @@ enum SpokenSymbol {
             symbol: "_",
             names: ["อันเดอร์สกอร์", "อันเดอร์สกอล", "underscore"],
             trigger: .betweenLatin,
-            attach: .flush,
+            attach: .snake,
             blockedFollowers: [
                 "the", "a", "an", "this", "that", "these", "those", "and", "or", "how", "why", "what",
                 "our", "my", "your", "his", "her", "its", "their", "it", "to", "is", "was"
@@ -256,9 +259,14 @@ enum SpokenSymbol {
             }
         case .standalone:
             replacement = spaced(replacement, from: start, to: end, in: text)
-        case .flush:
+        case .flush, .snake:
             start = skippingPauses(before: start, in: text)
             end = skippingPauses(after: end, in: text)
+            if attach == .snake, isConstant(firstWord(endingAt: start, names: entry.names, in: text)) {
+                let wordEnd = latinRun(after: end, in: text)
+                replacement += text[end..<wordEnd].uppercased()
+                end = wordEnd
+            }
         }
         return SymbolMatch(range: start..<end, replacement: replacement)
     }
@@ -371,6 +379,40 @@ enum SpokenSymbol {
         var cursor = start
         while cursor > text.startIndex, text[text.index(before: cursor)] == " " {
             cursor = text.index(before: cursor)
+        }
+        return cursor
+    }
+
+    /// The first word of a name joined by underscores, spoken or already written, so every part
+    /// of "AWS underscore secret underscore access" sees "AWS".
+    private static func firstWord(endingAt end: String.Index, names: [String], in text: String) -> Substring {
+        var wordEnd = end
+        while true {
+            var wordStart = wordEnd
+            while wordStart > text.startIndex,
+                  text[text.index(before: wordStart)].isLatinOrDigit || text[text.index(before: wordStart)] == "_" {
+                wordStart = text.index(before: wordStart)
+            }
+            let word = text[wordStart..<wordEnd]
+            let gap = skippingPauses(before: wordStart, in: text)
+            let spoken = names.lazy.compactMap {
+                text[..<gap].range(of: $0, options: [.caseInsensitive, .backwards, .anchored])
+            }.first
+            guard let spoken else { return word.split(separator: "_").first ?? word }
+            wordEnd = skippingPauses(before: spoken.lowerBound, in: text)
+        }
+    }
+
+    /// Two capital letters or more and no small ones: "API" and "AWS", not "X", "S3", or "User".
+    private static func isConstant(_ word: Substring) -> Bool {
+        let letters = word.filter(\.isLetter)
+        return letters.count >= 2 && letters.allSatisfy(\.isUppercase)
+    }
+
+    private static func latinRun(after start: String.Index, in text: String) -> String.Index {
+        var cursor = start
+        while cursor < text.endIndex, text[cursor].isLatinOrDigit {
+            cursor = text.index(after: cursor)
         }
         return cursor
     }

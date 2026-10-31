@@ -47,16 +47,27 @@ struct SpokenSymbolTests {
     /// Verbatim raw output from the benchmark recordings of 31 October: an underscore said in Thai,
     /// "เท่ากับ" heard as "ทั้งกับ", and a port written with the slashes of a URL scheme.
     static let benchmarkSlips: [(String, String)] = [
-        ("ตัวแปร API อันเดอร์สกอร์ key ห้าม commit ขึ้น Git", "ตัวแปร API_key ห้าม commit ขึ้น Git"),
+        ("ตัวแปร API อันเดอร์สกอร์ key ห้าม commit ขึ้น Git", "ตัวแปร API_KEY ห้าม commit ขึ้น Git"),
         ("ตัวแปร user อันเดอร์สกอล id", "ตัวแปร user_id"),
         ("ตั้ง timeout เครื่องหมายทั้งกับ 30 วินาที", "ตั้ง timeout = 30 วินาที"),
         ("เปิด localhost://3000 ดูก่อน", "เปิด localhost:3000 ดูก่อน"),
         ("เปิด 127.0.0.1://8085 ดูก่อน", "เปิด 127.0.0.1:8085 ดูก่อน"),
         ("เรียก localhost://3000/api ก่อน", "เรียก localhost:3000/api ก่อน"),
         // Said slowly on its own, the pauses come back as commas, or the marker comes along.
-        ("API, underscore, key", "API_key"),
-        ("API เครื่องหมาย underscore key", "API_key"),
-        ("API underscore key", "API_key")
+        ("API, underscore, key", "API_KEY"),
+        ("API เครื่องหมาย underscore key", "API_KEY"),
+        ("API underscore key", "API_KEY")
+    ]
+
+    /// A name joined by an underscore takes the case of its first word when that word is all
+    /// capitals, so it reads as a constant. Anything else keeps the case the model wrote.
+    static let underscoreCase: [(String, String)] = [
+        ("ใส่ AWS underscore region", "ใส่ AWS_REGION"),
+        ("AWS underscore secret underscore access underscore key", "AWS_SECRET_ACCESS_KEY"),
+        ("ตัวแปร user underscore id", "ตัวแปร user_id"),
+        ("User underscore id", "User_id"),
+        ("X underscore value", "X_value"),
+        ("S3 underscore bucket", "S3_bucket")
     ]
 
     /// A symbol that sits between two things needs one space on each side, and the edges of the
@@ -135,7 +146,7 @@ struct SpokenSymbolTests {
     ]
 
     static let everyConversion: [(String, String)] = [
-        recordings, standaloneEdges, emptyBrackets, benchmarkSlips, spacedNamesAndCounts, atSignNames, dottedEmails, spokenEmails
+        recordings, standaloneEdges, emptyBrackets, benchmarkSlips, underscoreCase, spacedNamesAndCounts, atSignNames, dottedEmails, spokenEmails
     ].flatMap { $0 }
 
     /// Near misses of a spoken address, which must come back unchanged.
@@ -237,6 +248,11 @@ struct SpokenSymbolTests {
 
     @Test(arguments: benchmarkSlips)
     func repairsTheBenchmarkSlips(raw: String, expected: String) {
+        #expect(written(raw) == expected)
+    }
+
+    @Test(arguments: underscoreCase)
+    func anUnderscoreNameFollowsItsFirstWordsCapitals(raw: String, expected: String) {
         #expect(written(raw) == expected)
     }
 
