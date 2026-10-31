@@ -10,11 +10,19 @@ struct OverlayCardView: View {
 
     var body: some View {
         card
-            .padding(.horizontal, isListening ? 12 : 16)
-            .padding(.vertical, isListening ? 12 : 14)
+            .padding(.horizontal, isListening ? 0 : 16)
+            .padding(.vertical, isListening ? 0 : 14)
             .frame(width: width, alignment: isListening ? .center : .leading)
-            .background(VisualEffectBackground(material: .hudWindow, cornerRadius: 16))
-            .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(.white.opacity(0.12)))
+            .background {
+                if !isListening {
+                    VisualEffectBackground(material: .hudWindow, cornerRadius: 16)
+                }
+            }
+            .overlay {
+                if !isListening {
+                    RoundedRectangle(cornerRadius: 16).strokeBorder(.white.opacity(0.12))
+                }
+            }
             .fixedSize(horizontal: false, vertical: true)
             .animation(.snappy(duration: 0.2), value: phaseKey)
     }

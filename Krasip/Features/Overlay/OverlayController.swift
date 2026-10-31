@@ -41,6 +41,12 @@ final class OverlayController {
             if !panel.isVisible {
                 screen = Self.screenUnderPointer()
             }
+            // The listening orb floats bare, so the window shadow would draw a box around nothing.
+            if case .listening = phase {
+                panel.hasShadow = false
+            } else {
+                panel.hasShadow = true
+            }
             place()
             panel.orderFrontRegardless()
         }
