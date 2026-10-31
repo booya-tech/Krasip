@@ -31,6 +31,15 @@ struct SpokenSymbolTests {
         ("push a hash sign before the number", "push a # before the number")
     ]
 
+    /// An empty pair is a function call, so it sticks to the name before it. Whisper writes the
+    /// two names with or without a space between them.
+    static let emptyBrackets: [(String, String)] = [
+        ("เรียก function fetchUser วงเล็บเปิดวงเล็บปิด ก่อน render", "เรียก function fetchUser() ก่อน render"),
+        ("เรียก function fetchUser วงเล็บเปิด วงเล็บปิด ก่อน render", "เรียก function fetchUser() ก่อน render"),
+        ("เรียก fetchUserวงเล็บซ้ายวงเล็บขวา", "เรียก fetchUser()"),
+        ("เรียก function fetchUser วงเล็บเปิด id วงเล็บปิด ก่อน render", "เรียก function fetchUser (id) ก่อน render")
+    ]
+
     /// A symbol that sits between two things needs one space on each side, and the edges of the
     /// text and a line break count as a separator already.
     static let standaloneEdges: [(String, String)] = [
@@ -204,6 +213,11 @@ struct SpokenSymbolTests {
 
     @Test(arguments: recordings)
     func writesTheSymbolTheUserSpoke(raw: String, expected: String) {
+        #expect(written(raw) == expected)
+    }
+
+    @Test(arguments: emptyBrackets)
+    func writesAnEmptyPairAsACall(raw: String, expected: String) {
         #expect(written(raw) == expected)
     }
 

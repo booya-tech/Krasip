@@ -79,6 +79,7 @@ An address can also be spoken in parts, as in `patompong.beam at sign gmail dot 
 | Test | What it checks |
 | --- | --- |
 | `writesTheSymbolTheUserSpoke` | The eleven recorded sentences, with their spacing: `เครื่องหมายตกใจ` to `!`, `hashtag` to `#`, `100 ดอลลาร์` to `$100`, the two brackets, `colon`, `semicolon`, `แห่ง` to `&`, `ดอกจัน` to `*`, `เท่ากับ` to `=`, and `hash sign` in an all-English sentence. |
+| `writesAnEmptyPairAsACall` | `fetchUser วงเล็บเปิดวงเล็บปิด` becomes `fetchUser()`, with or without a space between the two names, because an empty pair is a function call and sticks to the name before it. A pair with something inside, `fetchUser วงเล็บเปิด id วงเล็บปิด`, keeps its space: `fetchUser (id)`. |
 | `keepsOneSpaceOnEachSideOfAStandaloneSymbol` | A standalone symbol at the very start or the very end of the text gets no space on the outside, a line break next to it counts as a separator already, text with a space on one side only ends with exactly one on each side, and no output ever holds two spaces in a row. |
 | `aStandaloneSymbolSwallowsNoSpace` | The logged change for `hex เครื่องหมายเท่ากับ 10` is the phrase alone becoming `=`, leaving the spaces that were already there, and the one for `ดูที่เครื่องหมายดอกจันท้ายประโยค` carries the two new spaces with the symbol. |
 | `logsEverySymbolAsAChange` | Each of those sentences logs a `spoken symbol` change whose before is a piece of the raw text and whose after is in the final text. |

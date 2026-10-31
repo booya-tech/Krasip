@@ -70,8 +70,10 @@ enum SpokenSymbol {
         ),
         Entry(symbol: "#", names: ["ชาร์ป", "sharp"], trigger: .marker, attach: .standalone),
         Entry(symbol: "$", names: ["ดอลลาร์", "ดอลล่า", "dollar", "dollars"], trigger: .afterNumber, attach: .right),
-        Entry(symbol: "(", names: ["วงเล็บเปิด", "วงเล็บซ้าย"], trigger: .bare, attach: .right),
-        Entry(symbol: ")", names: ["วงเล็บปิด", "วงเล็บขวา"], trigger: .bare, attach: .left),
+        Entry(symbol: "(", names: openBracket, trigger: .bare, attach: .right),
+        Entry(symbol: ")", names: closeBracket, trigger: .bare, attach: .left),
+        // An empty pair is a function call, as in "fetchUser()", so it sticks to the name before it.
+        Entry(symbol: "()", names: emptyBrackets, trigger: .bare, attach: .left),
         Entry(symbol: ":", names: ["โคลอน", "colon"], trigger: .marker, attach: .left),
         Entry(symbol: ";", names: ["เซมิโคลอน", "semicolon", "อัฒภาค"], trigger: .marker, attach: .left),
         // แห่ง is what the model heard for a spoken แอนด์. It is safe only because the marker is
@@ -96,6 +98,12 @@ enum SpokenSymbol {
     ]
 
     private static let atSignInThai = ["แอดไซน์", "แอทไซน์", "แอด ไซน์", "แอท ไซน์"]
+
+    private static let openBracket = ["วงเล็บเปิด", "วงเล็บซ้าย"]
+    private static let closeBracket = ["วงเล็บปิด", "วงเล็บขวา"]
+    private static let emptyBrackets = openBracket.flatMap { open in
+        closeBracket.flatMap { close in [open + close, open + " " + close] }
+    }
 
     private static let thaiMarker = "เครื่องหมาย"
     private static let englishMarker = "sign"
