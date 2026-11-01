@@ -10,11 +10,19 @@ struct OverlayCardView: View {
 
     var body: some View {
         card
-            .padding(.horizontal, 16)
-            .padding(.vertical, 14)
-            .frame(width: width, alignment: .leading)
-            .background(VisualEffectBackground(material: .hudWindow, cornerRadius: 16))
-            .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(.white.opacity(0.12)))
+            .padding(.horizontal, isBare ? 10 : 16)
+            .padding(.vertical, isBare ? 10 : 14)
+            .frame(width: width, alignment: isBare ? .center : .leading)
+            .background {
+                if !isBare {
+                    VisualEffectBackground(material: .hudWindow, cornerRadius: 16)
+                }
+            }
+            .overlay {
+                if !isBare {
+                    RoundedRectangle(cornerRadius: 16).strokeBorder(.white.opacity(0.12))
+                }
+            }
             .fixedSize(horizontal: false, vertical: true)
             .animation(.snappy(duration: 0.2), value: phaseKey)
     }
@@ -43,7 +51,18 @@ struct OverlayCardView: View {
         switch phase {
         case .review, .finished: 440
         case .notice: 380
+        case .listening: 120
+        case .idle: 120
         default: 340
+        }
+    }
+
+    /// Phases drawn with no card behind them. Idle is included so the panel never
+    /// flashes an empty blurred rectangle on its way into the listening orb.
+    private var isBare: Bool {
+        switch phase {
+        case .listening, .idle: true
+        default: false
         }
     }
 
