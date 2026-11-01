@@ -76,12 +76,14 @@ enum PreviewRenderer {
     }
 
     private static func render(app: AppController, to folder: URL) async {
+        let gradient = LinearGradient(colors: [.indigo, .teal], startPoint: .topLeading, endPoint: .bottomTrailing)
         for (name, phase) in samplePhases(app: app) {
             let card = OverlayCardView(phase: phase)
                 .environment(app)
                 .padding(28)
-                .background(LinearGradient(colors: [.indigo, .teal], startPoint: .topLeading, endPoint: .bottomTrailing))
-            await snapshot(AnyView(card), size: nil, dark: true, name: "overlay-\(name)", folder: folder)
+            await snapshot(AnyView(card.background(gradient)), size: nil, dark: true, name: "overlay-\(name)", folder: folder)
+            // Still dark, because OverlayPanel pins the real panel to .darkAqua whatever the desktop looks like.
+            await snapshot(AnyView(card.background(Color.white)), size: nil, dark: true, name: "overlay-\(name)-onwhite", folder: folder)
         }
         for tab in [SettingsTab.general, .languages, .glossary, .privacy] {
             app.settingsTab = tab
