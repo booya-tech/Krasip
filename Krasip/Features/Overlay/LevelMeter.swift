@@ -16,10 +16,11 @@ struct LevelMeter: View {
     private static let maxHeight: CGFloat = 10
     private static let width = CGFloat(taper.count) * barWidth + CGFloat(taper.count - 1) * gap
 
-    /// The microphone reports a level every 50ms, but cross-correlating the reference
-    /// recording puts its wave at roughly 13 bars a second. Shifting on every reading
-    /// would run half again too fast, so two readings make one bar and the louder wins.
-    private static let readingsPerBar = 2
+    /// How many 50ms microphone readings make one bar, and so how fast the wave travels.
+    /// 1 gives 20 bars a second, 2 gives 10. Cross-correlating the reference recording put
+    /// its wave near 13. When this changes, the animation below has to follow it: a step
+    /// longer than `readingsPerBar * 0.05` is cut off by the next one and flattens the wave.
+    private static let readingsPerBar = 1
 
     @State private var history = [Float](repeating: 0, count: LevelMeter.taper.count)
     @State private var peak: Float = 0
@@ -34,7 +35,7 @@ struct LevelMeter: View {
             }
         }
         .frame(width: Self.width, height: Self.maxHeight)
-        .animation(.linear(duration: 0.08), value: history)
+        .animation(.linear(duration: 0.04), value: history)
         .onChange(of: level) { _, newValue in
             peak = max(peak, newValue)
             readings += 1
