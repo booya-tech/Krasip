@@ -16,7 +16,14 @@ struct LevelMeter: View {
     private static let maxHeight: CGFloat = 10
     private static let width = CGFloat(taper.count) * barWidth + CGFloat(taper.count - 1) * gap
 
+    /// The microphone reports a level every 50ms, but cross-correlating the reference
+    /// recording puts its wave at roughly 13 bars a second. Shifting on every reading
+    /// would run half again too fast, so two readings make one bar and the louder wins.
+    private static let readingsPerBar = 2
+
     @State private var history = [Float](repeating: 0, count: LevelMeter.taper.count)
+    @State private var peak: Float = 0
+    @State private var readings = 0
 
     var body: some View {
         HStack(alignment: .center, spacing: Self.gap) {
@@ -29,8 +36,13 @@ struct LevelMeter: View {
         .frame(width: Self.width, height: Self.maxHeight)
         .animation(.linear(duration: 0.08), value: history)
         .onChange(of: level) { _, newValue in
+            peak = max(peak, newValue)
+            readings += 1
+            guard readings >= Self.readingsPerBar else { return }
             history.removeLast()
-            history.insert(newValue, at: 0)
+            history.insert(peak, at: 0)
+            peak = 0
+            readings = 0
         }
         .accessibilityHidden(true)
     }
