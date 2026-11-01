@@ -11,13 +11,13 @@ struct ListeningCard: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            RecordingOrb(level: app.flow.level)
+            RibbonOrb(level: app.flow.level)
             LevelMeter(
                 level: app.flow.level,
                 barCount: 11,
                 barWidth: 2,
                 maxHeight: 12,
-                tint: RecordingOrb.accent.opacity(0.9)
+                tint: RibbonOrb.accent.opacity(0.9)
             )
         }
         .frame(maxWidth: .infinity)
