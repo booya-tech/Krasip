@@ -1,12 +1,16 @@
 // OverlayCardView.swift
 // Krasip
-// The overlay card for one dictation phase, on a dark blurred background.
+// The overlay card for one dictation phase, on a solid near-black background.
 
 import SwiftUI
 import KrasipCore
 
 struct OverlayCardView: View {
     let phase: FlowPhase
+
+    /// Solid, not a blur: a translucent card disappears into a white desktop.
+    private static let cardFill = Color(white: 0.071)
+    private static let cardBorder = Color(white: 0.141)
 
     var body: some View {
         card
@@ -15,12 +19,12 @@ struct OverlayCardView: View {
             .frame(width: width, alignment: isBare ? .center : .leading)
             .background {
                 if !isBare {
-                    VisualEffectBackground(material: .hudWindow, cornerRadius: 16)
+                    RoundedRectangle(cornerRadius: 16).fill(Self.cardFill)
                 }
             }
             .overlay {
                 if !isBare {
-                    RoundedRectangle(cornerRadius: 16).strokeBorder(.white.opacity(0.12))
+                    RoundedRectangle(cornerRadius: 16).strokeBorder(Self.cardBorder)
                 }
             }
             .fixedSize(horizontal: false, vertical: true)
@@ -51,8 +55,8 @@ struct OverlayCardView: View {
         switch phase {
         case .review, .finished: 440
         case .notice: 380
-        case .listening: 120
-        case .idle: 120
+        case .listening: 140
+        case .idle: 140
         default: 340
         }
     }

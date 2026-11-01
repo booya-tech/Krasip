@@ -47,6 +47,7 @@ enum AppString {
         static let listening = String(localized: "Listening…")
         static let transcribing = String(localized: "Transcribing…")
         static let cancel = String(localized: "Cancel")
+        static let finish = String(localized: "Finish")
         static let cancelHelp = String(localized: "Discard this text (it stays in History).")
         static let copy = String(localized: "Copy")
         static let edit = String(localized: "Edit")
