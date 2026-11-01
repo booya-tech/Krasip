@@ -1360,6 +1360,17 @@
         }
       }
     },
+    "Finish": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เสร็จ"
+          }
+        }
+      }
+    },
     "Finish Dictation": {
       "extractionState": "manual",
       "localizations": {

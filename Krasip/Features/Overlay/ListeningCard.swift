@@ -1,6 +1,6 @@
 // ListeningCard.swift
 // Krasip
-// Overlay card while recording: just the animated orb and a small level meter under it.
+// Overlay card while recording: the animated orb with the meter pill under it.
 
 import SwiftUI
 import KrasipCore
@@ -12,16 +12,16 @@ struct ListeningCard: View {
     var body: some View {
         VStack(spacing: 8) {
             RibbonOrb(level: app.flow.level)
-            LevelMeter(
+            MeterPill(
                 level: app.flow.level,
-                barCount: 11,
-                barWidth: 2,
-                maxHeight: 12,
-                tint: RibbonOrb.accent.opacity(0.9)
+                showsActions: listening.handsFree,
+                onCancel: { app.flow.cancel() },
+                onFinish: { app.flow.toggleHandsFree() }
             )
         }
         .frame(maxWidth: .infinity)
-        .accessibilityElement(children: .combine)
+        // Contain, not combine: combining would swallow the hands-free buttons.
+        .accessibilityElement(children: .contain)
         .accessibilityLabel(AppString.Overlay.listening)
     }
 }
