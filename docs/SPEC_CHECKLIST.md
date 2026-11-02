@@ -125,7 +125,7 @@ The robot voice reads English with a heavy Thai accent, so this is a worst case,
 
 | Requirement | Status |
 | --- | --- |
-| Overlay: recording state, text, cancel | Built. **Note:** the recording state is the orb and level pill, not the spec's "● Listening…" line, and nothing on screen names Esc. Hands-free puts an ✕ and a ✓ in the pill; a held key needs neither. |
+| Overlay: recording state, text, cancel | Built. **Note:** the recording state and the text are two separate cards, not the spec's original single one — recording is the wordless orb and level pill, and nothing on screen names Esc. Hands-free puts an ✕ and a ✓ in the pill; a held key needs neither. |
 | Settings has four tabs: General, Languages, Glossary, Privacy | Built |
 
 ## Definition of v1 done

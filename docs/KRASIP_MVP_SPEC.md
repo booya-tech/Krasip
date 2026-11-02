@@ -223,14 +223,37 @@ Do not optimize a model using only word error rate. A single changed `GitHub`, n
 
 ## First UI
 
+This section originally sketched one card that showed the recording state and the text together.
+What shipped splits them: recording is wordless, and the text only appears once there is text.
+
+While you hold ⌥ Space — no card, no label, no timer:
+
+```text
+        ╭─────────╮
+        │   orb   │       RibbonOrb, animated with your voice
+        ╰─────────╯
+      (  ▁▃▅▇▅▃▁  )       MeterPill: level bars
+```
+
+Hands-free is the same orb, with the two controls a held key does not need:
+
+```text
+      ( ✕  ▁▃▅▇▅▃▁  ✓ )   ✕ discards · ✓ finishes
+```
+
+Then the result:
+
 ```text
 ┌────────────────────────────────────┐
-│  ● Listening…                      │
+│  ✓ Inserted into Notes          ⧉ │
 │  วันนี้จะต้องกลับบ้านไปทำ          │
 │  side-project                      │
-│                         Esc Cancel │
+│  side project → side-project       │
 └────────────────────────────────────┘
 ```
+
+Esc cancels during both phases. Nothing on screen says so, which is a deliberate trade for a
+quieter overlay — see [`SPEC_CHECKLIST.md`](SPEC_CHECKLIST.md).
 
 Settings only needs four tabs: General, Languages, Glossary, Privacy.
 
