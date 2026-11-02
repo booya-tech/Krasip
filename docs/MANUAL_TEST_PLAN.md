@@ -12,7 +12,7 @@ About 15 minutes. These are the checks that need a real microphone, real permiss
 ## 1. The primary success case
 
 - [ ] In the setup guide's practice box, hold ⌥ Space and say **"วันนี้จะต้องกลับบ้านไปทำ side project"**. Release.
-- [ ] The overlay shows "● Listening…" while you hold, then "Transcribing…", then the text.
+- [ ] While you hold, the overlay is a small animated orb with a dark level pill under it — no words. Then "Transcribing…", then the text.
 - [ ] The text in the box ends with **side-project** (from the seeded glossary entry).
 
 If the engine hears "side project" as something else (for example สายเจ็ด), open History, select the dictation, fix the text, and save. Do the same fix a second time on another dictation — Krasip should offer to add a glossary rule.
@@ -42,8 +42,11 @@ For each app: click into a text field, hold ⌥ Space, say "เดี๋ยว p
 
 ## 4. Hands-free
 
-- [ ] Quick-tap ⌥ Space: the overlay says "Hands-free · press ⌥Space to finish". Speak a longer sentence, then tap ⌥ Space again. The text is inserted.
+- [ ] Quick-tap ⌥ Space: the orb stays up on its own, and the level pill grows two buttons — an **✕** on the left and a **✓** on the right. Speak a longer sentence, then tap ⌥ Space again. The text is inserted.
 - [ ] Menu bar → Start Hands-Free Dictation works the same way.
+- [ ] Start hands-free again and **click the ✓** instead of tapping ⌥ Space: recording finishes and the text is inserted, exactly as the second tap does.
+- [ ] Start hands-free once more and **click the ✕**: the overlay disappears, nothing is typed, and History gains no row.
+- [ ] Now hold ⌥ Space the normal way: the pill shows level bars only, with no ✕ and no ✓. The buttons belong to hands-free, where there is no key to release — holding still cancels with Esc.
 
 ## 5. Review, suggestions, and undo
 

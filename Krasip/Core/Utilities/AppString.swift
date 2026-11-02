@@ -78,14 +78,6 @@ enum AppString {
             String(localized: "into \(appName)")
         }
 
-        static func releaseHint(_ shortcut: String) -> String {
-            String(localized: "Release \(shortcut) to finish")
-        }
-
-        static func handsFreeHint(_ shortcut: String) -> String {
-            String(localized: "Hands-free · press \(shortcut) to finish")
-        }
-
         static func inserted(_ appName: String?) -> String {
             appName.map { String(localized: "Inserted into \($0)") } ?? String(localized: "Inserted")
         }

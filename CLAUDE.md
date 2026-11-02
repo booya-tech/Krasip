@@ -50,6 +50,12 @@ APP=$(ls -dt ~/Library/Developer/Xcode/DerivedData/Krasip-*/Build/Products/Debug
 # add -AppleLanguages '(th)' to either to see the Thai interface
 ```
 
+Each overlay phase comes out of `--render-previews` twice: `overlay-<phase>.png` on an indigo-to-teal
+gradient, and `overlay-<phase>-onwhite.png` on plain white. The card stays dark in both, because
+`OverlayPanel` pins the real panel to `.darkAqua` whatever the desktop looks like. The white pair is
+there to catch the opposite bug: a translucent or light element that vanishes against a white
+desktop. Check it after touching the overlay — that is what the meter pill was added for.
+
 The simulation is how the overlay gets verified without a microphone. It checks panel size and position per phase, auto-dismiss, hands-free tapping, Esc, and the resulting history.
 
 ## Architecture
