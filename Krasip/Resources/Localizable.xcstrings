@@ -1536,17 +1536,6 @@
         }
       }
     },
-    "Hands-free · press %@ to finish": {
-      "extractionState": "manual",
-      "localizations": {
-        "th": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ไม่ต้องกดค้าง · กด %@ เพื่อจบ"
-          }
-        }
-      }
-    },
     "Heard": {
       "extractionState": "manual",
       "localizations": {
@@ -2698,17 +2687,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "อัดเสียงตัวเองอ่านทีละประโยค แล้วสั่งทดสอบ การรักษาคำสำคัญสำคัญกว่าความแม่นรวม ๆ เพราะ GitHub ชื่อคน หรือ URL ผิดคำเดียวก็ใช้ไม่ได้ทั้งประโยค"
-          }
-        }
-      }
-    },
-    "Release %@ to finish": {
-      "extractionState": "manual",
-      "localizations": {
-        "th": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ปล่อย %@ เพื่อจบ"
           }
         }
       }

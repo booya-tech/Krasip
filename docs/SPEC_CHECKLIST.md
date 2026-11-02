@@ -32,7 +32,7 @@ Legend: **Test** = checked by an automated test · **Built** = implemented, chec
 
 | Step | Status | Where |
 | --- | --- | --- |
-| Hold ⌥ Space → overlay "Recording" | Built · You | `ListeningCard` ("● Listening…", level meter, timer, "esc Cancel"). |
+| Hold ⌥ Space → overlay "Recording" | Built · You | `ListeningCard`: `RibbonOrb` with `MeterPill` under it (level bars; in hands-free an ✕ and a ✓). No words, no timer — Esc still cancels, without a label saying so. |
 | Release → raw transcript → policy → final text | Test | `holdSpeakReleaseInsertsFinalTextAndRecordsHistory`. |
 | Overlay shows final text, then inserts | Built · You | `ResultCard` / `ReviewCard`. |
 | History stores raw, final, and edits | Test | `HistoryStoreTests.correctionUpdatesFinalTextAndKeepsBefore`. |
@@ -125,7 +125,7 @@ The robot voice reads English with a heavy Thai accent, so this is a worst case,
 
 | Requirement | Status |
 | --- | --- |
-| Overlay: "● Listening…", text, "Esc Cancel" | Built |
+| Overlay: recording state, text, cancel | Built. **Note:** the recording state is the orb and level pill, not the spec's "● Listening…" line, and nothing on screen names Esc. Hands-free puts an ✕ and a ✓ in the pill; a held key needs neither. |
 | Settings has four tabs: General, Languages, Glossary, Privacy | Built |
 
 ## Definition of v1 done
