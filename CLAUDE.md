@@ -39,7 +39,9 @@ xcodebuild -project Krasip.xcodeproj -scheme Krasip -configuration Debug -destin
 Two debug-only entry points, both `#if DEBUG`, in `Krasip/Core/Utilities/`:
 
 ```bash
-APP=$(ls -dt ~/Library/Developer/Xcode/DerivedData/Krasip-*/Build/Products/Debug/Krasip.app | head -1)
+APP=$(xcodebuild -project Krasip.xcodeproj -scheme Krasip -configuration Debug \
+  -destination 'platform=macOS' -showBuildSettings 2>/dev/null \
+  | sed -n 's/^ *BUILT_PRODUCTS_DIR = //p' | head -1)/Krasip.app
 
 # render every screen to PNG with throwaway sample data
 "$APP/Contents/MacOS/Krasip" --render-previews /tmp/shots
@@ -122,7 +124,7 @@ What automated tests cannot reach: real microphone input, Accessibility permissi
 ## Gotchas
 
 - **Two running copies fight over ⌥ Space.** Quit any older build before running a new one. Check with `ps aux | grep -i krasip`.
-- **`ls ~/Library/Developer/Xcode/DerivedData/Krasip-*/...` sorts alphabetically, not by time.** Use `ls -t`, or you will inspect a stale build and report a false result.
+- **Never hunt for the built app in `DerivedData` yourself.** Xcode keeps several `Krasip-*` folders, and a folder's own timestamp does not move when a build writes inside it, so `ls -t` can hand you an app weeks old and you will report a false result. Ask Xcode: `xcodebuild ... -showBuildSettings` and read `BUILT_PRODUCTS_DIR`. Then check the binary's timestamp before trusting anything it prints.
 - **`grep` on this machine is `ugrep` and skips gitignored files.** Use `git grep` when the question is "is this in the repo".
 - **Changing the bundle ID resets the Accessibility permission, the app settings, and the Keychain entry.** User data survives, because it lives in `~/Library/Application Support/Krasip/` under a literal folder name.
 - The app is a menu bar accessory, `LSUIElement`, so there is no Dock icon until a window opens.
