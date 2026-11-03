@@ -92,6 +92,19 @@ enum PreviewRenderer {
         await snapshot(AnyView(HistoryView().environment(app)), size: CGSize(width: 1080, height: 700), dark: false, name: "history", folder: folder)
         await snapshot(AnyView(HistorySidebar().environment(app)), size: CGSize(width: 360, height: 700), dark: false, name: "history-sidebar", folder: folder)
         await snapshot(AnyView(BenchmarkSidebar(model: app.benchmark).environment(app)), size: CGSize(width: 340, height: 700), dark: false, name: "benchmark-sidebar", folder: folder)
+        let missed = DictationRecord(
+            rawText: "ใส่ github.com.th ใน env ด้วย",
+            finalText: "ใส่ github.com.th ใน env ด้วย",
+            destinationBundleID: "com.todesktop.cursor",
+            destinationAppName: "Cursor",
+            confidence: 0.71,
+            providerID: TranscriberID.appleOnDevice.rawValue,
+            audioDuration: 3.2,
+            latency: 1.04
+        )
+        for (name, kind) in [("report-miss", MissKind.misheard), ("report-miss-other", .somethingElse)] {
+            await snapshot(AnyView(ReportMissSheet(record: missed, initialKind: kind).environment(app)), size: CGSize(width: 560, height: 560), dark: false, name: name, folder: folder)
+        }
         for step in OnboardingStep.allCases {
             await snapshot(AnyView(OnboardingView(initialStep: step).environment(app)), size: CGSize(width: 660, height: 560), dark: false, name: "onboarding-\(step.rawValue)", folder: folder)
         }
