@@ -1833,6 +1833,61 @@
         }
       }
     },
+    "It changed something that was already right": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "แก้คำที่ถูกอยู่แล้วให้ผิด"
+          }
+        }
+      }
+    },
+    "It heard": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ได้ยินว่า"
+          }
+        }
+      }
+    },
+    "It heard the wrong words": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ได้ยินคำผิด"
+          }
+        }
+      }
+    },
+    "It threw away a good fix": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ทิ้งคำแก้ที่ถูกต้องไป"
+          }
+        }
+      }
+    },
+    "It typed": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "พิมพ์ว่า"
+          }
+        }
+      }
+    },
     "It worked — “side project” became “side-project” from your glossary.": {
       "extractionState": "manual",
       "localizations": {
@@ -1950,6 +2005,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Krasip เปิดฐานข้อมูลในเครื่องไม่ได้ ประวัติจะอยู่จนกว่าคุณจะปิดแอป (%@)"
+          }
+        }
+      }
+    },
+    "Krasip fills in what it heard and what it typed. You fill in the rest.": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Krasip เติมสิ่งที่ได้ยินและสิ่งที่พิมพ์ให้แล้ว คุณเติมส่วนที่เหลือ"
           }
         }
       }
@@ -2328,6 +2394,17 @@
         }
       }
     },
+    "Not sure": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ไม่แน่ใจ"
+          }
+        }
+      }
+    },
     "Note (optional)": {
       "extractionState": "manual",
       "localizations": {
@@ -2401,6 +2478,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "เปิดการตั้งค่า…"
+          }
+        }
+      }
+    },
+    "Open the Report": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เปิดแบบฟอร์มแจ้ง"
           }
         }
       }
@@ -2735,6 +2823,28 @@
         }
       }
     },
+    "Report a Miss…": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "แจ้งคำที่ผิด…"
+          }
+        }
+      }
+    },
+    "Report a miss": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "แจ้งคำที่ผิด"
+          }
+        }
+      }
+    },
     "Restart Now": {
       "extractionState": "manual",
       "localizations": {
@@ -3054,6 +3164,17 @@
         }
       }
     },
+    "Something else": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "อย่างอื่น"
+          }
+        }
+      }
+    },
     "Something went wrong": {
       "extractionState": "manual",
       "localizations": {
@@ -3252,6 +3373,17 @@
         }
       }
     },
+    "Tell us what happened": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เล่าให้ฟังว่าเกิดอะไรขึ้น"
+          }
+        }
+      }
+    },
     "Terms kept": {
       "extractionState": "manual",
       "localizations": {
@@ -3373,6 +3505,17 @@
         }
       }
     },
+    "This is not about the speech model, so it opens a bug report about the app instead.": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เรื่องนี้ไม่ใช่โมเดลเสียง จึงเปิดแบบฟอร์มแจ้งบั๊กของแอปแทน"
+          }
+        }
+      }
+    },
     "This only changes Krasip's windows. Restart Krasip to see the change.": {
       "extractionState": "manual",
       "localizations": {
@@ -3380,6 +3523,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "เปลี่ยนเฉพาะหน้าต่างของ Krasip เท่านั้น ต้องเปิด Krasip ใหม่จึงจะเห็นผล"
+          }
+        }
+      }
+    },
+    "This opens a report about the speech model, already filled in. Read it, then click Submit.": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "จะเปิดแบบฟอร์มแจ้งเรื่องโมเดลเสียงที่กรอกไว้ให้แล้ว อ่านดูแล้วกด Submit"
           }
         }
       }
@@ -3582,6 +3736,17 @@
         }
       }
     },
+    "What should it have said?": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ที่ถูกต้องควรเป็นอะไร"
+          }
+        }
+      }
+    },
     "What the speech engine heard": {
       "extractionState": "manual",
       "localizations": {
@@ -3600,6 +3765,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "สิ่งที่เครื่องถอดเสียงอาจเขียน เช่น side project, ไซต์โปรเจกต์"
+          }
+        }
+      }
+    },
+    "What went wrong?": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "อะไรผิดพลาด"
           }
         }
       }
@@ -3944,6 +4120,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "เวลาที่พูด"
+          }
+        }
+      }
+    },
+    "the text landed in the wrong window": {
+      "extractionState": "manual",
+      "localizations": {
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ข้อความไปลงผิดหน้าต่าง"
           }
         }
       }

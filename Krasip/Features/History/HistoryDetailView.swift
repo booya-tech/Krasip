@@ -18,6 +18,7 @@ struct HistoryDetailView: View {
     @State private var retry: FinalText?
     @State private var isRetrying = false
     @State private var retryError: String?
+    @State private var isReporting = false
 
     var body: some View {
         ScrollView {
@@ -43,6 +44,9 @@ struct HistoryDetailView: View {
                 Button(AppString.History.copy, systemImage: "doc.on.doc") {
                     app.inserter.copyToClipboard(record.finalText)
                 }
+                Button(AppString.History.reportMiss, systemImage: "exclamationmark.bubble") {
+                    isReporting = true
+                }
                 Button(AppString.History.delete, systemImage: "trash", role: .destructive) {
                     app.history.delete(record.id)
                 }
@@ -53,6 +57,9 @@ struct HistoryDetailView: View {
             PreferredSpellingSheet(draft: draft, record: record) {
                 load()
             }
+        }
+        .sheet(isPresented: $isReporting) {
+            ReportMissSheet(record: record)
         }
     }
 

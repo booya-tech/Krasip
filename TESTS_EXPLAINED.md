@@ -219,6 +219,32 @@ A fake microphone, a fixed transcript, and a fake inserter stand in for the real
 | `repeatedCorrectionOfferIsShownAfterInsert` | A repeated correction produces an "Add to glossary?" offer that can be answered. |
 | `finishedCardHidesAutomatically` | The result card hides on its own. |
 
+### MissReportTests.swift: the report a user files when a dictation comes out wrong
+
+The History screen has a **Report a Miss…** button. It builds a GitHub issue that is already filled in, so nobody retypes Thai by hand and no report arrives without the strings that decide what went wrong. `MissReport` does that work as plain text, which is why it lives in `KrasipCore` with no AppKit anywhere near it.
+
+The kind of miss decides which repository the issue goes to. Four kinds blame the speech or correction model and go to `krasip-correction`. "Something else" means the words were fine but the app misbehaved, and goes to `Krasip` as a bug. These tests pin that split, because getting it wrong would quietly mix app bugs into the model worklist.
+
+| Test | What it pins |
+| --- | --- |
+| `modelMissesGoToTheCorrectionRepo` | All four model kinds resolve to `krasip-correction`. |
+| `somethingElseGoesToTheAppRepo` | "Something else" resolves to `Krasip` with the `bug.yml` form. |
+| `theTwoRepositoriesAreDifferent` | The two destinations never collapse into one, and each names its own form. |
+| `aModelMissNeedsTheWantedText` | Sending stays blocked until the user says what it should have said. Whitespace does not count as an answer. |
+| `somethingElseNeedsTheNoteAndIgnoresTheWantedText` | For an app bug the note is the required field instead, so a stale "wanted" value cannot unlock sending. |
+| `theBlockCarriesWhatTheBucketsNeed` | The pasted block holds what the engine returned, what the text rules made of it, what was typed, what was wanted, the app, the engine, and the app version. Sorting a miss needs all of them. |
+| `theBlockIsFencedBecauseTheIssueFormCannotRenderIt` | The block arrives in a code fence. A GitHub issue form refuses to pre-fill a field that sets `render`, so the fence is added here instead. |
+| `numbersAreRoundedForReading` | Confidence as a percent, latency and audio length to a readable number of places. |
+| `theTimeIsStampedInTheUsersOwnZone` | The timestamp follows the reporter's clock, not UTC, so "it happened just before lunch" lines up. |
+| `fieldsNobodyMeasuredAreLeftOutRatherThanPrintedEmpty` | A record with no app, confidence, or latency prints neither the label nor an empty value. |
+| `aModelMissOpensTheCorrectionFormWithTheDropdownChosen` | The URL names the right repo and form, and pre-selects the dropdown with text that matches an option in `miss.yml` exactly. A mismatch there is silent: GitHub just ignores the pre-fill. |
+| `somethingElseOpensTheAppBugFormInstead` | The bug form gets the note and never the model dropdown. |
+| `theFormIsNeverHandedAnEmptyFieldItWouldShowAsBlank` | "What did you say" is left out of the URL entirely. The app cannot know it, and pre-filling it empty would wipe the field's own placeholder. |
+| `thaiSurvivesTheRoundTripThroughTheURL` | Thai is percent-encoded going in and comes back unchanged. |
+| `aHugeDictationIsClippedSoTheBrowserStillOpensIt` | A 5000-character dictation is clipped with an ellipsis. Thai costs nine bytes a character once encoded, so an unclipped one builds a URL no browser will open. |
+| `theTitleStaysShortEnoughToRead` | A long dictation still yields a title under 80 characters. |
+| `aRecordFillsInEverythingTheUserShouldNotHaveToType` | Building from a `DictationRecord` carries every known field across, starts at "Not sure", and starts unsendable. |
+
 ### GlossaryJSONTests.swift — the spec's JSON shape
 
 | Test | What it checks |

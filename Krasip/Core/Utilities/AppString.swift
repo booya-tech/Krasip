@@ -452,6 +452,29 @@ enum AppString {
         static let badgeLowConfidence = String(localized: "The speech engine was unsure")
         static let badgeCorrected = String(localized: "You corrected this")
         static let badgeAudio = String(localized: "Audio kept for retry")
+        static let reportMiss = String(localized: "Report a Miss…")
+        static let reportTitle = String(localized: "Report a miss")
+        static let reportIntro = String(localized: "Krasip fills in what it heard and what it typed. You fill in the rest.")
+        static let reportHeard = String(localized: "It heard")
+        static let reportTyped = String(localized: "It typed")
+        static let reportWanted = String(localized: "What should it have said?")
+        static let reportKind = String(localized: "What went wrong?")
+        static let reportNote = String(localized: "Tell us what happened")
+        static let reportNotePrompt = String(localized: "the text landed in the wrong window")
+        static let reportSend = String(localized: "Open the Report")
+        static let reportCancel = String(localized: "Cancel")
+        static let reportModelHelp = String(localized: "This opens a report about the speech model, already filled in. Read it, then click Submit.")
+        static let reportAppHelp = String(localized: "This is not about the speech model, so it opens a bug report about the app instead.")
+
+        static func reportKindName(_ kind: MissKind) -> String {
+            switch kind {
+            case .misheard: String(localized: "It heard the wrong words")
+            case .overCorrected: String(localized: "It changed something that was already right")
+            case .discardedFix: String(localized: "It threw away a good fix")
+            case .notSure: String(localized: "Not sure")
+            case .somethingElse: String(localized: "Something else")
+            }
+        }
 
         static func emptyMessage(_ shortcut: String) -> String {
             String(localized: "Hold \(shortcut) in any app and speak. Your dictations appear here.")
