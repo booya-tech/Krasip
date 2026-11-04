@@ -20,8 +20,9 @@ Packages/KrasipKit/.swiftpm/
 # macOS
 .DS_Store
 
-# Local agent tooling
-.claude/
+# Local agent tooling. Skills are shared; the rest is per-machine.
+.claude/*
+!.claude/skills/
 
 # Coverage data from instrumented runs
 *.profraw
