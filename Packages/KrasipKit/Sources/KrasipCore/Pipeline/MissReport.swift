@@ -31,7 +31,9 @@ public struct MissReport: Equatable, Sendable {
     }
 
     public static let modelRepo = Destination(owner: "booya-tech", repo: "krasip-correction", template: "miss.yml")
-    public static let appRepo = Destination(owner: "booya-tech", repo: "Krasip", template: "bug.yml")
+    /// App bugs land in the private repo too, because every report carries the reporter's own speech
+    /// and the Krasip repo is public.
+    public static let appRepo = Destination(owner: "booya-tech", repo: "krasip-correction", template: "bug.yml")
 
     /// A long dictation would otherwise build a URL no browser will open.
     static let fieldLimit = 1500
