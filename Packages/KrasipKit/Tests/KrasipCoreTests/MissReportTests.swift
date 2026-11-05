@@ -108,7 +108,7 @@ private func sample(
 }
 
 @Suite struct MissReportURLTests {
-    @Test func aModelMissOpensTheCorrectionFormWithTheDropdownChosen() throws {
+    @Test func aModelMissOpensTheCorrectionFormWithItsBucketAsLabels() throws {
         let url = try #require(sample(kind: .overCorrected).issueURL)
         let items = try #require(URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems)
         let byName = Dictionary(uniqueKeysWithValues: items.map { ($0.name, $0.value ?? "") })
@@ -116,9 +116,32 @@ private func sample(
         #expect(url.host == "github.com")
         #expect(url.path == "/booya-tech/krasip-correction/issues/new")
         #expect(byName["template"] == "miss.yml")
-        #expect(byName["kind"] == "It changed something that was already right")
+        #expect(byName["labels"] == "miss,over-corrected")
         #expect(byName["wanted"] == "ใส่ github_token ใน env ด้วย")
         #expect(byName["history"]?.contains("heard") == true)
+    }
+
+    /// A URL cannot pre-select a dropdown in a GitHub issue form, measured on the real form on
+    /// 2026-11-05 with both the option text and its index. The bucket travels as labels instead.
+    @Test func theBucketIsNeverSentAsADropdownValue() throws {
+        for kind in MissKind.allCases {
+            let url = try #require(sample(kind: kind, note: "note").issueURL)
+            let items = try #require(URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems)
+            #expect(items.contains { $0.name == "kind" } == false)
+        }
+    }
+
+    @Test func everyModelMissCarriesTheMissLabelPlusItsOwnBucket() {
+        let buckets: [MissKind: String] = [
+            .misheard: "misheard",
+            .overCorrected: "over-corrected",
+            .discardedFix: "discarded-fix",
+            .notSure: "not-sure"
+        ]
+        for (kind, bucket) in buckets {
+            #expect(sample(kind: kind).labels == ["miss", bucket])
+        }
+        #expect(sample(kind: .somethingElse, note: "n").labels == ["bug"])
     }
 
     @Test func somethingElseOpensTheAppBugFormInstead() throws {
@@ -162,6 +185,15 @@ private func sample(
         report.typedText = String(repeating: "ก", count: 500)
         #expect(report.title.count <= 80)
         #expect(report.title.hasSuffix("…"))
+    }
+
+    @Test func theTitleNeverLeaksARawCaseName() {
+        #expect(sample(kind: .overCorrected).title.hasPrefix("Over-corrected: "))
+        #expect(sample(kind: .discardedFix).title.hasPrefix("Discarded fix: "))
+        #expect(sample(kind: .somethingElse, note: "wrong window").title == "Bug: wrong window")
+        for kind in MissKind.allCases {
+            #expect(sample(kind: kind, note: "note").title.contains(kind.rawValue) == false)
+        }
     }
 }
 
