@@ -42,10 +42,14 @@ private func sample(
         #expect(sample(kind: .somethingElse, note: "the text landed in the wrong window").destination == MissReport.appRepo)
     }
 
-    @Test func theTwoRepositoriesAreDifferent() {
-        #expect(MissReport.modelRepo.repo != MissReport.appRepo.repo)
+    @Test func theTwoFormsAreDifferentAndNeitherIsThePublicRepo() {
         #expect(MissReport.modelRepo.template == "miss.yml")
         #expect(MissReport.appRepo.template == "bug.yml")
+        #expect(MissReport.modelRepo.template != MissReport.appRepo.template)
+        // Every report carries the reporter's own speech, and booya-tech/Krasip is public.
+        for destination in [MissReport.modelRepo, MissReport.appRepo] {
+            #expect(destination.repo == "krasip-correction")
+        }
     }
 }
 
@@ -123,7 +127,7 @@ private func sample(
         let items = try #require(URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems)
         let byName = Dictionary(uniqueKeysWithValues: items.map { ($0.name, $0.value ?? "") })
 
-        #expect(url.path == "/booya-tech/Krasip/issues/new")
+        #expect(url.path == "/booya-tech/krasip-correction/issues/new")
         #expect(byName["template"] == "bug.yml")
         #expect(byName["what"] == "the text landed in the wrong window")
         #expect(byName["kind"] == nil)

@@ -20,7 +20,7 @@ You end up with two things running:
 | macOS 14 or newer | macOS 26 also unlocks Apple's on-device Thai engine as a fallback. |
 | 16 GB memory or more | The two models need about 5 GB while running. |
 | About 4 GB free disk | Mostly the speech model. |
-| Access to two private repos | `booya-tech/Krasip` and `booya-tech/krasip-correction`. Ask Boo. |
+| Access to `booya-tech/krasip-correction` | It is private, and the setup script downloads the models through your GitHub account. Ask Boo. The app repo is public, so it needs no invite. |
 
 Install the command line pieces, if you do not have them:
 
@@ -31,8 +31,8 @@ brew install gh
 gh auth login
 ```
 
-You need `gh auth login` to finish, because both repos are private and the setup script downloads
-the models through your GitHub account.
+You need `gh auth login` to finish, because `krasip-correction` is private and the setup script
+downloads the models through your GitHub account.
 
 ---
 
@@ -142,8 +142,9 @@ If the problem is not about the words at all, for example the text landed in the
 the shortcut did not fire, pick **Something else**. That files a bug against the app instead, in a
 different list.
 
-**One thing to know:** those issues will contain your real dictated speech. Both repos are private,
-so only the two of you can read them. Say so now if that is not comfortable.
+**One thing to know:** those issues will contain your real dictated speech. Both kinds are filed on
+`krasip-correction`, which is private, so only the two of you can read them. Nothing you say lands
+in the public app repo. Say so now if that is not comfortable.
 
 ---
 
