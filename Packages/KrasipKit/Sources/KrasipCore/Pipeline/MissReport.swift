@@ -115,7 +115,18 @@ public struct MissReport: Equatable, Sendable {
         let subject = kind == .somethingElse ? note : typedText
         let cleaned = subject.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "\n", with: " ")
         let short = cleaned.count > 60 ? String(cleaned.prefix(60)) + "…" : cleaned
-        return short.isEmpty ? kind.rawValue : "\(kind.rawValue): \(short)"
+        return short.isEmpty ? titlePrefix : "\(titlePrefix): \(short)"
+    }
+
+    /// Read by a person in an issue list, so never the raw case name.
+    var titlePrefix: String {
+        switch kind {
+        case .misheard: "Misheard"
+        case .overCorrected: "Over-corrected"
+        case .discardedFix: "Discarded fix"
+        case .notSure: "Not sure"
+        case .somethingElse: "Bug"
+        }
     }
 
     /// The block the user pastes into the issue. Fields nobody measured are left out, not printed empty.
@@ -145,10 +156,10 @@ public struct MissReport: Equatable, Sendable {
             URLQueryItem(name: "template", value: destination.template),
             URLQueryItem(name: "title", value: clipped(title))
         ]
+        items.append(URLQueryItem(name: "labels", value: labels.joined(separator: ",")))
         if kind == .somethingElse {
             items.append(URLQueryItem(name: "what", value: clipped(note)))
         } else {
-            items.append(URLQueryItem(name: "kind", value: formLabel))
             items.append(URLQueryItem(name: "typed", value: clipped(typedText)))
             items.append(URLQueryItem(name: "wanted", value: clipped(wantedText)))
         }
@@ -157,14 +168,15 @@ public struct MissReport: Equatable, Sendable {
         return components.url
     }
 
-    /// Must match an option in the issue form's dropdown, or GitHub ignores the pre-fill.
-    var formLabel: String {
+    /// The kind travels as GitHub labels, because a URL cannot pre-select a dropdown in an issue form.
+    /// Each name must exist in the destination repository or GitHub drops it silently.
+    public var labels: [String] {
         switch kind {
-        case .misheard: "It heard the wrong words"
-        case .overCorrected: "It changed something that was already right"
-        case .discardedFix: "It threw away a good fix"
-        case .notSure: "Not sure"
-        case .somethingElse: "Something else"
+        case .misheard: ["miss", "misheard"]
+        case .overCorrected: ["miss", "over-corrected"]
+        case .discardedFix: ["miss", "discarded-fix"]
+        case .notSure: ["miss", "not-sure"]
+        case .somethingElse: ["bug"]
         }
     }
 
