@@ -18,7 +18,7 @@ public struct OpenAIConfiguration: Codable, Equatable, Sendable {
     }
 
     public static let defaultBaseURL = URL(string: "https://api.openai.com/v1")!
-    public static let suggestedModels = ["gpt-4o-transcribe", "gpt-4o-mini-transcribe", "whisper-1"]
+    public static let suggestedModels = ["thonburian-8bit", "gpt-4o-transcribe", "gpt-4o-mini-transcribe", "whisper-1"]
 
     var endpoint: URL { baseURL.appending(path: "audio/transcriptions") }
 

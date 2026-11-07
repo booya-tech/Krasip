@@ -272,7 +272,7 @@ enum AppString {
             switch engine {
             case .appleOnDevice: String(localized: "Apple — on this Mac")
             case .appleOnline: String(localized: "Apple — online")
-            case .openAI: String(localized: "OpenAI — cloud")
+            case .openAI: String(localized: "Krasip — on this Mac")
             }
         }
 
@@ -280,7 +280,7 @@ enum AppString {
             switch engine {
             case .appleOnDevice: String(localized: "Private and free. Works offline after a one-time download.")
             case .appleOnline: String(localized: "Free. Your recording is sent to Apple.")
-            case .openAI: String(localized: "Best with mixed Thai and English. Needs your own API key.")
+            case .openAI: String(localized: "Thai mixed with English. Needs the Krasip speech server running on this Mac.")
             }
         }
 
@@ -531,8 +531,8 @@ enum AppString {
         static let accessibilityStepsTitle = String(localized: "How to allow it")
         static let accessibilitySteps = String(localized: "1. Click “Open Settings…” above.\n2. In Privacy & Security → Accessibility, turn on Krasip.\n3. Come back here. This page updates by itself.")
         static let accessibilityDone = String(localized: "All set. Krasip can type into your apps.")
-        static let engineTitle = String(localized: "Choose how speech becomes text")
-        static let engineMessage = String(localized: "You can change this anytime in Settings → Languages, and compare engines in the Benchmark window.")
+        static let engineTitle = String(localized: "Connect your speech server")
+        static let engineMessage = String(localized: "Krasip sends your recording to the speech server on this Mac. Start it before you dictate. You can change the address anytime in Settings → Languages.")
         static let practiceTitle = String(localized: "Try it")
         static let practiceSay = String(localized: "Say this:")
         static let changeShortcut = String(localized: "Change Shortcut…")

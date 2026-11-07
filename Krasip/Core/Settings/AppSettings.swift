@@ -29,9 +29,12 @@ enum SpeechEngine: String, CaseIterable, Identifiable, Codable {
 
     static var available: [SpeechEngine] { allCases.filter(\.isAvailable) }
 
-    static var recommended: SpeechEngine {
-        SpeechEngine.appleOnDevice.isAvailable ? .appleOnDevice : .appleOnline
-    }
+    /// Whether Settings and onboarding let the user pick this engine. The Apple engines still
+    /// run, so the Benchmark window can compare all three, but Krasip's own speech server is
+    /// the only setup we support day to day.
+    var isOffered: Bool { self == .openAI }
+
+    static var recommended: SpeechEngine { .openAI }
 
     var transcriberID: TranscriberID {
         switch self {
@@ -71,6 +74,11 @@ final class AppSettings {
     /// Core Audio UID of the chosen microphone; `nil` follows the system default.
     var inputDeviceUID: String? { didSet { defaults.set(inputDeviceUID, forKey: Key.inputDevice) } }
 
+    /// A fresh install points at the Krasip speech server on this Mac, the only setup we
+    /// support. `scripts/start.sh` in the krasip-correction repo serves this address.
+    static let defaultEndpoint = "http://127.0.0.1:8085/v1"
+    static let defaultModel = "thonburian-8bit"
+
     var engine: SpeechEngine { didSet { defaults.set(engine.rawValue, forKey: Key.engine) } }
     var languages: [Language] { didSet { defaults.set(languages.map(\.rawValue), forKey: Key.languages) } }
     var openAIModel: String { didSet { defaults.set(openAIModel, forKey: Key.openAIModel) } }
@@ -96,11 +104,11 @@ final class AppSettings {
         inputDeviceUID = defaults.string(forKey: Key.inputDevice)
 
         let savedEngine = defaults.string(forKey: Key.engine).flatMap(SpeechEngine.init(rawValue:))
-        engine = savedEngine.flatMap { $0.isAvailable ? $0 : nil } ?? .recommended
+        engine = savedEngine.flatMap { $0.isOffered ? $0 : nil } ?? .recommended
         let savedLanguages = (defaults.stringArray(forKey: Key.languages) ?? []).compactMap(Language.init(rawValue:))
         languages = savedLanguages.isEmpty ? [.thai, .english] : savedLanguages
-        openAIModel = defaults.string(forKey: Key.openAIModel) ?? "gpt-4o-transcribe"
-        openAIBaseURL = defaults.string(forKey: Key.openAIBaseURL) ?? OpenAIConfiguration.defaultBaseURL.absoluteString
+        openAIModel = defaults.string(forKey: Key.openAIModel) ?? AppSettings.defaultModel
+        openAIBaseURL = defaults.string(forKey: Key.openAIBaseURL) ?? AppSettings.defaultEndpoint
         openAISendsLanguageHint = defaults.object(forKey: Key.openAILanguageHint) as? Bool ?? true
 
         suggestSoundAlikes = defaults.object(forKey: Key.soundAlikes) as? Bool ?? true
