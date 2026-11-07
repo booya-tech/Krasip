@@ -31,6 +31,17 @@ private func sample(
     )
 }
 
+/// Reads one field back the way a form reader does: a bare + is a space, then percent-decode.
+/// `URLComponents.queryItems` does not do this, which is why it never caught the eaten + sign.
+private func formDecodedField(_ name: String, in percentEncodedQuery: String) -> String? {
+    for pair in percentEncodedQuery.split(separator: "&") {
+        let parts = pair.split(separator: "=", maxSplits: 1)
+        guard parts.count == 2, parts[0] == name else { continue }
+        return parts[1].replacingOccurrences(of: "+", with: " ").removingPercentEncoding
+    }
+    return nil
+}
+
 @Suite struct MissReportDestinationTests {
     @Test func modelMissesGoToTheCorrectionRepo() {
         for kind in [MissKind.misheard, .overCorrected, .discardedFix, .notSure] {
@@ -194,6 +205,48 @@ private func sample(
         for kind in MissKind.allCases {
             #expect(sample(kind: kind, note: "note").title.contains(kind.rawValue) == false)
         }
+    }
+
+    /// GitHub read the query the way a form reader does, so a bare + arrived as a space and the
+    /// timestamp landed as "0700" instead of "+0700". Seen on the real form on 2026-11-07.
+    @Test func thePlusInATimezoneOffsetSurvivesAFormReader() throws {
+        let report = sample()
+        #expect(report.body.contains("+0700"))
+
+        let url = try #require(report.issueURL)
+        let query = try #require(URLComponents(url: url, resolvingAgainstBaseURL: false)?.percentEncodedQuery)
+        #expect(query.contains("+") == false)
+
+        let history = try #require(formDecodedField("history", in: query))
+        #expect(history == report.body)
+    }
+
+    @Test func everyFieldSurvivesAFormReaderUnchanged() throws {
+        let report = sample(kind: .overCorrected)
+        let url = try #require(report.issueURL)
+        let query = try #require(URLComponents(url: url, resolvingAgainstBaseURL: false)?.percentEncodedQuery)
+
+        #expect(formDecodedField("title", in: query) == report.title)
+        #expect(formDecodedField("typed", in: query) == report.typedText)
+        #expect(formDecodedField("wanted", in: query) == report.wantedText)
+        #expect(formDecodedField("labels", in: query) == "miss,over-corrected")
+    }
+
+    /// The form has a "Which app were you in?" field and the app knows the answer, so it fills it.
+    /// It arrived as "_No response_" until this was sent.
+    @Test func theAppNameFillsItsOwnFieldNotJustTheHistoryBlock() throws {
+        let url = try #require(sample().issueURL)
+        let items = try #require(URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems)
+        let byName = Dictionary(uniqueKeysWithValues: items.map { ($0.name, $0.value ?? "") })
+        #expect(byName["app"] == "Cursor")
+    }
+
+    @Test func noAppFieldIsSentWhenKrasipCouldNotTellWhichAppItWas() throws {
+        var report = sample()
+        report.appName = nil
+        let url = try #require(report.issueURL)
+        let items = try #require(URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems)
+        #expect(items.contains { $0.name == "app" } == false)
     }
 }
 
