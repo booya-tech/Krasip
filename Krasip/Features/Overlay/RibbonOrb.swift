@@ -16,7 +16,7 @@ struct RibbonOrb: View {
 
     var body: some View {
         TimelineView(.animation) { timeline in
-            let step = motion.advance(to: timeline.date, towards: Self.shaped(level))
+            let step = motion.advance(to: timeline.date, towards: level)
             Rectangle()
                 .fill(.black)
                 .frame(width: side, height: side)
@@ -32,16 +32,6 @@ struct RibbonOrb: View {
         .frame(width: side, height: side)
         .accessibilityHidden(true)
     }
-
-    /// `SampleSink` maps -50 dBFS to 0 and 0 dBFS to 1, so a quiet room still reads near 0.1
-    /// and ordinary speech tops out near 0.8. Stretching that band over the whole range is
-    /// what makes the orb use its full travel instead of hovering in the middle.
-    private static func shaped(_ raw: Float) -> Float {
-        min(1, max(0, (raw - quiet) / (loud - quiet)))
-    }
-
-    private static let quiet: Float = 0.12
-    private static let loud: Float = 0.78
 
     /// Seconds to settle, not per-frame blends, so the feel does not change with the refresh
     /// rate. Loud lands at once and quiet falls away slowly, the way a meter needle behaves;

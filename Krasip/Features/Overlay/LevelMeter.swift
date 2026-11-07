@@ -7,9 +7,10 @@ import SwiftUI
 struct LevelMeter: View {
     let level: Float
 
-    /// Measured over 494 frames of the reference recording: the outer bars never reach
-    /// full height, which is what makes the field read as a wave instead of a block.
-    private static let taper: [CGFloat] = [0.60, 0.75, 0.87, 0.95, 1.00, 1.00, 0.96, 0.88, 0.75, 0.60]
+    /// Measured off the reference design: the outer bars never reach full height, which is
+    /// what makes the field read as a wave instead of a block. The drop at the ends is
+    /// steep on purpose; a gentler one reads as a solid block at ordinary speaking volume.
+    private static let taper: [CGFloat] = [0.25, 0.50, 0.50, 0.75, 1.00, 1.00, 1.00, 0.75, 0.50, 0.25]
     private static let barWidth: CGFloat = 2
     private static let gap: CGFloat = 2
     private static let minHeight: CGFloat = 2
@@ -27,8 +28,10 @@ struct LevelMeter: View {
 
     /// The ripple that keeps travelling when nobody is speaking: one wave across the field,
     /// so it takes a whole field interval to pass. It is scaled away as soon as there is a
-    /// voice, so it never masks quiet speech.
-    private static let idleDepth: Float = 0.55
+    /// voice, so it never masks quiet speech. Shallow on purpose, because the stretched
+    /// level floors a quiet room to 0 and so makes this the resting state; at the old 0.55
+    /// it stood 89% as tall as ordinary speech and a silent room looked busy.
+    private static let idleDepth: Float = 0.25
     private static let idlePhaseStep = Float(2 * Double.pi) / Float(taper.count)
     private static let idleGate: Float = 0.15
     private static let activityDecay: Float = 0.90
