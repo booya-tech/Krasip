@@ -40,7 +40,4 @@ struct ParticleOrb: View {
         }
         .accessibilityHidden(true)
     }
-
-    /// The bright blue of the rim, reused by the level meter.
-    static let accent = Color(red: 0.640, green: 0.850, blue: 1.0)
 }
