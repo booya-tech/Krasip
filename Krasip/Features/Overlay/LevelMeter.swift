@@ -5,6 +5,8 @@
 import SwiftUI
 
 struct LevelMeter: View {
+    /// Stretched by `ListeningCard`, so 0 is a quiet room and 1 is a stressed word, not the
+    /// raw `SampleSink` reading. The idle ripple below takes 0 to mean nobody is speaking.
     let level: Float
 
     /// Measured off the reference design: the outer bars never reach full height, which is

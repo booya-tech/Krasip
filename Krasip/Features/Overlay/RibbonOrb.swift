@@ -5,6 +5,8 @@
 import SwiftUI
 
 struct RibbonOrb: View {
+    /// Stretched by `ListeningCard`, so 0 is a quiet room and 1 is a stressed word, not the
+    /// raw `SampleSink` reading. The shader leans on that full range.
     let level: Float
     var diameter: CGFloat = 44
 
