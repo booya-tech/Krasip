@@ -66,7 +66,4 @@ struct RibbonOrb: View {
             return (level, swirl)
         }
     }
-
-    /// The brightest blue in the ribbons, reused by the level meter.
-    static let accent = Color(red: 0.776, green: 0.820, blue: 1.0)
 }
