@@ -613,13 +613,13 @@
         }
       }
     },
-    "Best with mixed Thai and English. Needs your own API key." : {
+    "Thai mixed with English. Needs the Krasip speech server running on this Mac." : {
       "extractionState" : "manual",
       "localizations" : {
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ดีที่สุดกับไทยปนอังกฤษ ต้องใช้ API key ของคุณเอง"
+            "value" : "ไทยปนอังกฤษ ต้องเปิดเซิร์ฟเวอร์เสียงของ Krasip บนเครื่องนี้ไว้"
           }
         }
       }
@@ -734,13 +734,13 @@
         }
       }
     },
-    "Choose how speech becomes text" : {
+    "Connect your speech server" : {
       "extractionState" : "manual",
       "localizations" : {
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "เลือกวิธีแปลงเสียงเป็นข้อความ"
+            "value" : "เชื่อมต่อเซิร์ฟเวอร์เสียงของคุณ"
           }
         }
       }
@@ -1216,7 +1216,7 @@
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "เครื่องถอดเสียง"
+            "value" : "ที่ใช้อยู่"
           }
         }
       }
@@ -2552,13 +2552,13 @@
         }
       }
     },
-    "OpenAI — cloud" : {
+    "Krasip — on this Mac" : {
       "extractionState" : "manual",
       "localizations" : {
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "OpenAI — คลาวด์"
+            "value" : "Krasip — บนเครื่องนี้"
           }
         }
       }
@@ -4018,13 +4018,13 @@
         }
       }
     },
-    "You can change this anytime in Settings → Languages, and compare engines in the Benchmark window." : {
+    "Krasip sends your recording to the speech server on this Mac. Start it before you dictate. You can change the address anytime in Settings → Languages." : {
       "extractionState" : "manual",
       "localizations" : {
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "เปลี่ยนได้ทุกเมื่อที่ การตั้งค่า → ภาษา และเทียบเครื่องถอดเสียงได้ในหน้าทดสอบ"
+            "value" : "Krasip ส่งเสียงที่อัดไปยังเซิร์ฟเวอร์เสียงบนเครื่องนี้ เปิดไว้ก่อนเริ่มพูด เปลี่ยนที่อยู่ได้ทุกเมื่อที่ การตั้งค่า → ภาษา"
           }
         }
       }

@@ -6,7 +6,7 @@ About 15 minutes. These are the checks that need a real microphone, real permiss
 
 - [ ] Build and run the **Krasip** scheme in Xcode (⌘R).
 - [ ] The setup guide opens. Allow the Microphone. Allow Accessibility (System Settings → Privacy & Security → Accessibility → turn on Krasip). The guide updates by itself.
-- [ ] Choose **Apple — on this Mac** and press **Download** for the Thai model (macOS 26), or allow Speech Recognition for **Apple — online**.
+- [ ] Start the speech server, then press **Test Connection** in the setup guide. It says "Connected".
 - [ ] A waveform icon is in the menu bar. Its menu says "Ready — hold ⌥Space to dictate".
 
 ## 1. The primary success case
@@ -91,7 +91,8 @@ For each app: click into a text field, hold ⌥ Space, say "เดี๋ยว p
 - [ ] Dictate once: the overlay, History, and the menu bar are all Thai.
 - [ ] Set it back to **Same as macOS** (or English) and restart again.
 
-## 12. Other engines (optional)
+## 12. Other endpoints (optional)
 
-- [ ] Settings → Languages → **OpenAI — cloud** → paste an API key → **Test Connection** shows "Connected". Dictate the primary sentence again and compare.
-- [ ] Local Whisper server: set the endpoint to your server (for example `http://localhost:8080/v1`) and model name; no key is needed.
+- [ ] Settings → Languages → change **Endpoint** to a cloud service and paste an API key → **Test Connection** shows "Connected". Dictate the primary sentence again and compare.
+- [ ] Set it back to `http://127.0.0.1:8085/v1` with model `thonburian-8bit` and an empty key.
+- [ ] The Apple engines are no longer in Settings. Compare them in the **Benchmark** window instead.

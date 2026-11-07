@@ -91,16 +91,19 @@ Stop it with **Ctrl+C**, which stops both halves.
 
 ---
 
-## Step 3. Point Krasip at it
+## Step 3. Check Krasip is pointed at it
 
-In Krasip, open **Settings** from the menu bar icon, then **Languages**.
+In Krasip, open **Settings** from the menu bar icon, then **Languages**. A fresh install already
+holds these values, so this is a check, not typing.
 
 | Field | Value |
 | --- | --- |
-| Engine | OpenAI |
+| Engine | Krasip — on this Mac |
 | Endpoint | `http://127.0.0.1:8085/v1` |
 | Model | `thonburian-8bit` |
 | API key | leave empty |
+
+Click **Test Connection**. It should say Connected.
 
 Krasip treats a `127.0.0.1` endpoint as a local server, so it does not ask for a key and no audio
 leaves your Mac.

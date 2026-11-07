@@ -42,40 +42,20 @@ struct LanguagesSettingsView: View {
                     .foregroundStyle(.secondary)
             }
 
-            Section(AppString.Languages.engineSection) {
-                Picker(AppString.Languages.engine, selection: $settings.engine) {
-                    ForEach(SpeechEngine.available) { engine in
-                        VStack(alignment: .leading) {
-                            Text(AppString.Languages.engineName(engine))
-                            Text(AppString.Languages.engineSummary(engine))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                        .tag(engine)
-                    }
+            Section {
+                LabeledContent(AppString.Languages.engine) {
+                    Text(AppString.Languages.engineName(settings.engine))
                 }
-                .pickerStyle(.radioGroup)
-
-                switch settings.engine {
-                case .appleOnDevice:
-                    OnDeviceModelRow()
-                case .appleOnline:
-                    PermissionRow(
-                        title: AppString.Permissions.speech,
-                        detail: AppString.Permissions.speechDetail,
-                        status: app.permissions.speechRecognition
-                    ) {
-                        Task { await app.permissions.requestSpeechRecognition() }
-                    }
-                case .openAI:
-                    OpenAISettingsSection()
-                }
+                OpenAISettingsSection()
+            } header: {
+                Text(AppString.Languages.engineSection)
+            } footer: {
+                Text(AppString.Languages.engineSummary(settings.engine))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
         }
         .formStyle(.grouped)
-        .task(id: settings.languages) {
-            await app.speechModel.refresh(for: Language.primary(of: settings.languages))
-        }
     }
 
     private var interfaceLanguage: Binding<InterfaceLanguage> {

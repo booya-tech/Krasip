@@ -19,6 +19,7 @@ struct OpenAISettingsSection: View {
             LabeledContent(AppString.Languages.apiKey) {
                 HStack {
                     SecureField(AppString.Languages.apiKeyPlaceholder, text: $apiKey)
+                        .labelsHidden()
                         .textFieldStyle(.roundedBorder)
                         .frame(maxWidth: 280)
                         .onSubmit(saveKey)
@@ -29,6 +30,7 @@ struct OpenAISettingsSection: View {
             LabeledContent(AppString.Languages.model) {
                 HStack {
                     TextField(AppString.Languages.model, text: $settings.openAIModel)
+                        .labelsHidden()
                         .textFieldStyle(.roundedBorder)
                         .frame(maxWidth: 220)
                     Menu {
@@ -44,6 +46,7 @@ struct OpenAISettingsSection: View {
             }
             LabeledContent(AppString.Languages.endpoint) {
                 TextField(AppString.Languages.endpoint, text: $settings.openAIBaseURL)
+                    .labelsHidden()
                     .textFieldStyle(.roundedBorder)
                     .frame(maxWidth: 320)
             }
