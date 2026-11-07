@@ -1,0 +1,55 @@
+Krasip License
+
+Copyright (c) 2026 Boo Pannachai. All rights reserved.
+
+This source code is published so that people can read it. It is not open source,
+and no licence to use it is granted.
+
+
+WHAT YOU MAY DO
+
+You may read this source code.
+
+You may view and fork this repository on GitHub. That right comes from GitHub's
+Terms of Service, which grant it to every user of a public repository, not from
+this licence.
+
+You may build and run the app on your own machine to evaluate it.
+
+
+WHAT YOU MAY NOT DO
+
+Without prior written permission from the copyright holder, you may not use,
+copy, modify, adapt, translate, merge, publish, distribute, sublicense, sell, or
+create derivative works from this source code or any part of it. This applies to
+commercial and non-commercial purposes alike.
+
+The name Krasip, the Krasip app icon, and the Krasip visual design are not
+licensed to you.
+
+
+MODELS, TRAINING CODE, AND DATA
+
+The speech and correction models that Krasip connects to are not in this
+repository and are not covered by this licence. Neither are their training code,
+their training data, or any model weights or adapters. Those are licensed
+separately, or not at all.
+
+Models made by other people, reached by name over the network, carry their own
+licences from their own authors. This licence says nothing about them.
+
+
+ASKING FOR PERMISSION
+
+Permission is given in writing or not at all. Write to
+booya.pannachai@gmail.com and say what you would like to do.
+
+
+NO WARRANTY
+
+THIS SOURCE CODE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN
+ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION
+WITH THIS SOURCE CODE OR ITS USE.

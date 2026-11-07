@@ -208,3 +208,5 @@ See [`docs/BENCHMARK_RESULTS.md`](docs/BENCHMARK_RESULTS.md) for how the speech 
 ## License
 
 All rights reserved. You may read this code. You may not use, copy, or distribute it. Ask me if you want to.
+
+See [`LICENSE`](LICENSE) for the exact terms, including what is and is not covered for the speech models.
