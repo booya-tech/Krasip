@@ -223,13 +223,13 @@ A fake microphone, a fixed transcript, and a fake inserter stand in for the real
 
 The History screen has a **Report a Miss…** button. It builds a GitHub issue that is already filled in, so nobody retypes Thai by hand and no report arrives without the strings that decide what went wrong. `MissReport` does that work as plain text, which is why it lives in `KrasipCore` with no AppKit anywhere near it.
 
-The kind of miss decides which repository the issue goes to. Four kinds blame the speech or correction model and go to `krasip-correction`. "Something else" means the words were fine but the app misbehaved, and goes to `Krasip` as a bug. These tests pin that split, because getting it wrong would quietly mix app bugs into the model worklist.
+The kind of miss decides which form the issue uses. Four kinds blame the speech or correction model and open `miss.yml`. "Something else" means the words were fine but the app misbehaved, and opens `bug.yml`. Both forms live in `krasip-correction`, which is private, because every report carries the reporter's own recorded speech and the `Krasip` repo is public. These tests pin that split, because getting it wrong would either mix app bugs into the model worklist or publish someone's voice.
 
 | Test | What it pins |
 | --- | --- |
 | `modelMissesGoToTheCorrectionRepo` | All four model kinds resolve to `krasip-correction`. |
-| `somethingElseGoesToTheAppRepo` | "Something else" resolves to `Krasip` with the `bug.yml` form. |
-| `theTwoRepositoriesAreDifferent` | The two destinations never collapse into one, and each names its own form. |
+| `somethingElseGoesToTheAppRepo` | "Something else" resolves to the `bug.yml` form. |
+| `theTwoFormsAreDifferentAndNeitherIsThePublicRepo` | The two destinations never collapse into one, each names its own form, and neither points at the public `Krasip` repo. |
 | `aModelMissNeedsTheWantedText` | Sending stays blocked until the user says what it should have said. Whitespace does not count as an answer. |
 | `somethingElseNeedsTheNoteAndIgnoresTheWantedText` | For an app bug the note is the required field instead, so a stale "wanted" value cannot unlock sending. |
 | `theBlockCarriesWhatTheBucketsNeed` | The pasted block holds what the engine returned, what the text rules made of it, what was typed, what was wanted, the app, the engine, and the app version. Sorting a miss needs all of them. |
@@ -237,12 +237,19 @@ The kind of miss decides which repository the issue goes to. Four kinds blame th
 | `numbersAreRoundedForReading` | Confidence as a percent, latency and audio length to a readable number of places. |
 | `theTimeIsStampedInTheUsersOwnZone` | The timestamp follows the reporter's clock, not UTC, so "it happened just before lunch" lines up. |
 | `fieldsNobodyMeasuredAreLeftOutRatherThanPrintedEmpty` | A record with no app, confidence, or latency prints neither the label nor an empty value. |
-| `aModelMissOpensTheCorrectionFormWithTheDropdownChosen` | The URL names the right repo and form, and pre-selects the dropdown with text that matches an option in `miss.yml` exactly. A mismatch there is silent: GitHub just ignores the pre-fill. |
-| `somethingElseOpensTheAppBugFormInstead` | The bug form gets the note and never the model dropdown. |
+| `aModelMissOpensTheCorrectionFormWithItsBucketAsLabels` | The URL names the right repo and form, and carries the bucket as labels. |
+| `theBucketIsNeverSentAsADropdownValue` | No `kind` parameter is ever sent. A URL cannot pre-select a dropdown in a GitHub issue form, measured on the real form with both the option text and its index. |
+| `everyModelMissCarriesTheMissLabelPlusItsOwnBucket` | Each model kind sends `miss` plus its own label, and "Something else" sends only `bug`. Every name must exist on the repo or GitHub drops it without a word. |
+| `somethingElseOpensTheAppBugFormInstead` | The bug form gets the note and never the model fields. |
 | `theFormIsNeverHandedAnEmptyFieldItWouldShowAsBlank` | "What did you say" is left out of the URL entirely. The app cannot know it, and pre-filling it empty would wipe the field's own placeholder. |
 | `thaiSurvivesTheRoundTripThroughTheURL` | Thai is percent-encoded going in and comes back unchanged. |
 | `aHugeDictationIsClippedSoTheBrowserStillOpensIt` | A 5000-character dictation is clipped with an ellipsis. Thai costs nine bytes a character once encoded, so an unclipped one builds a URL no browser will open. |
 | `theTitleStaysShortEnoughToRead` | A long dictation still yields a title under 80 characters. |
+| `theTitleNeverLeaksARawCaseName` | Titles read "Over-corrected" and "Discarded fix", never the Swift case name. A real issue once arrived titled `overCorrected:`. |
+| `thePlusInATimezoneOffsetSurvivesAFormReader` | The query holds no bare `+`. GitHub reads the query the way a form reader does, where `+` means a space, so `+0700` arrived as `0700` until the sign was escaped. |
+| `everyFieldSurvivesAFormReaderUnchanged` | Title, typed, wanted, and labels all come back byte for byte after that same form decoding. `URLComponents.queryItems` does not decode `+` as a space, which is why it never caught this. |
+| `theAppNameFillsItsOwnFieldNotJustTheHistoryBlock` | The form's "Which app were you in?" field is filled, not left reading `_No response_`. |
+| `noAppFieldIsSentWhenKrasipCouldNotTellWhichAppItWas` | With no known app, the field is left out so its own placeholder still shows. |
 | `aRecordFillsInEverythingTheUserShouldNotHaveToType` | Building from a `DictationRecord` carries every known field across, starts at "Not sure", and starts unsendable. |
 
 ### GlossaryJSONTests.swift — the spec's JSON shape

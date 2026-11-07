@@ -163,8 +163,15 @@ public struct MissReport: Equatable, Sendable {
             items.append(URLQueryItem(name: "typed", value: clipped(typedText)))
             items.append(URLQueryItem(name: "wanted", value: clipped(wantedText)))
         }
+        if let appName, !appName.isEmpty {
+            items.append(URLQueryItem(name: "app", value: clipped(appName)))
+        }
         items.append(URLQueryItem(name: "history", value: clipped(body)))
         components.queryItems = items
+        // A bare + in a query string means a space to whatever reads it, which ate the sign
+        // off a timezone offset and turned "+0700" into "0700".
+        components.percentEncodedQuery = components.percentEncodedQuery?
+            .replacingOccurrences(of: "+", with: "%2B")
         return components.url
     }
 
