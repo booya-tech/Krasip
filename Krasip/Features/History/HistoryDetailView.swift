@@ -44,12 +44,15 @@ struct HistoryDetailView: View {
                 Button(AppString.History.copy, systemImage: "doc.on.doc") {
                     app.inserter.copyToClipboard(record.finalText)
                 }
+                .help(AppString.History.copy)
                 Button(AppString.History.reportMiss, systemImage: "exclamationmark.bubble") {
                     isReporting = true
                 }
+                .help(AppString.History.reportTitle)
                 Button(AppString.History.delete, systemImage: "trash", role: .destructive) {
                     app.history.delete(record.id)
                 }
+                .help(AppString.History.delete)
             }
         }
         .onAppear(perform: load)
