@@ -138,7 +138,7 @@ What automated tests cannot reach: real microphone input, Accessibility permissi
 
 ## Speech engines
 
-Three adapters behind one `Transcriber` protocol: Apple on-device (current default), Apple online, and any OpenAI-compatible `/audio/transcriptions` endpoint. A `localhost` endpoint is treated as a local server and needs no API key.
+Three adapters behind one `Transcriber` protocol: Apple on-device, Apple online, and any OpenAI-compatible `/audio/transcriptions` endpoint. A `localhost` endpoint is treated as a local server and needs no API key. Settings offers only the endpoint adapter, named "Krasip — on this Mac" and defaulting to `http://127.0.0.1:8085/v1`; `SpeechEngine.isOffered` is the one place that decides, and the Apple two stay reachable from the Benchmark window.
 
 The daily-use setup is that local endpoint, served by the private `krasip-correction` repo (`scripts/start.sh`). Its relay sends the audio to whisper-server running Thonburian large-v3 8-bit, then corrects the text with Qwen3-4B (4-bit, MLX) plus a LoRA add-on, currently `run8`, then runs the guard and safety checks. Krasip sees only an OpenAI-compatible server. The relay prints `model: runN` on startup; check it, because starting from the wrong folder once ran an old model for days.
 

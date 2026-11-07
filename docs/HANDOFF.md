@@ -6,7 +6,7 @@ Krasip is a finished macOS app, built against every criterion in [`KRASIP_MVP_SP
 
 1. Clone the repo and open `Krasip.xcodeproj` in Xcode. There is nothing to configure first.
 2. Pick the **Krasip** scheme and **My Mac**, then press **⌘R**.
-3. The setup guide opens. Allow **Microphone** and **Accessibility**. On macOS 26 pick **Apple — on this Mac** and download the Thai model once. On macOS 14 or 15 that engine does not exist and the app uses **Apple — online** instead.
+3. The setup guide opens. Allow **Microphone** and **Accessibility**, then start the speech server and press **Test Connection**. Krasip points at `http://127.0.0.1:8085/v1` out of the box.
 4. Click into Notes, hold **⌥ Space**, say *"วันนี้จะต้องกลับบ้านไปทำ side project"*, let go. The text appears at your cursor, with **side-project** spelled that way by the text policy.
 5. Want the app itself in Thai? Settings → Languages → **Show Krasip in** → ไทย → **Restart Now**.
 
@@ -34,7 +34,7 @@ There is also a stronger local setup, Thonburian Whisper plus a correction model
 | macOS 14+, Swift 6, SwiftUI, no third-party dependencies | Done |
 | Global push-to-talk hotkey (⌥ Space, changeable), plus hands-free quick tap | Done |
 | Microphone capture with level meter, cancel, device-change recovery | Done |
-| Three speech engines behind one interface: Apple on-device, Apple online, any OpenAI-compatible endpoint (including a local Whisper server) | Done |
+| Three speech engines behind one interface: Apple on-device, Apple online, any OpenAI-compatible endpoint (including a local Whisper server). Settings offers the last one; the Apple two stay for the Benchmark window | Done |
 | Conservative text policy: Thai↔English spacing, punctuation choice, spoken clock times, nothing else | Done |
 | Personal glossary: exact normalized matching, locked and ask-me-first modes, sound-alike suggestions, learning from your corrections | Done |
 | Insertion at the cursor through Accessibility, ⌘V paste fallback, clipboard fallback, password fields refused | Done |

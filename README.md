@@ -27,9 +27,8 @@ Nothing to configure. Clone it and press ⌘R.
 
 1. Open `Krasip.xcodeproj` in Xcode.
 2. Choose the **Krasip** scheme and **My Mac**, then press **⌘R**.
-3. The setup guide opens. Allow the **Microphone** and **Accessibility**, and pick a speech engine.
-   On macOS 26 pick **Apple — on this Mac** and download the Thai model once; on macOS 14 or 15 the
-   default is **Apple — online**.
+3. The setup guide opens. Allow the **Microphone** and **Accessibility**, then start the speech
+   server (see [Speech engines](#speech-engines)) and press **Test Connection**.
 4. Click into any text field (Notes is a good first try), hold **⌥ Space**, speak, and let go.
 
 Krasip lives in the **menu bar** (a waveform icon). There is no Dock icon unless a Krasip window is open.
@@ -67,17 +66,17 @@ want, as in `./scripts/setup-local.sh 45C3927649`.
 
 ## Speech engines
 
-All three sit behind one small interface (`Transcriber`), so each can be swapped without touching anything else.
+Three adapters sit behind one small interface (`Transcriber`), so each can be swapped without touching anything else. Settings offers one of them.
 
 | Engine | Where audio goes | Setup | Notes |
 | --- | --- | --- | --- |
-| **Apple — on this Mac** (default on macOS 26+) | Stays on the Mac | Download the Thai model once (Settings → Languages) | Excellent for plain Thai. English words spoken with a Thai accent can come back Thai-spelled; the glossary fixes the ones you care about. |
-| **Apple — online** (default on macOS 14/15) | Apple | Allow Speech Recognition | Same trade-offs, needs internet. |
-| **OpenAI — cloud** | Your chosen endpoint | Paste an API key | Best at mixed Thai-English. Works with any OpenAI-compatible `/audio/transcriptions` endpoint (OpenAI, Groq, …), including a **local Whisper server** at `http://localhost…` (no key needed, audio stays on the Mac). |
+| **Krasip — on this Mac** (the only one Settings offers) | Your endpoint, `http://127.0.0.1:8085/v1` by default | Run the speech server, then **Test Connection** | Best at mixed Thai-English. Any OpenAI-compatible `/audio/transcriptions` endpoint works. A `127.0.0.1` or `localhost` address needs no key and keeps audio on the Mac. |
+| Apple on-device | Stays on the Mac | None | Still built in, still comparable in the **Benchmark** window, but Settings no longer offers it. Excellent for plain Thai, weaker on English spoken with a Thai accent. |
+| Apple online | Apple | Allow Speech Recognition | Same, over the network. Benchmark only. |
 
-The OpenAI adapter sends only the audio plus spelling hints from your glossary. The transcript itself is never sent anywhere.
+The adapter sends only the audio plus spelling hints from your glossary. The transcript itself is never sent anywhere.
 
-Run the **Benchmark** window with your own voice to pick the engine that works best for you (the spec's "select an ASR adapter after Thai-English benchmark testing").
+Run the **Benchmark** window with your own voice to compare all three (the spec's "select an ASR adapter after Thai-English benchmark testing").
 
 ---
 
